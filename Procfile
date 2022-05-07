@@ -1,0 +1,1 @@
+web: gunicorn mocktions.wsgi --log-file -
