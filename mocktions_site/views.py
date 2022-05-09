@@ -1,6 +1,6 @@
-from http.client import HTTPResponse
+from django.http import HttpResponse
 from django.shortcuts import render
 
 # Create your views here.
 def index(request):
-    return HTTPResponse("Hello, world!")
+    return HttpResponse("Working")
