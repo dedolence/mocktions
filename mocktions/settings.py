@@ -121,6 +121,47 @@ USE_I18N = True
 USE_TZ = True
 
 
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'Simple_Format': {
+            'format': '{levelname}: {message}',
+            'style': '{'
+        },
+        'verbose': {
+            'format': '({levelname}) Raised at {asctime} from {module}:\n"{message}"\nFull path: {pathname}\n',
+            'style': '{',
+        }
+    },
+
+    'handlers': {
+        'error_file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR + '/logs/errors.log',
+            'formatter': 'verbose',
+        },
+        'general_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR + '/logs/general.log',
+            'formatter': 'Simple_Format',
+        },
+    },
+
+    'filters': {},
+
+    'loggers': {
+        '': {
+            'handlers': ['general_file', 'error_file'],
+            'level': 'INFO',
+        }
+    },
+}
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
