@@ -141,13 +141,13 @@ LOGGING = {
         'error_file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR + '/logs/errors.log',
+            'filename': '/logs/errors.log',
             'formatter': 'verbose',
         },
         'general_file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': BASE_DIR + '/logs/general.log',
+            'filename': '/logs/general.log',
             'formatter': 'Simple_Format',
         },
     },
