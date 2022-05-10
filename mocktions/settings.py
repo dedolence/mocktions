@@ -137,7 +137,7 @@ LOGGING = {
         }
     },
 
-    'handlers': {
+    'handlers': {""" 
         'error_file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
@@ -149,7 +149,7 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': '/logs/general.log',
             'formatter': 'Simple_Format',
-        },
+        }, """
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
