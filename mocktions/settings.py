@@ -148,10 +148,6 @@ LOGGING = {
     'filters': {},
 
     'loggers': {
-        '': {
-            'handlers': ['general_file', 'error_file'],
-            'level': 'INFO',
-        },
         'heroku_stream': {
             'handlers': ['console'],
             'level': 'INFO',
