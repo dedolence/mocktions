@@ -150,6 +150,11 @@ LOGGING = {
             'filename': '/logs/general.log',
             'formatter': 'Simple_Format',
         },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
     },
 
     'filters': {},
@@ -157,6 +162,10 @@ LOGGING = {
     'loggers': {
         '': {
             'handlers': ['general_file', 'error_file'],
+            'level': 'INFO',
+        },
+        'heroku_stream': {
+            'handlers': ['console'],
             'level': 'INFO',
         }
     },
@@ -177,4 +186,4 @@ STATICFILES_DIR = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Activate Django-Heroku
-django_heroku.settings(locals())
+django_heroku.settings(locals(), logging=False)

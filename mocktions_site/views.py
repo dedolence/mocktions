@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 # set up logger
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('heroku_stream')
 
 
 def index(request):
