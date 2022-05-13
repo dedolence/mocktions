@@ -169,7 +169,6 @@ STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATICFILES_DIR = [
     os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'mocktions_site/static'),
 ]
 
 # Default primary key field type
