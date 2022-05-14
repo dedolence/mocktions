@@ -30,12 +30,14 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1', 'mocktions.herokuapp.com']
 
 # Sentry setup
 sentry_sdk.init(
+    # remove this for production
+    #dsn='https://323a1597f3134297b9051cfc882dae88:bb813f44456e4e4a811d9442abdd1f1b@o1239642.ingest.sentry.io/6391230',
     dsn=os.environ['SENTRY_DSN'],
     integrations=[DjangoIntegration()]
 )
