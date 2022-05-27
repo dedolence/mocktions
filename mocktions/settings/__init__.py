@@ -1,8 +1,8 @@
 import os
 from .base import *
 
-# evaluate as strings to avoid eval()
-if os.environ['PRODUCTION'] == "False":
-    from .dev import *
-else:
+try:
+    os.environ.get('ENVIRONMENT')
     from .prod import *
+except KeyError:
+    from .dev import *

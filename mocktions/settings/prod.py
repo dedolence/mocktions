@@ -1,6 +1,8 @@
 import os
 import sentry_sdk
+import dj_database_url
 from sentry_sdk.integrations.django import DjangoIntegration
+
 
 DEBUG = False
 ALLOWED_HOSTS = ['mocktions.herokuapp.com']
@@ -13,3 +15,15 @@ sentry_sdk.init(
     dsn=SENTRY_DSN,
     integrations=[DjangoIntegration()]
 )
+
+
+# Database
+# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
+DATABASE_URL = os.environ['DATABASE_URL']
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    }
+}
+db_from_env = dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(db_from_env)
