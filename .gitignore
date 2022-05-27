@@ -18,4 +18,4 @@ venv.bak/
 
 */testing/
 
-./mocktions/settings/dev.py
+mocktions/settings/dev.py
