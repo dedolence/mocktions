@@ -7,5 +7,5 @@ logger = logging.getLogger('heroku_stream')
 
 
 def index(request):
-    logger.info("First time log set up!")
+    #logger.info("First time log set up!")
     return render(request, 'mocktions_site/index.html', {})
