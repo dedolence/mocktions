@@ -11,47 +11,17 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 import dj_database_url
-import django_heroku
-import environ
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = ''
+SECRET_KEY = os.environ['SECRET_KEY']
+DATABASE_URL = os.environ['DATABASE_URL']
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-
-# either get environment variables from config vars or .env file
-try:
-    SENTRY_DSN = os.environ['SENTRY_DSN']
-    SECRET_KEY = os.environ['SECRET_KEY']
-    DATABASE_URL = os.environ['DATABASE_URL']
-except KeyError:
-    env = environ.Env()
-    environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-    SENTRY_DSN = env('SENTRY_DSN')
-    SECRET_KEY = env('SECRET_KEY')
-    DATABASE_URL = env('DATABASE_URL')
-
-# Sentry setup
-sentry_sdk.init(
-    # remove this for production
-    #dsn='https://323a1597f3134297b9051cfc882dae88:bb813f44456e4e4a811d9442abdd1f1b@o1239642.ingest.sentry.io/6391230',
-    dsn=SENTRY_DSN,
-    integrations=[DjangoIntegration()]
-)
-
 # Application definition
-
 INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.admin',

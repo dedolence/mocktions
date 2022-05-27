@@ -1,6 +1,8 @@
 import os
 from .base import *
-if not os.environ['PRODUCTION']:
+
+# evaluate as strings to avoid eval()
+if os.environ['PRODUCTION'] == "False":
     from .dev import *
 else:
     from .prod import *
