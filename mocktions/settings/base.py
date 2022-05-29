@@ -139,11 +139,16 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # django appends this to URLs for assets
 STATIC_URL = 'static/'
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 # Additional locations to find  static files
 # Tried:
-# [ BASE_DIR ], [ os.path.join(BASE_DIR, 'static')], ['static']
-STATICFILES_DIR = [(BASE_DIR / "static")]
+# > [ BASE_DIR ], [ os.path.join(BASE_DIR, 'static')], ['static'], (BASE_DIR / "static")
+#   according to the docs, BASE_DIR / "static" SHOULD WORK!!!!!
+# > switching from whitenoise to default django storage
+STATICFILES_DIR = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
