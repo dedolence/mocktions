@@ -141,7 +141,7 @@ STATIC_URL = 'static/'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Additional locations to find  static files
-STATICFILES_DIR = [ os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIR = [BASE_DIR]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
