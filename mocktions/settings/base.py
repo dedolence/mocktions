@@ -126,14 +126,14 @@ LOGGING = {
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'project_static')
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Additional locations to find  static files
 STATICFILES_DIR = [
     os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'project_static/'),
-    os.path.join(BASE_DIR, 'mocktions_site/static/')
+    os.path.join(BASE_DIR, 'project_static'),
+    os.path.join(BASE_DIR, 'mocktions_site/static')
 ]
 
 # Default primary key field type
