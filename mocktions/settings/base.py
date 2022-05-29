@@ -138,20 +138,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # django appends this to URLs for assets
 STATIC_URL = 'static/'
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-#STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-# Additional locations to find  static files
-# Tried:
-# > [ BASE_DIR ], [ os.path.join(BASE_DIR, 'static')], ['static'], (BASE_DIR / "static")
-#   >> according to the docs, BASE_DIR / "static" SHOULD WORK!!!!!
-# > switching from whitenoise to default django storage (no manifest entry error but still not finding them)
-#
-# Conclusions:
-# - the main problem is that collectstatic is only finding static files when they are included within an app subdirectory
-# - despite the docs saying that project-wide static locations are possible by adding their path to STATICFILES_DIR,
-#   in practice, this hasn't worked. Proof: running findstatic shows clearly that django is ONLY searching the admin
-#   directory; i.e., it is not even bothering to search anywhere else, including the STATICFILES_DIR.
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
