@@ -126,8 +126,14 @@ LOGGING = {
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
+WHITENOISE_USE_FINDERS = False
+
+# Directory where static files should be collected into
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# django appends this to URLs for assets
+STATIC_URL = 'static/'
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Additional locations to find  static files
 STATICFILES_DIR = [
