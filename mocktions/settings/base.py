@@ -130,10 +130,10 @@ LOGGING = {
 # Set this explicitly because default is settings.DEBUG, which doesn't exist
 WHITENOISE_USE_FINDERS = False
 
-# Directory where static files should be collected into.
-# this should live outside the server; django should collect them there
+# Django collects static files and then outputs them to this location.
+# It should live outside the server; Django should collect them there
 # and then the server should load them directly from there, not involving
-# django at all.
+# Django at all.
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # django appends this to URLs for assets
@@ -141,7 +141,9 @@ STATIC_URL = 'static/'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Additional locations to find  static files
-STATICFILES_DIR = []
+STATICFILES_DIR = [
+    BASE_DIR / 'static',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
