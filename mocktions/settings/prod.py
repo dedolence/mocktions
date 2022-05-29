@@ -5,7 +5,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 
 SECRET_KEY = os.environ['SECRET_KEY']
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['mocktions.herokuapp.com']
 
 # Sentry setup
