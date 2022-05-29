@@ -126,6 +126,8 @@ LOGGING = {
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
+
+# Set this explicitly because default is settings.DEBUG, which doesn't exist
 WHITENOISE_USE_FINDERS = False
 
 # Directory where static files should be collected into
@@ -136,10 +138,7 @@ STATIC_URL = 'static/'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Additional locations to find  static files
-STATICFILES_DIR = [
-    os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'mocktions_site/static')
-]
+STATICFILES_DIR = []
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
