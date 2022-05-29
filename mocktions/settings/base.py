@@ -129,6 +129,7 @@ LOGGING = {
 STATIC_ROOT = os.path.join(BASE_DIR, 'project_static')
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Additional locations to find  static files
 STATICFILES_DIR = [
     os.path.join(BASE_DIR, 'static'),
     os.path.join(BASE_DIR, 'project_static')
