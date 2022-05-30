@@ -13,7 +13,7 @@ CSRF_COOKIE_SECURE = True
 
 # Application definition
 INSTALLED_APPS = [
-    'whitenoise.runserver_nostatic',
+    #'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -22,11 +22,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'mocktions_site',
     'accounts',
+    'storages',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -125,28 +126,30 @@ LOGGING = {
 }
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
+# S3 settings
+AWS_ACCESS_KEY_ID = 'AKIA3H3PWI2OFZHG4OHC'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'mocktions-static'
+AWS_REGION = 'us-east-1'
+AWS_S3_CUSTOM_DOMAIN = 'https://{bucket}.s3.{region}.amazonaws.com'.format(
+    bucket=AWS_STORAGE_BUCKET_NAME, region=AWS_REGION)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age:86400',
+}
+AWS_LOCATION = 'static'
 
-# Set this explicitly because default is settings.DEBUG, which doesn't exist
-WHITENOISE_USE_FINDERS = False
-
-# Django collects static files and then outputs them to this location.
-# It should live outside the server; Django should collect them there
-# and then the server should load them directly from there, not involving
-# Django at all.
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# django appends this to URLs for assets
-STATIC_URL = 'static/'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Django settings
+STATIC_URL = '{domain}/{location}/'.format(
+    domain=AWS_S3_CUSTOM_DOMAIN,
+    location=AWS_LOCATION
+)
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-#TEST EDIT
