@@ -16,4 +16,8 @@ from .base import *
     from .prod import *
 except KeyError:
     from .dev import * """
-from .prod import *
+
+try:
+    from .dev import *
+except ModuleNotFoundError:
+    from .prod import *
