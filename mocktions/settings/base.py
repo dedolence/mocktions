@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'mocktions_site',
     'accounts',
+    'images',
     'storages',
 ]
 
@@ -42,8 +43,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            BASE_DIR, 
-            'mocktions_site/html',
+            BASE_DIR,
             ],
         'APP_DIRS': True,
         'OPTIONS': {
