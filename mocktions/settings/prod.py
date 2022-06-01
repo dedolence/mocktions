@@ -2,6 +2,7 @@ import os
 import sentry_sdk
 import dj_database_url
 from sentry_sdk.integrations.django import DjangoIntegration
+from settings import BASE_DIR
 
 
 SECRET_KEY = os.environ['SECRET_KEY']
@@ -28,3 +29,27 @@ DATABASES = {
 }
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
+
+
+# Static files (CSS, JavaScript, Images)
+# S3 settings
+AWS_ACCESS_KEY_ID = 'AKIA3H3PWI2OFZHG4OHC'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'mocktions-static'
+AWS_REGION = 'us-east-1'
+AWS_S3_CUSTOM_DOMAIN = 'https://{bucket}.s3.{region}.amazonaws.com'.format(
+    bucket=AWS_STORAGE_BUCKET_NAME, region=AWS_REGION)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age:86400',
+}
+AWS_LOCATION = 'static'
+
+# Django settings
+STATIC_URL = '{domain}/{location}/'.format(
+    domain=AWS_S3_CUSTOM_DOMAIN,
+    location=AWS_LOCATION
+)
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
