@@ -11,8 +11,9 @@ from .base import *
     for security's sake dev.py still checks to see if the variable is declared as "DEPLOYMENT."
     That being said, later I would like to switch it around so it defaults to production.
 """
-try:
+""" try:
     os.environ.get('ENVIRONMENT')
     from .prod import *
 except KeyError:
-    from .dev import *
+    from .dev import * """
+from .prod import *
