@@ -37,7 +37,7 @@ AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 AWS_STORAGE_BUCKET_NAME = 'mocktions-static'
 AWS_REGION = 'us-east-1'
-AWS_S3_CUSTOM_DOMAIN = 'https://{bucket}.s3.{region}.amazonaws.com'.format(
+AWS_S3_CUSTOM_DOMAIN = '{bucket}.s3.{region}.amazonaws.com'.format(
     bucket=AWS_STORAGE_BUCKET_NAME, region=AWS_REGION)
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age:86400',
