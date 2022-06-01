@@ -2,7 +2,7 @@ import os
 import sentry_sdk
 import dj_database_url
 from sentry_sdk.integrations.django import DjangoIntegration
-from settings import BASE_DIR
+from .base import BASE_DIR
 
 
 SECRET_KEY = os.environ['SECRET_KEY']
