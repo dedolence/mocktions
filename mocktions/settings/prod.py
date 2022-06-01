@@ -33,8 +33,8 @@ DATABASES['default'].update(db_from_env)
 
 # Static files (CSS, JavaScript, Images)
 # S3 settings
-AWS_ACCESS_KEY_ID = 'AKIA3H3PWI2OFZHG4OHC'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 AWS_STORAGE_BUCKET_NAME = 'mocktions-static'
 AWS_REGION = 'us-east-1'
 AWS_S3_CUSTOM_DOMAIN = 'https://{bucket}.s3.{region}.amazonaws.com'.format(
