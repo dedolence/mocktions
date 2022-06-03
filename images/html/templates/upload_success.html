@@ -1,0 +1,12 @@
+{% extends 'html/templates/base.html' %}
+{% load static %}
+{% block body %}
+    <h1>Upload success</h1>
+
+    <p>File name: {{ file_name }}</p>
+    <p>File type: {{ file_type }}</p>
+    <p>File size: {{ file_size }}</p>
+    <img src="{{ image_url }}"/>
+
+    <a href="{% url 'index' %}" class="btn btn-primary my-3">Back</a>
+{% endblock body %}
