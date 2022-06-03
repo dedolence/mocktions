@@ -3,8 +3,11 @@ from django.http import JsonResponse
 import os, json, boto3
 from django.shortcuts import render
 from .forms import UploadImageForm
-from mocktions.settings.dev import STATIC_URL
 
+try:
+    from mocktions.settings.dev import STATIC_URL
+except KeyError:
+    from mocktions.settings.prod import STATIC_URL
 
 def index(request):
     form = UploadImageForm()
