@@ -3,11 +3,7 @@ from django.http import JsonResponse
 import os, json, boto3
 from django.shortcuts import render
 from .forms import UploadImageForm
-
-try:
-    from mocktions.settings.dev import STATIC_URL
-except KeyError:
-    from mocktions.settings.prod import STATIC_URL
+from mocktions.settings.base import STATIC_URL
 
 def index(request):
     form = UploadImageForm()
@@ -24,7 +20,7 @@ def sign_s3(request):
     S3_BUCKET = os.environ['AWS_BUCKET_NAME']
     file_name = request.POST.get('file_name', 'untitled')
     file_type = request.POST.get('file_type', 'image/jpeg')
-    url = f"https://{STATIC_URL}/images/{file_name}"
+    url = f"https://{os.environ['AWS_IMAGE_DIR']}/{file_name}"
 
     s3 = boto3.client('s3')
 

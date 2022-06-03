@@ -130,3 +130,26 @@ LOGGING = {
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Static files (CSS, JavaScript, Images)
+# S3 settings
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+AWS_STORAGE_BUCKET_NAME = os.environ['AWS_BUCKET_NAME']
+AWS_REGION = os.environ['AWS_REGION']
+AWS_S3_CUSTOM_DOMAIN = '{bucket}.s3.{region}.amazonaws.com'.format(
+    bucket=AWS_STORAGE_BUCKET_NAME, region=AWS_REGION)
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age:86400',
+}
+AWS_LOCATION = 'static'
+
+# Django settings
+STATIC_URL = '{domain}/{location}/'.format(
+    domain=AWS_S3_CUSTOM_DOMAIN,
+    location=AWS_LOCATION
+)
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
