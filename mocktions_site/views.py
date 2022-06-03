@@ -2,7 +2,7 @@ import logging
 from django.shortcuts import render
 
 # set up logger
-logger = logging.getLogger('heroku_stream')
+#logger = logging.getLogger('heroku_stream')
 
 
 def index(request):
