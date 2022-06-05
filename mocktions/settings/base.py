@@ -5,8 +5,14 @@
 import os
 from pathlib import Path
 
-DEBUG = os.environ['DEBUG']
-SECRET_KEY = os.environ['SECRET_KEY']
+try:
+    DEBUG = os.environ['DEBUG']
+    SECRET_KEY = os.environ['SECRET_KEY']
+except KeyError:
+    from dotenv import load_dotenv
+    load_dotenv()
+    DEBUG = os.environ['DEBUG']
+    SECRET_KEY = os.environ['SECRET_KEY']
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent

@@ -47,26 +47,27 @@
                     throw Error(response.statusText);
                 }
             }).then((json) => {
-                uploadFile(file, json.data, json.url);
+                uploadFile(file, json.data, json.image_url);
             })
         }
 
 
-        function uploadFile(file, data, url) {
+        function uploadFile(file, data, image_url) {
             const post_data = new FormData();
-            for (key in data) {
+
+            for (key in data.fields) {
                 post_data.append(key, data.fields[key]);
             }
             post_data.append('file', file);
 
-            fetch(url, {
+            fetch(data.url, {
                 method: "POST",
                 body: post_data,
             }).then((res) => {
                 const image_preview = $('image_preview');
-                    image_preview.src = url;
+                    image_preview.src = image_url;
                 const image_url_input = $('id_image_url');
-                    image_url_input.value = url;
+                    image_url_input.value = image_url;
             })
         }
 
