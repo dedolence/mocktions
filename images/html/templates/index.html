@@ -1,0 +1,76 @@
+{% extends 'html/templates/base.html' %}
+{% load static %}
+{% block body %}
+    <h1>Image upload</h1>
+
+    <p id="status">Select a file to upload.</p>
+
+    <form method="POST" action="{% url 'images:post_image' %}" class="form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <img src="{% static 'images/user_avatar.png' %}" class="my-4 w-25" id="image_preview"/>
+        <span class="my-4" id="status"></span>
+        <input type="submit" value="Upload" class="form-control"/>
+    </form>
+
+    <script>
+
+        (function() {
+            let file_input_element = $('id_image');
+            file_input_element.onchange = function() {
+                let files = file_input_element.files;
+                let file = files[0]
+                if (!file) {
+                    return false;
+                }
+                getSignedRequest(file);
+            }
+        })();
+
+
+        function getSignedRequest(file) {
+            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const post_data = new FormData();
+                post_data.append('file_name', file.name);
+                post_data.append('file_type', file.type);
+            const url = '{% url 'images:sign_s3' %}';
+
+            fetch(url, {
+                method: "POST",
+                body: post_data,
+                headers: {'X-CSRFToken': csrf_token}
+            }).then((response) => {
+                if (response.status >= 200 && response.status <= 299) {
+                    return response.json();
+                }
+                else {
+                    throw Error(response.statusText);
+                }
+            }).then((json) => {
+                uploadFile(file, json.data, json.image_url);
+            })
+        }
+
+
+        function uploadFile(file, data, image_url) {
+            const post_data = new FormData();
+
+            for (key in data.fields) {
+                post_data.append(key, data.fields[key]);
+            }
+            post_data.append('file', file);
+
+            fetch(data.url, {
+                method: "POST",
+                body: post_data,
+            }).then((res) => {
+                const image_preview = $('image_preview');
+                    image_preview.src = image_url;
+                const image_url_input = $('id_image_url');
+                    image_url_input.value = image_url;
+            })
+        }
+
+    </script>
+    
+{% endblock body %}

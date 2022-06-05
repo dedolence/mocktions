@@ -3,4 +3,6 @@
 {% block body %}
     <h1>Static files finally configured?</h1>
     <img src="{% static 'images/user_avatar.png' %}" class="img img-thumbnail" style="width: 50px;">
+
+    <a href="{% url 'images:index' %}" class="btn btn-primary">Go to Images</a>
 {% endblock body %}
