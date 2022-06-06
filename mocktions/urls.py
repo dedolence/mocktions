@@ -19,5 +19,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('mocktions_site.urls', namespace='site')),
+    path('accounts/', include('accounts.urls', namespace='accounts')),
     path('images/', include('images.urls', namespace='images')),
 ]
