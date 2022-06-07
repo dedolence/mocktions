@@ -1,3 +1,6 @@
 from django.test import TestCase
+from .models import User
+from .forms import UserCreationForm
 
-# Create your tests here.
+class RegistrationFormTests(TestCase):
+    pass

@@ -4,7 +4,7 @@
     {% url 'account:register' as form_url %}
 {% endif %}
 
-<form action="{{ form_url }}" method="POST" class="container my-5 p-0" enctype="multipart/form-data" >
+<form action="{{ form_url }}" method="POST" class="container my-5 p-0" enctype="multipart/form-data" autocomplete="off">
     {% csrf_token %}
     <div class="col-md-8">
         <div class="container-fluid">
@@ -40,12 +40,9 @@
                                 Add a profile picture
                             </div>
                             <div class="col-md-8">
-                                <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addImageModal" type="button">
-                                    <i class="bi bi-card-image"></i> Add image
-                                </button>
+                                {% include 'images/html/includes/image_upload.html' with multiple=False %}
                             </div>
                         </div>
-                        {% comment %} {% include 'auctions/includes/uploadImage.html' %} {% endcomment %}
                     {% endif %}
                     {% if forloop.counter0 == 6 %}
                         <div class="row">
@@ -67,12 +64,9 @@
                                 Add a profile picture
                             </div>
                             <div class="col-md-8">
-                                <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addImageModal" type="button">
-                                    <i class="bi bi-card-image"></i> Add image
-                                </button>
+                                {% include 'auctions/includes/image_upload.html' with multiple=False %}
                             </div>
                         </div>
-                        {% include 'auctions/includes/uploadImage.html' %}
                     {% endif %}
                     {% if forloop.counter0 == 3 %}
                         <div class="row">

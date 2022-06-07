@@ -11,11 +11,11 @@ media
 
 notes.txt
 
-venv/
-.env
-venv.bak/
+#venv/
+#.env
+#venv.bak/
 
 staticfiles/
 */testing/
-mocktions/settings/dev.py
+#mocktions/settings/dev.py
 stock_images/

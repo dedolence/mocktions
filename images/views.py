@@ -19,6 +19,9 @@ def post_image(request):
 
 
 def sign_s3(request):
+    """
+        Generates a pre-signed post object that allows uploading an image to S3 bucket.
+    """
     AWS_BUCKET = os.environ['AWS_BUCKET_NAME']
     AWS_REGION = os.environ['AWS_REGION']
     file = request.POST.get('file_name', 'untitled')
