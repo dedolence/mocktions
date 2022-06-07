@@ -12,7 +12,7 @@ media
 notes.txt
 
 #venv/
-#.env
+.env
 #venv.bak/
 
 staticfiles/
