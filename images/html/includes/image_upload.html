@@ -1,0 +1,164 @@
+{% comment %}
+    - Can be inserted into other templates.
+    - Takes one context variable:
+        - multiple: boolean; true if multiple uploads allowed
+    - Allows upload of image from user's device, a URL, or the
+    retrieval of a random image from a 3rd-party API (Picsum).
+    - Stores URLs of uploaded images in a list. These will be 
+    included in POST data if this include is nested inside a form
+    element.
+{% endcomment %}
+
+<button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#id_add_image_modal" type="button">
+    <i class="bi bi-card-image"></i> Add image
+</button>
+
+<div id="id_add_image_modal" class="modal fade" tabindex="-1" aria-labelledby="id_add_image_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-center">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="id_add_image_modal_label">Add an image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container my-3">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item mb-3 pb-4">
+                            <p class="lead">Click "Save" to generate a random image.</p>
+                        </li>
+                        <li class="list-group-item mb-3 pb-4">
+                            <label class="lead mb-3" for="id_upload_image">Or, upload an image from your computer.</label>
+                            <input type="file" id="id_upload_image" name="upload_image" class="form-control" accept="image/*" {% if multiple %}multiple{% endif %}>
+                        </li>
+                        <li class="list-group-item mb-3 pb-4">
+                            <label class="lead mb-3" for="id_url_image">Or, add an image from the internet.</label>
+                            <input type="url" id="id_url_image" name="url_image" class="form-control" placeholder="URL of image">
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="reset" class="btn btn-outline-secondary">Clear form</button>
+                <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="id_upload_save_button">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<select class="d-none" name="image_urls" id="id_image_urls"></select>
+
+<div id="id_image_thumbnails" class="d-flex flex-row py-3"></div>
+
+<div id="id_loading_image_modal" class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="id_loading_image_modal_label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-center">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3 id="id_loading_image_modal_label">Loading image...</h3>
+                <p>This can take a little while sometimes.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    (function() {
+        $('id_upload_save_button').addEventListener('click', () => {
+            // determine source of file then initiate upload to S3 bucket
+            let files = $('id_upload_image').files;
+            const file = files[0];
+            const url = $('id_url_image').value;
+            const loading_modal = new bootstrap.Modal($('id_loading_image_modal'));
+                  
+            loading_modal.show();
+            
+            if (file === undefined) {
+                files = []
+                let request = getFile(url);
+                request.then(file => {
+                    files.push(file);
+                    console.log(files);
+                })
+            }
+            
+            /*
+            requests = []
+            for (const f of files) {
+                const request = getSignedRequest(f);
+                request.then(url => {
+                    addImageToPage(url);
+                })
+                requests.push(request);
+            }
+            */
+            requests = [Promise.resolve()]
+            Promise.all(requests).then(() => {
+                loading_modal.hide();
+            });
+        })
+    })();
+
+
+    function addImageToPage(url) {
+        const image_element = document.createElement('img');
+              image_element.classList.add('img-thumbnail');
+              image_element.alt = "A user-uploaded image";
+              image_element.src = url;
+
+        $('id_image_thumbnails').appendChild(image_element);
+    }
+
+    
+    async function getFile(url) {
+        let request = await fetch(url)
+        const reader = request.body.getReader();
+        
+        //let new_url = getSignedRequest(request.body);
+        //return new_url;
+    }
+
+    function getSignedRequest(file) {
+        return new Promise((res, rej) => {
+            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const post_data = new FormData();
+                post_data.append('file_name', file.name);
+                post_data.append('file_type', file.type);
+            const url = '{% url 'images:sign_s3' %}';
+    
+            fetch(url, {
+                method: "POST",
+                body: post_data,
+                headers: {'X-CSRFToken': csrf_token}
+            }).then((response) => {
+                if (response.status >= 200 && response.status <= 299) {
+                    return response.json();
+                }
+                else {
+                    throw Error(response.statusText);
+                }
+            }).then((json) => {
+                res(uploadFile(file, json.data, json.image_url));
+            })
+        })
+    }
+
+
+    function uploadFile(file, data, image_url) {
+        return new Promise((res, rej) => {
+            const post_data = new FormData();
+            for (key in data.fields) {
+                post_data.append(key, data.fields[key]);
+            }
+            post_data.append('file', file);
+    
+            fetch(data.url, {
+                method: "POST",
+                body: post_data,
+            }).then(() => {
+                res(image_url);
+            })
+        })
+    }
+
+</script>
