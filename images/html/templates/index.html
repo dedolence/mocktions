@@ -5,7 +5,7 @@
 
     <form method="POST" action="{% url 'images:post_image' %}" class="form" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="my-5">{% include 'images/html/includes/image_upload.html' %}</div>
+        <div class="my-5">{% include 'images/html/includes/image_upload.html' with multiple="multiple" %}</div>
     </form>
 
 {% endblock body %}

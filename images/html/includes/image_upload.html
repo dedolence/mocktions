@@ -1,3 +1,4 @@
+{% load static %}
 {% comment %}
     - Can be inserted into other templates.
     - Takes one context variable:
@@ -13,6 +14,17 @@
     <i class="bi bi-card-image"></i> Add image
 </button>
 
+<div class="alert alert-warning alert-dismissible fade hide my-2" id="id_image_errors" role="alert">
+    <h4 class="alert-heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-triangle-fill flex-shrink-0 me-2" viewBox="0 0 16 16" role="img" aria-label="Warning:">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </svg>
+        There was an error uploading your image.
+    </h4>
+    <p>Try uploading an image from your computer, using the random image feature, or a different URL.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
 <div id="id_add_image_modal" class="modal fade" tabindex="-1" aria-labelledby="id_add_image_modal_label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-center">
         <div class="modal-content">
@@ -24,7 +36,9 @@
                 <div class="container my-3">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item mb-3 pb-4">
-                            <p class="lead">Click "Save" to generate a random image.</p>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="triggerUploads()">
+                                Click here to generatea random image
+                            </button>
                         </li>
                         <li class="list-group-item mb-3 pb-4">
                             <label class="lead mb-3" for="id_upload_image">Or, upload an image from your computer.</label>
@@ -38,9 +52,11 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <input type="hidden" name="sign_s3_url" value="{% url 'images:sign_s3' %}"/>
+                <input type="hidden" name="get_image_html" value="{% url 'images:get_image_html' %}"/>
                 <button type="reset" class="btn btn-outline-secondary">Clear form</button>
                 <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="id_upload_save_button">Save</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="triggerUploads()">Save</button>
             </div>
         </div>
     </div>
@@ -61,70 +77,113 @@
     </div>
 </div>
 
+{% comment %} <script src="{% static 'js/images.js' %}"></script> {% endcomment %}
 <script>
-
-    (function() {
-        $('id_upload_save_button').addEventListener('click', () => {
-            // determine source of file then initiate upload to S3 bucket
-            let files = $('id_upload_image').files;
-            const file = files[0];
-            const url = $('id_url_image').value;
-            const loading_modal = new bootstrap.Modal($('id_loading_image_modal'));
-                  
-            loading_modal.show();
-            
-            if (file === undefined) {
-                files = []
-                let request = getFile(url);
-                request.then(file => {
-                    files.push(file);
-                    console.log(files);
-                })
-            }
-            
-            /*
-            requests = []
-            for (const f of files) {
-                const request = getSignedRequest(f);
-                request.then(url => {
-                    addImageToPage(url);
-                })
-                requests.push(request);
-            }
-            */
-            requests = [Promise.resolve()]
-            Promise.all(requests).then(() => {
-                loading_modal.hide();
-            });
-        })
-    })();
-
-
-    function addImageToPage(url) {
-        const image_element = document.createElement('img');
-              image_element.classList.add('img-thumbnail');
-              image_element.alt = "A user-uploaded image";
-              image_element.src = url;
-
-        $('id_image_thumbnails').appendChild(image_element);
-    }
-
-    
-    async function getFile(url) {
-        let request = await fetch(url)
-        const reader = request.body.getReader();
+    async function triggerUploads(e) {
+        // determine source of file then initiate upload to S3 bucket
+        const files = Array.from($('id_upload_image').files);
+        const file = files[0];
+        const url = $('id_url_image').value;
+        const loading_modal = new bootstrap.Modal($('id_loading_image_modal'));
+                
+        loading_modal.show();
         
-        //let new_url = getSignedRequest(request.body);
-        //return new_url;
-    }
+        const retrieveFiles = await new Promise((res, rej) => {
+            if (file === undefined) {
+                // no files provided to upload, so halt operation 
+                // to retrieve file from a 3rd party website.
+                getFile(url)
+                .then(file => {
+                    files.push(file);
+                })
+                .then(() => {
+                    res();
+                })
+                .catch((e) => {
+                    console.log(e);
+                    loading_modal.hide();
+                    $('id_image_errors').classList.remove('hide');
+                    $('id_image_errors').classList.add('show');
+                })
+            } else {
+                res();
+            }
+        })
+    
+        const url_requests = [];
+        for (const f of files) {
+            url_requests.push(getSignedUrlRequest(f));
+        }
+        
+        const html_requests = [];
+        Promise.all(url_requests).then((image_urls) => {
+            for (const image_url of image_urls) {
+                html_requests.push(getImageHtml(image_url));
+            }
+        });
 
-    function getSignedRequest(file) {
+        Promise.all(html_requests).then((image_htmls) => {
+            console.log("Image htmls to be added: ", image_htmls);
+            const img_thumbnails = $('id_image_thumbnails');
+            const container_html = img_thumbnails.innerHTML;
+            console.log("Container innerHTML: ", container_html);
+            for (const image_html of image_htmls) {
+                console.log("Adding image HTML: ", image_html);
+                container_html += image_html;
+                console.log("New container innerHTML: ", container_html);
+            }
+            img_thumbnails.innerHTML = container_html;
+            console.log("Final container innerHTML: ", container_html);
+            loading_modal.hide();
+        });
+    
+    }
+    
+    
+    function getImageHtml(image_url) {
+        return new Promise((res, rej) => {
+            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const url = document.querySelector('[name=get_image_html]').value;
+            
+            fetch(url + "?image_url=" + image_url, {
+                headers: {'X-CSRFToken': csrf_token}
+            })
+            .then((response) => { return response.json(); })
+            .then((response) => { 
+                console.log(response);
+                res(response.html); 
+            });
+        });
+    }
+    
+    
+    function getFile(url) {
+        // retrieve/create file from URL
+        // source: https://newbedev.com/how-to-convert-dataurl-to-file-object-in-javascript
+        if (!url) {
+            url = "https://picsum.photos/300";
+        }
+        return fetch(url)
+        .then((res) => {
+            return res.arrayBuffer();
+        })
+        .then((buf) => {
+            const file = new File([buf], 'image_upload.jpg', {type: 'image/jpg'});
+            return file;
+        })
+        .catch((err) => {
+            throw err;
+        })
+    }
+    
+    
+    function getSignedUrlRequest(file) {
         return new Promise((res, rej) => {
             const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
             const post_data = new FormData();
-                post_data.append('file_name', file.name);
-                post_data.append('file_type', file.type);
-            const url = '{% url 'images:sign_s3' %}';
+                  post_data.append('file_name', file.name);
+                  post_data.append('file_type', file.type);
+            const url = document.querySelector('[name=sign_s3_url]').value;
     
             fetch(url, {
                 method: "POST",
@@ -142,8 +201,8 @@
             })
         })
     }
-
-
+    
+    
     function uploadFile(file, data, image_url) {
         return new Promise((res, rej) => {
             const post_data = new FormData();
@@ -160,5 +219,4 @@
             })
         })
     }
-
 </script>
