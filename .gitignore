@@ -17,5 +17,6 @@ notes.txt
 
 staticfiles/
 */testing/
+testing/
 mocktions/settings/dev.py
 stock_images/

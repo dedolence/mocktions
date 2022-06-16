@@ -7,12 +7,10 @@ async function triggerUploads(e) {
             
     loading_modal.show();
     
+    // retrieve file from URL first if necessary
     const retrieveFiles = await new Promise((res, rej) => {
         if (file === undefined) {
-            // no files provided to upload, so halt operation 
-            // to retrieve file from a 3rd party website.
-            let getFileRequest = getFile(url);
-            getFileRequest
+            getFile(url)
             .then(file => {
                 files.push(file);
             })
@@ -21,34 +19,49 @@ async function triggerUploads(e) {
             })
             .catch((e) => {
                 console.log(e);
-                return false;
+                loading_modal.hide();
+                $('id_image_errors').classList.remove('hide');
+                $('id_image_errors').classList.add('show');
             })
         } else {
             res();
         }
     })
 
-    const requests = []
+    promises = []
     for (const f of files) {
-        const url = await getSignedUrlRequest(f);
-        addImageToPage(url);
-        requests.push(url);
+        // get signed url 
+        const promise = getSignedUrlRequest(f)
+        promises.push(promise);
+        promise.then((signed_url) => {
+                // get formatted html
+                return getImageHtml(signed_url);
+            })
+            .then((image_html) => {
+                const img_thumbnails = $('id_image_thumbnails');
+                img_thumbnails.innerHTML += image_html;
+            });
     }
-    
-    Promise.all(requests).then(() => {
+
+    Promise.all(promises).then(() => {
         loading_modal.hide();
     });
-
 }
 
 
-function addImageToPage(url) {
-    const image_element = document.createElement('img');
-          image_element.classList.add('img-thumbnail');
-          image_element.alt = "A user-uploaded image";
-          image_element.src = url;
-
-    $('id_image_thumbnails').appendChild(image_element);
+function getImageHtml(image_url) {
+    return new Promise((res, rej) => {
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const url = document.querySelector('[name=get_image_html]').value;
+        
+        fetch(url + "?image_url=" + image_url, {
+            headers: {'X-CSRFToken': csrf_token}
+        })
+        .then((response) => { return response.json(); })
+        .then((response) => { 
+            res(response.html); 
+        });
+    });
 }
 
 
@@ -67,8 +80,7 @@ function getFile(url) {
         return file;
     })
     .catch((err) => {
-        // Probably a CORS problem
-        throw e;
+        throw err;
     })
 }
 

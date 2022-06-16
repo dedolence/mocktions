@@ -62,9 +62,13 @@
     </div>
 </div>
 
-<select class="d-none" name="image_urls" id="id_image_urls"></select>
+<select class="d-none" name="images" id="id_image_ids" multiple data-max="{{ MAX_IMAGE_UPLOADS }}">
+    {% for image in collected_images %}
+        {{ image }}
+    {% endfor %}
+</select>
 
-<div id="id_image_thumbnails" class="d-flex flex-row py-3"></div>
+<div id="id_image_thumbnails" class="d-flex flex-row py-3 flex-wrap justify-content-start"></div>
 
 <div id="id_loading_image_modal" class="modal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="id_loading_image_modal_label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-center">
@@ -79,19 +83,68 @@
 
 {% comment %} <script src="{% static 'js/images.js' %}"></script> {% endcomment %}
 <script>
+    /*
+    * To test:
+    * - triggerUploads is, um, triggered.
+    * - Acquire presigned URLs from server
+    * - Upload files to S3 
+    * - Append new files to DOM 
+    */
     async function triggerUploads(e) {
+        // coordinates various AJAX requests to upload and display an image file 
+        const loading_modal = new bootstrap.Modal($('id_loading_image_modal'));    
+        loading_modal.show();
+        
+        files = await getFiles();
+        promises = []
+        for (const f of files) {
+            // get signed urls for each file
+            console.log("Getting signed url...");
+            const promise = getSignedUrlRequest(f)
+
+            // add to an array to track when to close loading modal
+            promises.push(promise);
+
+            promise.then((signed_url) => {
+                    console.log("Signed URL acquired: ", signed_url);
+                    console.log("Acquiring formatted html...");
+                    // with signed_url, get formatted HTML
+                    return getImageHtml(signed_url);
+                })
+                .then((image_html) => {
+                    console.log("Formatted html acquired: ", image_html);
+                    console.log("Appending html to DOM...")
+                    // with formatted html, append to DOM 
+                    const img_thumbnails = $('id_image_thumbnails');
+                    img_thumbnails.innerHTML += image_html;
+                });
+        }
+
+        Promise.all(promises).then(() => {
+            loading_modal.hide();
+        });
+    }
+    
+    function FileSource() {
+        this.files_input = $('id_upload_image');
+        this.files = [];
+        this.getFiles() = function() {
+            // look for input to file input field 
+            uploaded_files = Array.from(this.files_input.files);
+            if (uploaded_files[0]) {
+                this.files = uploaded_files;
+                return this.uploaded_files;
+            }
+        }
+    }
+
+    async function getFiles() {
         // determine source of file then initiate upload to S3 bucket
         const files = Array.from($('id_upload_image').files);
         const file = files[0];
         const url = $('id_url_image').value;
-        const loading_modal = new bootstrap.Modal($('id_loading_image_modal'));
-                
-        loading_modal.show();
-        
         const retrieveFiles = await new Promise((res, rej) => {
             if (file === undefined) {
-                // no files provided to upload, so halt operation 
-                // to retrieve file from a 3rd party website.
                 getFile(url)
                 .then(file => {
                     files.push(file);
@@ -109,54 +162,10 @@
                 res();
             }
         })
+        return files;
+    }
     
-        const url_requests = [];
-        for (const f of files) {
-            url_requests.push(getSignedUrlRequest(f));
-        }
-        
-        const html_requests = [];
-        Promise.all(url_requests).then((image_urls) => {
-            for (const image_url of image_urls) {
-                html_requests.push(getImageHtml(image_url));
-            }
-        });
 
-        Promise.all(html_requests).then((image_htmls) => {
-            console.log("Image htmls to be added: ", image_htmls);
-            const img_thumbnails = $('id_image_thumbnails');
-            const container_html = img_thumbnails.innerHTML;
-            console.log("Container innerHTML: ", container_html);
-            for (const image_html of image_htmls) {
-                console.log("Adding image HTML: ", image_html);
-                container_html += image_html;
-                console.log("New container innerHTML: ", container_html);
-            }
-            img_thumbnails.innerHTML = container_html;
-            console.log("Final container innerHTML: ", container_html);
-            loading_modal.hide();
-        });
-    
-    }
-    
-    
-    function getImageHtml(image_url) {
-        return new Promise((res, rej) => {
-            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            const url = document.querySelector('[name=get_image_html]').value;
-            
-            fetch(url + "?image_url=" + image_url, {
-                headers: {'X-CSRFToken': csrf_token}
-            })
-            .then((response) => { return response.json(); })
-            .then((response) => { 
-                console.log(response);
-                res(response.html); 
-            });
-        });
-    }
-    
-    
     function getFile(url) {
         // retrieve/create file from URL
         // source: https://newbedev.com/how-to-convert-dataurl-to-file-object-in-javascript
@@ -164,8 +173,8 @@
             url = "https://picsum.photos/300";
         }
         return fetch(url)
-        .then((res) => {
-            return res.arrayBuffer();
+        .then((response) => {
+            return response.arrayBuffer();
         })
         .then((buf) => {
             const file = new File([buf], 'image_upload.jpg', {type: 'image/jpg'});
@@ -175,7 +184,25 @@
             throw err;
         })
     }
+
     
+
+    function getImageHtml(image_url) {
+        return new Promise((res, rej) => {
+            const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const url = document.querySelector('[name=get_image_html]').value;
+            fetch(url + "?image_url=" + image_url, {
+                headers: {'X-CSRFToken': csrf_token}
+            })
+            .then((response) => {
+                return response.json();
+            })
+            .then((json) => { 
+                res(json.html); 
+            });
+        });
+    }
+
     
     function getSignedUrlRequest(file) {
         return new Promise((res, rej) => {
@@ -184,20 +211,60 @@
                   post_data.append('file_name', file.name);
                   post_data.append('file_type', file.type);
             const url = document.querySelector('[name=sign_s3_url]').value;
-    
+
+            console.log("... Making fetch to AWS via Django...");
             fetch(url, {
                 method: "POST",
                 body: post_data,
                 headers: {'X-CSRFToken': csrf_token}
-            }).then((response) => {
-                if (response.status >= 200 && response.status <= 299) {
-                    return response.json();
-                }
-                else {
-                    throw Error(response.statusText);
-                }
-            }).then((json) => {
+            })
+            .then((response) => {
+                console.log("... Response acquired, converting to JSON...");
+                return response.json();
+            })
+            .then((json) => {
+                console.log("... JSON acquired, resolving promise to uploadFile()...");
+                // send the presigned url to be uploaded
                 res(uploadFile(file, json.data, json.image_url));
+            })
+        })
+    }
+
+
+    async function makeFetch(formData, url, method="POST", format="json") {
+        // a generic fetch method
+        const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        return fetch(url, {
+            method: method,
+            body: formData,
+            headers: {'X-CSRFToken': csrf_token}
+        })
+        .then(res => {
+            // if the server response is good, return data in the format specified
+            if (res.status >= 200 && res.status <= 299) {
+                let data;
+                switch (format) {
+                    case "json":
+                        data = res.json();
+                        break;
+                    case "arrayBuffer":
+                        data = res.arrayBuffer();
+                        break;
+                    default:
+                        data = res;
+                        break;
+                }
+                return data;
+            }
+            else {
+                throw Error(res.statusText);
+            }
+        })
+        .catch(() => {
+            // this catches 4xx and 5xx errors
+            // return a rejected promise so i can catch() it elsewhere
+            return new Promise((res, rej) => {
+                rej();
             })
         })
     }
@@ -206,17 +273,21 @@
     function uploadFile(file, data, image_url) {
         return new Promise((res, rej) => {
             const post_data = new FormData();
+            // all fields need to be copied into the post body
             for (key in data.fields) {
                 post_data.append(key, data.fields[key]);
             }
             post_data.append('file', file);
-    
+            
+            console.log("... Sending presigned URL and file data to AWS...");
             fetch(data.url, {
                 method: "POST",
-                body: post_data,
-            }).then(() => {
-                res(image_url);
+                body: post_data
             })
-        })
+            .then(() => {
+                console.log("... AWS responded, returning the URL of the image...");
+                res(image_url);
+            });
+        });
     }
 </script>
