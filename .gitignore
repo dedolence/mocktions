@@ -14,6 +14,7 @@ notes.txt
 #venv/
 .env
 #venv.bak/
+.vscode/
 
 staticfiles/
 */testing/

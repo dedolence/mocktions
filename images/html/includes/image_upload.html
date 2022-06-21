@@ -127,14 +127,22 @@
     
     function FileSource() {
         this.files_input = $('id_upload_image');
-        this.files = [];
+        this.url = $('id_url_image').value;
+        this.files = Array.from(this.files_input.files);
+
         this.getFiles() = function() {
-            // look for input to file input field 
-            uploaded_files = Array.from(this.files_input.files);
-            if (uploaded_files[0]) {
-                this.files = uploaded_files;
-                return this.uploaded_files;
-            }
+            // Checks to see where a file is coming from then returns it as a resolved promise
+            return new Promise((res, rej) => {
+                const files = this.files;
+                const file = files[0];
+                const url = this.url;
+                
+            })
+        }
+
+        this.getFile(url) = function {
+            // retrieve a file from somewhere online
+            // if no url is supplied, use a random image generator
         }
     }
 
