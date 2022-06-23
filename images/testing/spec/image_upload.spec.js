@@ -18,7 +18,7 @@ describe('The FileSource object checklist:', () => {
         expect(fileSource.fileArray).toEqual(jasmine.any(Array));
     });
 
-    it("should be able to retrieve a random image from a given URL using parameter defaults", () => {
+    it("should be able to retrieve a random image using parameter defaults", () => {
         return fileSource.getImageFromURL().then((image) => {
             expect(image.type).toEqual(imageTypeTester);
             expect(image.name).toEqual('image.jpg');
@@ -35,7 +35,36 @@ describe('The FileSource object checklist:', () => {
             expect(image.name).toEqual(imageName);
             expect(image.type).toEqual(imageType);
         })
-    })
+    });
+
+    it("should be able to retrieve a presigned URL for a file to be used for uploading to an S3 bucket", () => {
+        // create a fake file
+        let mockFile = new File([], 'mockFile.jpg', {type: 'image/jpg'});
+
+        // create the element from which the method will retrieve the path to the server
+        let urlElement = document.createElement('input');
+            urlElement.type = 'hidden';
+            urlElement.name='sign_s3_url';
+            urlElement.value='ajax_url';
+        document.body.appendChild(urlElement);
+
+        // create a fake response
+        let serverResponse = new Response(JSON.stringify(
+            {
+                data: {}, 
+                image_url: 'imageURL'
+            }
+        ));
+
+        // spy on the global makeFetch method and return a fake response
+        spyOn(window, 'makeFetch').and.returnValue(Promise.resolve(serverResponse));
+        
+        return fileSource.getPresignedURLPacket(mockFile).then((packet) => {
+            expect(packet.file).toEqual(mockFile);
+            expect(packet.data).toEqual(jasmine.any(Object));
+            expect(packet.imageURL).toEqual('imageURL');
+        });
+    });
 
 });
 

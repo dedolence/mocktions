@@ -14,10 +14,26 @@ function FileSource() {
     })();
 }
 
-FileSource.prototype.getImageFromURL = async (
+FileSource.prototype.getPresignedURLPacket = function(sourceFile) {
+    return new Promise((res, rej) => {
+        const url = document.querySelector('[name=sign_s3_url]').value
+            + "?name=" + sourceFile.name + "type=" + sourceFile.type;
+
+        makeFetch(url)
+        .then((response) => {
+            return response.json();
+        })
+        .then((json) => {
+            // send the presigned url to be uploaded
+            res({file: sourceFile, data: json.data, imageURL: json.image_url});
+        });
+    });
+}
+
+FileSource.prototype.getImageFromURL = function(
     url="https://picsum.photos/300", 
     fileName="image.jpg", 
-    fileType="image/jpg") => {
+    fileType="image/jpg") {
     // used to download images from a 3rd-party website
     // source: https://newbedev.com/how-to-convert-dataurl-to-file-object-in-javascript
     return new Promise((res, rej) => {
