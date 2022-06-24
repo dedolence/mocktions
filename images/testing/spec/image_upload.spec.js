@@ -1,4 +1,4 @@
-describe('The FileSource object checklist:', () => {
+describe('Retrieving images from URLs:', () => {
     /* 
         asynchronous functions get tested as such:
             return asyncFunction.then(function(any_returned_value) {
@@ -15,7 +15,7 @@ describe('The FileSource object checklist:', () => {
     }
 
     it("should have a property called fileArray that is an array", () => {
-        expect(fileSource.fileArray).toEqual(jasmine.any(Array));
+        expect(fileSource.sourceFileArray).toEqual(jasmine.any(Array));
     });
 
     it("should be able to retrieve a random image using parameter defaults", () => {
@@ -36,37 +36,59 @@ describe('The FileSource object checklist:', () => {
             expect(image.type).toEqual(imageType);
         })
     });
+});
 
-    it("should be able to retrieve a presigned URL for a file to be used for uploading to an S3 bucket", () => {
+
+describe("Presigned URLS:", () => {
+    const fileSource = new FileSource();
+    let mockFile, urlElement, serverResponse;
+
+    beforeEach(function() {
         // create a fake file
-        let mockFile = new File([], 'mockFile.jpg', {type: 'image/jpg'});
+        mockFile = new File([], 'mockFile.jpg', {type: 'image/jpg'});
 
         // create the element from which the method will retrieve the path to the server
-        let urlElement = document.createElement('input');
-            urlElement.type = 'hidden';
-            urlElement.name='sign_s3_url';
-            urlElement.value='ajax_url';
+        urlElement = document.createElement('input');
+        urlElement.type = 'hidden';
+        urlElement.name='sign_s3_url';
+        urlElement.value='ajax_url';
         document.body.appendChild(urlElement);
 
         // create a fake response
-        let serverResponse = new Response(JSON.stringify(
+        serverResponse = new Response(JSON.stringify(
             {
                 data: {}, 
                 image_url: 'imageURL'
             }
         ));
 
+    })
+
+    it("should be able to retrieve a presigned URL for a file to be used for uploading to an S3 bucket", () => {
         // spy on the global makeFetch method and return a fake response
         spyOn(window, 'makeFetch').and.returnValue(Promise.resolve(serverResponse));
-        
+
         return fileSource.getPresignedURLPacket(mockFile).then((packet) => {
             expect(packet.file).toEqual(mockFile);
             expect(packet.data).toEqual(jasmine.any(Object));
-            expect(packet.imageURL).toEqual('imageURL');
+            expect(packet.url).toEqual('imageURL');
         });
     });
 
-});
+    it("should handle a promise rejection", () => {
+        spyOn(window, 'makeFetch').and.returnValue(Promise.reject("This is the error that should be handled."));
+        let resolvedCheck = rejectedCheck = false;
+        return fileSource.getPresignedURLPacket(mockFile)
+        .then(() => {
+            resolvedCheck = true;
+        })
+        .catch(() => {
+            rejectedCheck = true;
+            expect(resolvedCheck).toBe(false);
+            expect(rejectedCheck).toBe(true);
+        })
+    })
+})
 
 
 describe("The makeFetch() function", () => {
