@@ -259,9 +259,69 @@ ul.inheritsList
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
+								<b><a href="../symbols/FileSource.html#collectFiles">collectFiles</a></b>
+								</div>
+								<div class="description">Looks for files uploaded to a file input first, defaults to a URL if none.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/FileSource.html#presignedURLPackets">presignedURLPackets</a></b>
+								</div>
+								<div class="description">Objects returned from the server's S3 request, to be used for uploading file.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/FileSource.html#processAllFiles">processAllFiles</a></b>
+								</div>
+								<div class="description">Takes all the files contained in sourceFileArray and uploads them to S3.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/FileSource.html#processedImageURLs">processedImageURLs</a></b>
+								</div>
+								<div class="description">The URLs to images that have been fully processed and uploaded.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/FileSource.html#processFile">processFile</a></b>
+								</div>
+								<div class="description">Handles the complete upload cycle for a single file.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
 								<b><a href="../symbols/FileSource.html#sourceFileArray">sourceFileArray</a></b>
 								</div>
 								<div class="description">Files to be uploaded</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/FileSource.html#sourceURL">sourceURL</a></b>
+								</div>
+								<div class="description">A user-provided URL that points to an image to be uploaded</div>
 							</td>
 						</tr>
 					
@@ -298,9 +358,19 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/FileSource.html#getPresignedURLPacket">getPresignedURLPacket</a></b>(sourceFile)
+								<div class="fixedFont"><b><a href="../symbols/FileSource.html#getPresignedURLPacket">getPresignedURLPacket</a></b>(file)
 								</div>
 								<div class="description">AJAX request for a presigned URL to be used for uploading a file to S3 bucket.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/FileSource.html#uploadFileToS3">uploadFileToS3</a></b>(file, data, url)
+								</div>
+								<div class="description">Takes the information from the presigned URL as well as the File and sends
+them to AWS.</div>
 							</td>
 						</tr>
 					
@@ -350,15 +420,150 @@ Users can upload from their hard drive or provide a URL.
 					Field Detail
 				</div>
 				
+					<a name="collectFiles"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Array<PresignedURLPacket>}</span>
+					<b>collectFiles</b>
+					
+					</div>
+					<div class="description">
+						Looks for files uploaded to a file input first, defaults to a URL if none.
+The URL itself defaults to a random image API, so sourceFileArray will always
+contain at least one image file.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="presignedURLPackets"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Array<PresignedURLPacket>}</span>
+					<b>presignedURLPackets</b>
+					
+					</div>
+					<div class="description">
+						Objects returned from the server's S3 request, to be used for uploading file.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="processAllFiles"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{void}</span>
+					<b>processAllFiles</b>
+					
+					</div>
+					<div class="description">
+						Takes all the files contained in sourceFileArray and uploads them to S3.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="processedImageURLs"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Array<String>}</span>
+					<b>processedImageURLs</b>
+					
+					</div>
+					<div class="description">
+						The URLs to images that have been fully processed and uploaded.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="processFile"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{String}</span>
+					<b>processFile</b>
+					
+					</div>
+					<div class="description">
+						Handles the complete upload cycle for a single file. Retrieves a
+presigned URL, uploads file, and returns the URL of the image.
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name="sourceFileArray"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{...File}</span>
+					<span class="light">{Array<File>}</span>
 					<b>sourceFileArray</b>
 					
 					</div>
 					<div class="description">
 						Files to be uploaded
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="sourceURL"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{String}</span>
+					<b>sourceURL</b>
+					
+					</div>
+					<div class="description">
+						A user-provided URL that points to an image to be uploaded
 						
 						
 					</div>
@@ -383,12 +588,13 @@ Users can upload from their hard drive or provide a URL.
 					<a name="getImageFromURL"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{File}</span>
+					<span class="light">{Promise<File>}</span>
 					<b>getImageFromURL</b>(url, fileName, fileType)
 					
 					</div>
 					<div class="description">
-						Simple image retriever.
+						Simple image retriever. Technically this would work for any file type but it's
+intended for images.
 						
 						
 					</div>
@@ -426,7 +632,7 @@ Users can upload from their hard drive or provide a URL.
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{File}</span> </dd>
+								<dd><span class="light fixedFont">{Promise<File>}</span> A Javascript File object containing the new image.</dd>
 							
 							</dl>
 						
@@ -438,8 +644,8 @@ Users can upload from their hard drive or provide a URL.
 					<a name="getPresignedURLPacket"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{PresignedURLPacket}</span>
-					<b>getPresignedURLPacket</b>(sourceFile)
+					<span class="light">{Promise<PresignedURLPacket>}</span>
+					<b>getPresignedURLPacket</b>(file)
 					
 					</div>
 					<div class="description">
@@ -455,10 +661,10 @@ Users can upload from their hard drive or provide a URL.
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{File}</span> <b>sourceFile</b>
+									<span class="light fixedFont">{File}</span> <b>file</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>The file that we are retrieving the presigned URL for in order to upload.</dd>
 							
 							</dl>
 						
@@ -469,7 +675,65 @@ Users can upload from their hard drive or provide a URL.
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{PresignedURLPacket}</span> A PresignedURLPacket sent from AWS required for uploading file.</dd>
+								<dd><span class="light fixedFont">{Promise<PresignedURLPacket>}</span> A PresignedURLPacket sent from AWS required for uploading file.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="uploadFileToS3"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Promise<String>}</span>
+					<b>uploadFileToS3</b>(file, data, url)
+					
+					</div>
+					<div class="description">
+						Takes the information from the presigned URL as well as the File and sends
+them to AWS. If the request goes through, this method returns the URL of the
+file where it exists in the S3 bucket.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{File}</span> <b>file</b>
+									
+								</dt>
+								<dd>The original source file to be uploaded.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{S3Data}</span> <b>data</b>
+									
+								</dt>
+								<dd>An object returned by AWS, retrieved when the pre-signed URL was generated.</dd>
+							
+								<dt>
+									<span class="light fixedFont">{String}</span> <b>url</b>
+									
+								</dt>
+								<dd>The location of the file on the S3 bucket, already determined when the 
+presigned URL was generated.</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Promise<String>}</span> The same url as in the parameters.</dd>
 							
 							</dl>
 						
@@ -490,7 +754,7 @@ Users can upload from their hard drive or provide a URL.
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Thu Jun 23 2022 21:43:52 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Jun 25 2022 21:07:19 GMT-0400 (EDT)
 		</div>
 	</body>
 </html>
