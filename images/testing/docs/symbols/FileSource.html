@@ -259,7 +259,7 @@ ul.inheritsList
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/FileSource.html#collectFiles">collectFiles</a></b>
+								<b><a href="../symbols/FileSource.html#collectImages">collectImages</a></b>
 								</div>
 								<div class="description">Looks for files uploaded to a file input first, defaults to a URL if none.</div>
 							</td>
@@ -279,29 +279,9 @@ ul.inheritsList
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/FileSource.html#processAllFiles">processAllFiles</a></b>
-								</div>
-								<div class="description">Takes all the files contained in sourceFileArray and uploads them to S3.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
 								<b><a href="../symbols/FileSource.html#processedImageURLs">processedImageURLs</a></b>
 								</div>
 								<div class="description">The URLs to images that have been fully processed and uploaded.</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/FileSource.html#processFile">processFile</a></b>
-								</div>
-								<div class="description">Handles the complete upload cycle for a single file.</div>
 							</td>
 						</tr>
 					
@@ -367,6 +347,24 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/FileSource.html#processAllFiles">processAllFiles</a></b>()
+								</div>
+								<div class="description">Takes all the files contained in sourceFileArray and uploads them to S3.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/FileSource.html#processFile">processFile</a></b>(file)
+								</div>
+								<div class="description">Handles the complete upload cycle for a single file.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/FileSource.html#uploadFileToS3">uploadFileToS3</a></b>(file, data, url)
 								</div>
 								<div class="description">Takes the information from the presigned URL as well as the File and sends
@@ -420,11 +418,11 @@ Users can upload from their hard drive or provide a URL.
 					Field Detail
 				</div>
 				
-					<a name="collectFiles"> </a>
+					<a name="collectImages"> </a>
 					<div class="fixedFont">
 					
 					<span class="light">{Array<PresignedURLPacket>}</span>
-					<b>collectFiles</b>
+					<b>collectImages</b>
 					
 					</div>
 					<div class="description">
@@ -466,28 +464,6 @@ contain at least one image file.
 
 					<hr />
 				
-					<a name="processAllFiles"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{void}</span>
-					<b>processAllFiles</b>
-					
-					</div>
-					<div class="description">
-						Takes all the files contained in sourceFileArray and uploads them to S3.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name="processedImageURLs"> </a>
 					<div class="fixedFont">
 					
@@ -497,29 +473,6 @@ contain at least one image file.
 					</div>
 					<div class="description">
 						The URLs to images that have been fully processed and uploaded.
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="processFile"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{String}</span>
-					<b>processFile</b>
-					
-					</div>
-					<div class="description">
-						Handles the complete upload cycle for a single file. Retrieves a
-presigned URL, uploads file, and returns the URL of the image.
 						
 						
 					</div>
@@ -684,6 +637,82 @@ intended for images.
 
 					<hr />
 				
+					<a name="processAllFiles"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Promise}</span>
+					<b>processAllFiles</b>()
+					
+					</div>
+					<div class="description">
+						Takes all the files contained in sourceFileArray and uploads them to S3.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Promise}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="processFile"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{String}</span>
+					<b>processFile</b>(file)
+					
+					</div>
+					<div class="description">
+						Handles the complete upload cycle for a single file. Retrieves a
+presigned URL, uploads file, and returns the URL of the image.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{File}</span> <b>file</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{String}</span> URL of the file where it exists in the S3 bucket.</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
 					<a name="uploadFileToS3"> </a>
 					<div class="fixedFont">
 					
@@ -722,7 +751,7 @@ file where it exists in the S3 bucket.
 									
 								</dt>
 								<dd>The location of the file on the S3 bucket, already determined when the 
-presigned URL was generated.</dd>
+ presigned URL was generated.</dd>
 							
 							</dl>
 						
@@ -754,7 +783,7 @@ presigned URL was generated.</dd>
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Jun 25 2022 21:07:19 GMT-0400 (EDT)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Mon Jun 27 2022 14:46:38 GMT-0400 (EDT)
 		</div>
 	</body>
 </html>

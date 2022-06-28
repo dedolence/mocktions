@@ -16,12 +16,9 @@ describe("Collecting files to upload", () => {
         document.body.appendChild(urlInputElement);
 
         // create a dummy server response to avoid a real fetch request
-        serverResponse = new Response(JSON.stringify(
-            {
-                data: {}, 
-                image_url: 'imageURL'
-            }
-        ));
+        responseBody = JSON.stringify({data: {}, image_url: 'imageURL'});
+        responseOptions = {headers: {'content-type': 'image/jpeg'}};
+        serverResponse = new Response(responseBody, responseOptions);
         spyOn(window, 'makeFetch').and.resolveTo(serverResponse);
 
         // return a fake presigned URL packet 
@@ -37,12 +34,12 @@ describe("Collecting files to upload", () => {
     });
 
     it("should add an image (retrieved from supplied URL or a random image) to sourceFileArray if no files are provided", async () => {
-        let sourceFiles = await fileSource.collectFiles();
+        let sourceFiles = await fileSource.collectImages();
         expect(sourceFiles[0]).toEqual(jasmine.any(File));
     });
 
     it("if no files are given by user but a URL is, use that to retrieve the image", async () => {
-        let sourceFiles = await fileSource.collectFiles();
+        let sourceFiles = await fileSource.collectImages();
         expect(fileSource.sourceURL).toEqual(urlInputElement.value);
     });
 });
@@ -51,10 +48,22 @@ describe("Collecting files to upload", () => {
 describe("Processing files for uploading", () => {
     const fileSource = new FileSource();
     let mockFile, uploadedImageURL, fakePacket, mockFileArray;
+    let responseBody, responseOptions, serverResponse, imageURL;
+
+    beforeAll(function() {
+    });
 
     beforeEach(function() {
         mockFile = new File([], 'mockFile1.jpg', {type: 'image/jpg'});
+        mockFileArray = [
+            new File([], 'mockFile1.jpg', {type: 'image/jpg'}),
+            new File([], 'mockFile2.jpg', {type: 'image/jpg'}),
+            new File([], 'mockFile3.jpg', {type: 'image/jpg'})
+        ];
+
         uploadedImageURL = "https://path.to.image.jpg";
+        spyOn(fileSource, "uploadFileToS3").and.resolveTo(uploadedImageURL);
+        
         fakePacket = {
             file: mockFile,
             data: {
@@ -64,18 +73,19 @@ describe("Processing files for uploading", () => {
             },
             url: uploadedImageURL
         };
-        mockFileArray = [
-            new File([], 'mockFile1.jpg', {type: 'image/jpg'}),
-            new File([], 'mockFile2.jpg', {type: 'image/jpg'}),
-            new File([], 'mockFile3.jpg', {type: 'image/jpg'})
-        ];
-
         spyOn(fileSource, "getPresignedURLPacket").and.resolveTo(fakePacket);
-        spyOn(fileSource, "uploadFileToS3").and.resolveTo(uploadedImageURL);
+
+        // create a fake response
+        const imageURL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzID6RT9EwTVSFvNuTwh1vLSkKmUE4X_uDhA&usqp=CAU";
+        responseBody = JSON.stringify({html: '<img src="' + imageURL + '">'});
+        responseOptions = {headers: {'content-type': 'application/json'}};
+        serverResponse = new Response(responseBody, responseOptions);
+        spyOn(window, "makeFetch").and.resolveTo(serverResponse);
     });
 
     it("should upload a single file", async () => {
         let actualUploadedImageURL = await fileSource.processFile(mockFile);
+        spyOn(fileSource, "generateThumbnail").and.resolveTo(true);
         expect(actualUploadedImageURL).toEqual(uploadedImageURL);
         expect(fileSource.getPresignedURLPacket).toHaveBeenCalledWith(mockFile);
         expect(fileSource.uploadFileToS3)
@@ -87,27 +97,34 @@ describe("Processing files for uploading", () => {
     });
 
     it("should upload multiple files concurrently", async () => {
-        fileSource.sourceFileArray = mockFileArray;
+        spyOn(fileSource, "generateThumbnail").and.resolveTo(true);
+        spyOn(fileSource, "collectImages").and.resolveTo(mockFileArray);
         await fileSource.processAllFiles();
         expect(fileSource.processedImageURLs.length).toEqual(3);
         expect(fileSource.processedImageURLs[0]).toEqual(jasmine.any(String));
         expect(fileSource.getPresignedURLPacket).toHaveBeenCalledTimes(3);
         expect(fileSource.uploadFileToS3).toHaveBeenCalledTimes(3);
     });
+
+    it("should take an image URL and generate/append an image thumbnail to page", async () => {
+        // this method probably got stubbed so make sure to call it through
+        spyOn(fileSource, "generateThumbnail").and.callThrough();
+        // mock up a thumbnail container
+        const thumbnailElement = document.createElement("div");
+        thumbnailElement.id="id_image_thumbnails";
+        document.body.append(thumbnailElement);
+        //const thumbnailElement = document.getElementById("id_image_thumbnails");
+        return(fileSource.generateThumbnail(imageURL)).then(() => {
+            expect(window.makeFetch).toHaveBeenCalled();
+            expect(thumbnailElement.children.length).toBeGreaterThan(0);
+        });
+    });
 });
 
 
 describe('Retrieving images from URLs:', () => {
-    // TODO: check for file types/reject types not allowed
-
+    // this is a LIVE test; i.e. it actually performs the fetch requests. good idea? 
     const fileSource = new FileSource();
-
-    const imageTypeTester = {
-        asymmetricMatch: function(actual) {
-            const acceptedFileTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-            return acceptedFileTypes.includes(actual);
-        }
-    }
 
     it("should be able to retrieve a specific image from a given URL with specific parameters", () => {
         const imageURL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzID6RT9EwTVSFvNuTwh1vLSkKmUE4X_uDhA&usqp=CAU";
@@ -118,6 +135,21 @@ describe('Retrieving images from URLs:', () => {
         .then((image) => {
             expect(image.name).toEqual(imageName);
             expect(image.type).toEqual(imageType);
+        });
+    });
+
+    it("should reject files that aren't specified as valid MIME types", () => {
+        // try getting the minified Bootstrap files why not
+        const url = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js";
+        const resolvedCheck = rejectedCheck = false;
+        return fileSource.getImageFromURL(url, 'filename.zip', 'file/zip')
+        .then((res) => {
+            resolvedCheck = true;
+        })
+        .catch((res) => {
+            rejectedCheck = true;
+            expect(resolvedCheck).toBe(false);
+            expect(rejectedCheck).toBe(true);
         });
     });
 });
@@ -139,17 +171,14 @@ describe("Presigned URLS:", () => {
         document.body.appendChild(urlElement);
 
         // create a fake response
-        serverResponse = new Response(JSON.stringify(
-            {
-                data: {}, 
-                image_url: 'imageURL'
-            }
-        ));
+        responseBody = JSON.stringify({data: {}, image_url: 'imageURL'});
+        responseOptions = {headers: {'content-type': 'application/json'}};
+        serverResponse = new Response(responseBody, responseOptions);
     });
 
     it("should be able to retrieve a presigned URL for a file to be used for uploading to an S3 bucket", () => {
         // spy on the global makeFetch method and return a fake response
-        spyOn(window, 'makeFetch').and.returnValue(Promise.resolve(serverResponse));
+        spyOn(window, 'makeFetch').and.resolveTo(serverResponse);
 
         return fileSource.getPresignedURLPacket(mockFile).then((packet) => {
             expect(packet.file).toEqual(mockFile);
@@ -159,7 +188,7 @@ describe("Presigned URLS:", () => {
     });
 
     it("should handle a promise rejection", () => {
-        spyOn(window, 'makeFetch').and.returnValue(Promise.reject("This is the error that should be handled."));
+        spyOn(window, 'makeFetch').and.rejectWith("This is the error that should be handled.");
         let resolvedCheck = rejectedCheck = false;
         return fileSource.getPresignedURLPacket(mockFile)
         .then(() => {

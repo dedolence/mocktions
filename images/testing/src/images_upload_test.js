@@ -1,32 +1,17 @@
-/**
- * Copies the Jquery function to access DOM elements.
- * 
- * @param {String} element_id
- * 
- * @returns {HTMLElement} An HTMLElement
- */
-const $ = function(element_id) {
-    return document.getElementById(element_id);
-}
-
+"use strict";
 
 /**
  * Handles user uploads of files (typically images). 
  * Users can upload from their hard drive or provide a URL.
- * 
  * @constructor
- * 
  * @property {Array<PresignedURLPacket>} presignedURLPackets
- * Objects returned from the server's S3 request, to be used for uploading file.
- * 
+ *  Objects returned from the server's S3 request, to be used for uploading file.
  * @property {Array<String>} processedImageURLs 
- * The URLs to images that have been fully processed and uploaded.
- * 
+ *  The URLs to images that have been fully processed and uploaded.
  * @property {Array<File>} sourceFileArray 
- * Files to be uploaded
- * 
+ *  Files to be uploaded
  * @property {String} sourceURL
- * A user-provided URL that points to an image to be uploaded
+ *  A user-provided URL that points to an image to be uploaded
  */
 function FileSource() {
     this.presignedURLPackets = [];
@@ -39,13 +24,15 @@ function FileSource() {
 /**
  * Looks for files uploaded to a file input first, defaults to a URL if none.
  * The URL itself defaults to a random image API, so sourceFileArray will always
- * contain at least one image file. 
- * 
+ * contain at least one image file.
+ * @async
  * @returns {Array<PresignedURLPacket>}
  */
- FileSource.prototype.collectFiles = async function() {
+ FileSource.prototype.collectImages = async function() {
+    let image;
+
     // get image URL if provided
-    if ($('id_image_url')) {
+    if ($('id_image_url').value) {
         this.sourceURL = $('id_image_url').value;
     } else {
         this.sourceURL = "https://picsum.photos/300";
@@ -56,7 +43,7 @@ function FileSource() {
         this.sourceFileArray = Array.from($('id_image_upload')).files;
         return this.sourceFileArray;
     } else {
-        let image = await this.getImageFromURL(this.sourceURL);
+        image = await this.getImageFromURL(this.sourceURL);
         this.sourceFileArray = [image];
         return this.sourceFileArray;
     }
@@ -64,36 +51,79 @@ function FileSource() {
 
 
 /**
- * Handles the complete upload cycle for a single file. Retrieves a
- * presigned URL, uploads file, and returns the URL of the image.
+ * Simple image retriever. Technically this would work for any file type but it's
+ * intended for images.
+ * @source https://newbedev.com/how-to-convert-dataurl-to-file-object-in-javascript
  * @async
- * 
- * @param {File} file 
- * 
- * @returns {String} URL of the file where it exists in the S3 bucket.
- * 
+ * @param {String} url 
+ *  Optional. Points to the image to be retrieved. Defaults to a random image API.
+ * @param {String} fileName 
+ *  Optional. When uploaded to S3, filename gets randomized to a UUID hex.
+ * @param {String} fileType
+ *  Optional. MIME-Type.
+ * @returns {Promise<File>} A Javascript File object containing the new image.
  */
-FileSource.prototype.processFile = async function(file) {
-    const packet = await this.getPresignedURLPacket(file);
-    const url = await this.uploadFileToS3(packet.file, packet.data, packet.url);
-    return url;
+ FileSource.prototype.getImageFromURL = function(
+    url="https://picsum.photos/300",
+    fileName="image.jpg",
+    fileType="image/jpg") {
+    
+    const validTypes = ['image/jpg', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    return new Promise((res, rej) => {
+        let buffer, file;
+
+        makeFetch(url)
+        .then((response) => {
+            // check valid content type
+            const contentType = response.headers.get('content-type');
+            if (!validTypes.includes(contentType)) {
+                rej(handleFetchError(new Error("Invalid image type: " + contentType)));
+            } else {
+                buffer = response.arrayBuffer();
+                file = new File([buffer], fileName, {type: fileType});
+                res(file);
+            }
+        })
+        .catch((error) => {
+            rej(handleFetchError(error));
+        });
+    });
 }
 
 
 /**
- * Takes all the files contained in sourceFileArray and uploads them to S3.
- * 
+ * Requests a formatted chunk of URL from the server to append to DOM.
+ * Server responds with a JSON object with an html property.
  * @async
- * 
- * @returns {void}
+ * @param {String} url 
+ *  The image src
+ * @returns {Promise}
  */
-FileSource.prototype.processAllFiles = async function() {
-    let promises = [];
-    for (file of this.sourceFileArray) {
-        promises.push(this.processFile(file));
-    }
-
-    this.processedImageURLs = await Promise.all(promises);
+FileSource.prototype.generateThumbnail = function(imageURL) {
+    return new Promise((res, rej) => {
+        let html, thumbCont, div;
+        const fetchURL = getAJAXURL("imageThumbnail") + "?url=" + imageURL;
+        makeFetch(fetchURL)
+        .then((response) => {
+            // clone may only be necessary in testing since i'm reusing a response
+            // object for every makeFetch call.
+            return response.clone().json();
+        })
+        .then((response) => {
+            html = response.html;
+            try {
+                thumbCont = $('id_image_thumbnails');
+                thumbCont.innerHTML += html;
+                res();
+            }
+            catch(err) {
+                rej(new Error("No place to put image thumbnails!", err));
+            }
+        })
+        .catch((error) => {
+            console.log("Error in generating thumbnail: ", error);
+        })
+    });
 }
 
 
@@ -101,15 +131,12 @@ FileSource.prototype.processAllFiles = async function() {
  * An object returned by AWS containing relevant information for uploading a
  * file to an S3 bucket.
  * @typedef     {Object}   PresignedURLPacket
- * 
  * @property    {File}     file 
- * The original File object.
- * 
+ *  The original File object.
  * @property    {S3Data}   data 
- * Object returned by AWS needs to be included when uploading.
- * 
+ *  Object returned by AWS needs to be included when uploading.
  * @property    {String}   url This 
- * will be the location of the image once uploaded to S3.
+ *  will be the location of the image once uploaded to S3.
  */
 
 /**
@@ -120,21 +147,18 @@ FileSource.prototype.processAllFiles = async function() {
 
 /**
  * AJAX request for a presigned URL to be used for uploading a file to S3 bucket.
- * 
  * @async
- * 
  * @param {File} file 
- * The file that we are retrieving the presigned URL for in order to upload.
- * 
+ *  The file that we are retrieving the presigned URL for in order to upload.
  * @returns {Promise<PresignedURLPacket>} 
- * A {@link PresignedURLPacket} sent from AWS required for uploading file.
+ *  A {@link PresignedURLPacket} sent from AWS required for uploading file.
  */
-FileSource.prototype.getPresignedURLPacket = function(file) {
+ FileSource.prototype.getPresignedURLPacket = function(file) {
     return new Promise((res, rej) => {
-        const url = document.querySelector('[name=sign_s3_url]').value
+        const fetchURL = getAJAXURL('presignedURL') 
             + "?name=" + file.name + "type=" + file.type;
 
-        makeFetch(url)
+        makeFetch(fetchURL)
         .then((response) => {
             return response.json();
         })
@@ -156,39 +180,71 @@ FileSource.prototype.getPresignedURLPacket = function(file) {
 
 
 /**
- * Simple image retriever. Technically this would work for any file type but it's
- * intended for images.
- * 
- * @source https://newbedev.com/how-to-convert-dataurl-to-file-object-in-javascript
- * 
+ * Handles the complete upload cycle for a single file. Retrieves a
+ * presigned URL, uploads file, and returns the URL of the image.
  * @async
- * 
- * @param {String} url 
- * Optional. Points to the image to be retrieved. Defaults to a random image API.
- * 
- * @param {String} fileName 
- * Optional. When uploaded to S3, filename gets randomized to a UUID hex.
- * 
- * @param {String} fileType
- * Optional. MIME-Type.
- * 
- * @returns {Promise<File>} A Javascript File object containing the new image.
+ * @param {File} file 
+ * @returns {String} 
+ *  URL of the file where it exists in the S3 bucket.
  */
-FileSource.prototype.getImageFromURL = function(
-    url="https://picsum.photos/300",
-    fileName="image.jpg",
-    fileType="image/jpg") {
+FileSource.prototype.processFile = function(file) {
     return new Promise((res, rej) => {
-        makeFetch(url)
-        .then((response) => {
-            let buffer = response.arrayBuffer();
-            let file = new File([buffer], fileName, {type: fileType});
-            res(file);
+        let url;
+
+        this.getPresignedURLPacket(file)
+        .then((packet) => {
+            url = this.uploadFileToS3(packet.file, packet.data, packet.url);
+            this.generateThumbnail(url);
+            //this.appendImageURLToForm(url);
+            res(url);
         })
         .catch((error) => {
-            rej(error);
-        });
-    })
+            rej(handleFetchError(error));
+        })
+    });
+}
+
+
+/**
+ * Takes all the files contained in sourceFileArray and uploads them to S3.
+ * @async
+ * @returns {Promise}
+ */
+FileSource.prototype.processAllFiles = function() {
+    return new Promise((res, rej) => {
+        // first gather files to upload
+        this.collectImages()
+        .then((sourceFiles) => {
+            let modal, promises;
+
+            // just make sure there are files to upload
+            if(sourceFiles.length === 0 && this.sourceFileArray.length === 0) {
+                rej();
+            }
+            
+            // display a loading modal
+            try {
+                modal = new bootstrap.Modal($('id_loading_image_modal'));
+                modal.show();
+            }
+            catch(err) {
+                modal = { hide: () => { return; } };
+            }
+
+            // keep track of the promises by pushing them to an array
+            promises = [];
+            for (const file of sourceFiles) {
+                promises.push(this.processFile(file));
+            }
+
+            // when all promises are ready, turn off loading modal
+            Promise.all(promises).then((urls) => {
+                this.processedImageURLs = urls;
+                modal.hide();
+                res();
+            });
+        })
+    });
 }
 
 
@@ -196,19 +252,14 @@ FileSource.prototype.getImageFromURL = function(
  * Takes the information from the presigned URL as well as the File and sends
  * them to AWS. If the request goes through, this method returns the URL of the
  * file where it exists in the S3 bucket.
- * 
  * @async
- * 
  * @param {File} file 
- * The original source file to be uploaded.
- * 
+ *  The original source file to be uploaded.
  * @param {S3Data} data 
- * An object returned by AWS, retrieved when the pre-signed URL was generated.
- * 
+ *  An object returned by AWS, retrieved when the pre-signed URL was generated.
  * @param {String} url 
- * The location of the file on the S3 bucket, already determined when the 
- * presigned URL was generated.
- * 
+ *  The location of the file on the S3 bucket, already determined when the 
+ *  presigned URL was generated.
  * @returns {Promise<String>} The same url as in the parameters.
  */
 FileSource.prototype.uploadFileToS3 = function(file, data, url) {
@@ -231,80 +282,4 @@ FileSource.prototype.uploadFileToS3 = function(file, data, url) {
             rej(handleFetchError(error));
         });
     });
-}
-
-
-/**
- * An object describing the optional parameters for a fetch() request
- * 
- * @typedef {Object} FetchOptions
- * 
- * @property {String} method
- * GET or POST
- * 
- * @property {FormData} body
- * Body of request.
- * 
- * @property {Object} headers 
- * Standard HTTP request headers.
- */
-
-/**
- * Using this instead of the built-in fetch() API in order to provide better
- * error-handling.
- * 
- * @param {String} url Points to the server path to use for a fetch() request
- * @param {FetchOptions} options 
- * @returns {Response}
- */
-function makeFetch(url, options={}) {
-    /*
-    options = { method:, body:, headers:, etc.} (from vanilla fetch() api)
-    */
-    return new Promise((res, rej) => {
-        fetch(url, options)
-        .then((response) => {
-            if (response.status >= 200 && response.status <= 299) {
-                // request is ok, resolve response
-                res(response);
-            }
-            else {
-                throw new Error(response.statusText);
-            }
-        })
-        .catch((error) => {
-            rej(error);
-        })
-    });
-}
-
-
-/**
- * Handles server error by either updating the UI or logging.
- * @param {Error} error 
- * @returns {Error}
- */
-function handleFetchError(error) {
-    const errorDisplayAlert = $('errorDisplay');
-    const errorMessage = "There was an error handling fetch request:";
-    if (!errorDisplayAlert) {
-        console.log(errorMessage, error);
-    } else {
-        errorDisplayAlert.innerHTML = errorMessage + "<br/>" + error;
-    }
-    return error;
-}
-
-
-/**
- * Searches the DOM for a hidden form input containing the session's CSRF token.
- * @returns {String}
- */
-function getCSRFToken() {
-    if (document.querySelector('[name=csrfmiddlewaretoken]')) {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
-    }
-    else {
-        return "replace_this_with_some_error_condition";
-    }
 }
