@@ -61,7 +61,7 @@ function getAJAXURL(func) {
  */
  function handleFetchError(error) {
     const errorDisplayAlert = $('errorDisplay');
-    const errorMessage = "There was an error handling fetch request:";
+    const errorMessage = "There was an error with your request:";
     if (!errorDisplayAlert) {
         console.log(errorMessage, error);
     } else {

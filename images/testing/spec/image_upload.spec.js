@@ -48,12 +48,13 @@ describe("Collecting files to upload", () => {
 describe("Processing files for uploading", () => {
     const fileSource = new FileSource();
     let mockFile, uploadedImageURL, fakePacket, mockFileArray;
-    let responseBody, responseOptions, serverResponse, imageURL;
+    let responseBody, responseOptions, serverResponse;
 
     beforeAll(function() {
     });
 
     beforeEach(function() {
+        // fake files to fake-upload to fake-S3. fake.
         mockFile = new File([], 'mockFile1.jpg', {type: 'image/jpg'});
         mockFileArray = [
             new File([], 'mockFile1.jpg', {type: 'image/jpg'}),
@@ -64,6 +65,7 @@ describe("Processing files for uploading", () => {
         uploadedImageURL = "https://path.to.image.jpg";
         spyOn(fileSource, "uploadFileToS3").and.resolveTo(uploadedImageURL);
         
+        // fake S3 presignedURL packet
         fakePacket = {
             file: mockFile,
             data: {
@@ -81,11 +83,14 @@ describe("Processing files for uploading", () => {
         responseOptions = {headers: {'content-type': 'application/json'}};
         serverResponse = new Response(responseBody, responseOptions);
         spyOn(window, "makeFetch").and.resolveTo(serverResponse);
+
+        // spy on auxiliary methods generateThumbnail and appendImageURLToForm
+        spyOn(fileSource, "generateThumbnail").and.resolveTo(true);
+        spyOn(fileSource, "appendImageURLToForm").and.returnValue(true);
     });
 
     it("should upload a single file", async () => {
         let actualUploadedImageURL = await fileSource.processFile(mockFile);
-        spyOn(fileSource, "generateThumbnail").and.resolveTo(true);
         expect(actualUploadedImageURL).toEqual(uploadedImageURL);
         expect(fileSource.getPresignedURLPacket).toHaveBeenCalledWith(mockFile);
         expect(fileSource.uploadFileToS3)
@@ -97,7 +102,6 @@ describe("Processing files for uploading", () => {
     });
 
     it("should upload multiple files concurrently", async () => {
-        spyOn(fileSource, "generateThumbnail").and.resolveTo(true);
         spyOn(fileSource, "collectImages").and.resolveTo(mockFileArray);
         await fileSource.processAllFiles();
         expect(fileSource.processedImageURLs.length).toEqual(3);
@@ -105,19 +109,100 @@ describe("Processing files for uploading", () => {
         expect(fileSource.getPresignedURLPacket).toHaveBeenCalledTimes(3);
         expect(fileSource.uploadFileToS3).toHaveBeenCalledTimes(3);
     });
+});
 
-    it("should take an image URL and generate/append an image thumbnail to page", async () => {
-        // this method probably got stubbed so make sure to call it through
-        spyOn(fileSource, "generateThumbnail").and.callThrough();
-        // mock up a thumbnail container
-        const thumbnailElement = document.createElement("div");
-        thumbnailElement.id="id_image_thumbnails";
-        document.body.append(thumbnailElement);
-        //const thumbnailElement = document.getElementById("id_image_thumbnails");
-        return(fileSource.generateThumbnail(imageURL)).then(() => {
+
+describe("generating thumbnails and appending images to the DOM", () => {
+    const fileSource = new FileSource();
+    let imageUrl, thumbnailElement, response, responseBody, responseOptions;
+   
+    beforeEach(function() {
+        // create somewhere to put the thumbnails
+        thumbnailElement = document.createElement("div");
+        thumbnailElement.id = "id_image_thumbnails";
+        document.body.appendChild(thumbnailElement);
+
+        // create a dummy server response
+        responseBody = JSON.stringify(
+            { html: "<p>Server response HTML</p>" },
+        );
+        responseOptions = {
+            headers: {
+                'content-type': 'application/json'
+            },
+        };
+        response = new Response(responseBody, responseOptions);
+        
+        // a nice picture of a horse
+        imageUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzID6RT9EwTVSFvNuTwh1vLSkKmUE4X_uDhA&usqp=CAU";
+        
+        // return a fake url for ajax requests
+        spyOn(window, "getAJAXURL").and.returnValue("some-url");
+    });
+
+    afterEach(function() {
+        thumbnailElement.remove();
+    });
+
+    it("should request formatted HTML from the server", () => { 
+        spyOn(window, "makeFetch").and.resolveTo(response);
+        return fileSource.generateThumbnail(imageUrl).then(() => {
+            expect(window.getAJAXURL).toHaveBeenCalledWith("imageThumbnail");
             expect(window.makeFetch).toHaveBeenCalled();
-            expect(thumbnailElement.children.length).toBeGreaterThan(0);
         });
+    });
+
+    it("should append retrieved HTML to the DOM", () => {
+        spyOn(window, "makeFetch").and.resolveTo(response);
+
+        // get initial count of thumbnail container's children
+        let childCount = thumbnailElement.children.length;
+
+        return fileSource.generateThumbnail(imageUrl).then(() => {
+            let currentCount = thumbnailElement.children.length;
+            expect(currentCount).toBeGreaterThan(childCount);
+        });
+    });
+
+    it("should handle a promise rejection in the event of server error", () => {
+        spyOn(window, "makeFetch").and.rejectWith(false);
+        let resolvedCheck = rejectedCheck = false;
+        return fileSource.generateThumbnail(imageUrl).then(() => {
+            resolvedCheck = true;
+        }).catch((error) => {
+            rejectedCheck = true;
+            expect(resolvedCheck).toBe(false);
+            expect(rejectedCheck).toBe(true);
+        });
+    });
+});
+
+
+describe("adding and removing uploaded images to/from a form element", () => {
+    const fileSource = new FileSource();
+    let selectElement, fakeURL1, fakeURL2, fakeURL3;
+
+    beforeEach(function() {
+        selectElement = document.createElement("select");
+        selectElement.id = "id_image_select";
+        document.body.appendChild(selectElement);
+
+        fakeURL1 = "fakeURL1";
+        fakeURL2 = "fakeURL2";
+        fakeURL3 = "fakeURL3";
+
+    });
+    
+    afterEach(function() {
+        selectElement.remove();
+    });
+
+    xit("should append new images to a select element", () => {
+        fileSource.appendImageURLToForm()
+    });
+
+    xit("should remove a deleted image from select element", () => {
+
     });
 });
 

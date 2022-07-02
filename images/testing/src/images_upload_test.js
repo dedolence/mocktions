@@ -22,6 +22,16 @@ function FileSource() {
 
 
 /**
+ * Appends the URL of each uploaded image to the document's form body.
+ * @param {String} imageURL 
+ * @returns {void}
+ */
+FileSource.prototype.appendImageURLToForm = function(imageURL) {
+    return true;
+}
+
+
+/**
  * Looks for files uploaded to a file input first, defaults to a URL if none.
  * The URL itself defaults to a random image API, so sourceFileArray will always
  * contain at least one image file.
@@ -77,7 +87,7 @@ function FileSource() {
             // check valid content type
             const contentType = response.headers.get('content-type');
             if (!validTypes.includes(contentType)) {
-                rej(handleFetchError(new Error("Invalid image type: " + contentType)));
+                rej(handleFetchError("Invalid image type: " + contentType));
             } else {
                 buffer = response.arrayBuffer();
                 file = new File([buffer], fileName, {type: fileType});
@@ -121,8 +131,8 @@ FileSource.prototype.generateThumbnail = function(imageURL) {
             }
         })
         .catch((error) => {
-            console.log("Error in generating thumbnail: ", error);
-        })
+            rej(handleFetchError(error));
+        });
     });
 }
 
