@@ -1,33 +1,85 @@
 "use strict";
 
 /**
+ * @Class FileSource
  * Handles user uploads of files (typically images). 
- * Users can upload from their hard drive or provide a URL.
- * @constructor
- * @property {Array<PresignedURLPacket>} presignedURLPackets
- *  Objects returned from the server's S3 request, to be used for uploading file.
- * @property {Array<String>} processedImageURLs 
- *  The URLs to images that have been fully processed and uploaded.
- * @property {Array<File>} sourceFileArray 
- *  Files to be uploaded
- * @property {String} sourceURL
- *  A user-provided URL that points to an image to be uploaded
+ * Users can upload from their hard drive or provide a URL. All params are the ID
+ * attributes of DOM elements for use with getElementById().
  */
-function FileSource() {
-    this.presignedURLPackets = [];
-    this.processedImageURLs = [];
-    this.sourceFileArray = [];
-    this.sourceURL;
-}
+class FileSource {
+    /**
+     * All params are the ID attributes of their respective DOM elements, for use
+     * with document.getElementById().
+     * @param {String} urlSelectElementId 
+     * @param {String} urlInputElementId 
+     * @param {String} loadingModalElementId 
+     * @param {String} sourceFileElementId 
+     * @param {String} thumbnailContainerElementId 
+     */
+    constructor(
+        urlSelectElementId,
+        urlInputElementId,
+        loadingModalElementId,
+        sourceFileElementId,
+        thumbnailContainerElementId,
+    ) {
+        /**
+         * @property {Array<PresignedURLPacket>} presignedURLPackets
+         * Objects returned from the server's S3 request, to be used for uploading file.
+         */
+        this.presignedURLPackets = [];
 
+        /**
+         * @property {Array<String>} processedImageURLs 
+         *  The URLs to images that have been fully processed and uploaded.
+         */
+        this.processedImageURLs = [];
 
-/**
- * Appends the URL of each uploaded image to the document's form body.
- * @param {String} imageURL 
- * @returns {void}
- */
-FileSource.prototype.appendImageURLToForm = function(imageURL) {
-    return true;
+        /**
+         * @property {Array<File>} sourceFileArray 
+         *  Files to be uploaded 
+         */
+        this.sourceFileArray = [];
+
+        /**
+         * @property {String} sourceURL
+         *  A user-provided URL that points to an image to be uploaded 
+         */
+        this.sourceURL;
+
+        /**
+         * @property {HTMLElement} urlSelectElement
+         *  A hidden <select> element that contains a list (as the value of <option> elements)
+         *  of all the images that were uploaded, to be submitted with other form data. 
+         */
+        this.urlSelectElement = $(urlSelectElementId);
+
+        /**
+         * @property {HTMLElement} urlInputElement
+         *  An <input> element that can be filled in by the user to point to the URL of an image
+         *  to be uploaded.
+         */
+        this.urlInputElement = $(urlInputElementId);
+
+        /**
+         * @property {HTMLElement} loadingModalElement
+         *  A <div> with Bootstrap class "modal" used for displaying a "loading" indicator. 
+         */
+        this.loadingModalElement = $(loadingModalElementId);
+
+        /**
+         * @property {HTMLElement} sourceFileElement
+         *  A <input> element of type="file" for the user to provide images from their computer
+         *  to be uploaded. 
+         */
+        this.sourceFileElement = $(sourceFileElementId);
+
+        /**
+         * @property {HTMLElement} thumbnailContainerElement
+         *  A <div> in which thumbnails of uploaded images will be displayed to the user.
+         */
+        this.thumbnailContainerElement = $(thumbnailContainerElementId);
+    }
 }
 
 
@@ -205,7 +257,6 @@ FileSource.prototype.processFile = function(file) {
         .then((packet) => {
             url = this.uploadFileToS3(packet.file, packet.data, packet.url);
             this.generateThumbnail(url);
-            //this.appendImageURLToForm(url);
             res(url);
         })
         .catch((error) => {
@@ -249,12 +300,43 @@ FileSource.prototype.processAllFiles = function() {
 
             // when all promises are ready, turn off loading modal
             Promise.all(promises).then((urls) => {
-                this.processedImageURLs = urls;
+                // add new URLs to existing array
+                this.processedImageURLs = this.processedImageURLs.concat(urls);
+                this.refreshURLs(urls);
                 modal.hide();
                 res();
             });
         })
     });
+}
+
+
+/**
+ * Called when images are added or removed to make sure the select element
+ * containing their values is accurate.
+ * @returns {void}
+ */
+FileSource.prototype.refreshURLs = function(urls=this.processedImageURLs) {
+    let selectElement;
+
+    try {
+        selectElement = $('id_images_select');
+    } 
+    catch(error) {
+        // no element, most likely
+        throw new Error("Error: form element not found; new images will not be appened to POST data.");
+    }
+
+    while (selectElement.children.length > 0) {
+        selectElement.removeChild(selectElement.children[0]);
+    }
+
+    for (const url of urls) {
+        let optionElement = document.createElement("option");
+            optionElement.defaultSelected = true;
+            optionElement.value = url;
+        selectElement.appendChild(optionElement);
+    }
 }
 
 

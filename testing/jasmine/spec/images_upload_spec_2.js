@@ -1,4 +1,38 @@
-describe("Collecting files to upload", () => {
+describe("makeFetch()", () => {
+    const options = {
+        method: "GET",
+    }
+
+    const responseStatustester = {
+        asymmetricMatch: function(actual) {
+            return actual >= 200 && actual <= 299;
+        }
+    }
+
+    it("should fetch any arbitrary response from a server", () => {
+        const successfulURL = "https://randomuser.me/api/";
+        return makeFetch(successfulURL).then((response) => {
+            expect(response.status).toEqual(responseStatustester);
+        });
+    });
+
+    it("should return an error if there was a problem", () => {
+        const unsuccessfulURL = "https://doesnt.exist.com";
+        let resolvedCheck = rejectedCheck = false;
+        return makeFetch(unsuccessfulURL)
+        .then((response) => {
+            resolvedCheck = true;
+        })
+        .catch((error) => {
+            rejectedCheck = true;
+            expect(resolvedCheck).toEqual(false);
+            expect(rejectedCheck).toEqual(true);
+        });
+    });
+});
+
+
+describe("FileSource.collectImages()", () => {
     const fileSource = new FileSource();
     let mockFile1, mockFile2, mockFile3, urlInputElement, serverResponse;
 
@@ -45,74 +79,7 @@ describe("Collecting files to upload", () => {
 });
 
 
-describe("Processing files for uploading", () => {
-    const fileSource = new FileSource();
-    let mockFile, uploadedImageURL, fakePacket, mockFileArray;
-    let responseBody, responseOptions, serverResponse;
-
-    beforeAll(function() {
-    });
-
-    beforeEach(function() {
-        // fake files to fake-upload to fake-S3. fake.
-        mockFile = new File([], 'mockFile1.jpg', {type: 'image/jpg'});
-        mockFileArray = [
-            new File([], 'mockFile1.jpg', {type: 'image/jpg'}),
-            new File([], 'mockFile2.jpg', {type: 'image/jpg'}),
-            new File([], 'mockFile3.jpg', {type: 'image/jpg'})
-        ];
-
-        uploadedImageURL = "https://path.to.image.jpg";
-        spyOn(fileSource, "uploadFileToS3").and.resolveTo(uploadedImageURL);
-        
-        // fake S3 presignedURL packet
-        fakePacket = {
-            file: mockFile,
-            data: {
-                key1: "value1",
-                key2: "value2",
-                key3: "value3"
-            },
-            url: uploadedImageURL
-        };
-        spyOn(fileSource, "getPresignedURLPacket").and.resolveTo(fakePacket);
-
-        // create a fake response
-        const imageURL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzID6RT9EwTVSFvNuTwh1vLSkKmUE4X_uDhA&usqp=CAU";
-        responseBody = JSON.stringify({html: '<img src="' + imageURL + '">'});
-        responseOptions = {headers: {'content-type': 'application/json'}};
-        serverResponse = new Response(responseBody, responseOptions);
-        spyOn(window, "makeFetch").and.resolveTo(serverResponse);
-
-        // spy on auxiliary methods generateThumbnail and appendImageURLToForm
-        spyOn(fileSource, "generateThumbnail").and.resolveTo(true);
-        spyOn(fileSource, "appendImageURLToForm").and.returnValue(true);
-    });
-
-    it("should upload a single file", async () => {
-        let actualUploadedImageURL = await fileSource.processFile(mockFile);
-        expect(actualUploadedImageURL).toEqual(uploadedImageURL);
-        expect(fileSource.getPresignedURLPacket).toHaveBeenCalledWith(mockFile);
-        expect(fileSource.uploadFileToS3)
-            .toHaveBeenCalledWith(
-                fakePacket.file, 
-                fakePacket.data, 
-                fakePacket.url
-            );
-    });
-
-    it("should upload multiple files concurrently", async () => {
-        spyOn(fileSource, "collectImages").and.resolveTo(mockFileArray);
-        await fileSource.processAllFiles();
-        expect(fileSource.processedImageURLs.length).toEqual(3);
-        expect(fileSource.processedImageURLs[0]).toEqual(jasmine.any(String));
-        expect(fileSource.getPresignedURLPacket).toHaveBeenCalledTimes(3);
-        expect(fileSource.uploadFileToS3).toHaveBeenCalledTimes(3);
-    });
-});
-
-
-describe("generating thumbnails and appending images to the DOM", () => {
+describe("FileSource.generateThumbnail()", () => {
     const fileSource = new FileSource();
     let imageUrl, thumbnailElement, response, responseBody, responseOptions;
    
@@ -178,36 +145,7 @@ describe("generating thumbnails and appending images to the DOM", () => {
 });
 
 
-describe("adding and removing uploaded images to/from a form element", () => {
-    const fileSource = new FileSource();
-    let selectElement, fakeURL1, fakeURL2, fakeURL3;
-
-    beforeEach(function() {
-        selectElement = document.createElement("select");
-        selectElement.id = "id_image_select";
-        document.body.appendChild(selectElement);
-
-        fakeURL1 = "fakeURL1";
-        fakeURL2 = "fakeURL2";
-        fakeURL3 = "fakeURL3";
-
-    });
-    
-    afterEach(function() {
-        selectElement.remove();
-    });
-
-    xit("should append new images to a select element", () => {
-        fileSource.appendImageURLToForm()
-    });
-
-    xit("should remove a deleted image from select element", () => {
-
-    });
-});
-
-
-describe('Retrieving images from URLs:', () => {
+describe('FileSource.getImageFromURL()', () => {
     // this is a LIVE test; i.e. it actually performs the fetch requests. good idea? 
     const fileSource = new FileSource();
 
@@ -240,7 +178,7 @@ describe('Retrieving images from URLs:', () => {
 });
 
 
-describe("Presigned URLS:", () => {
+describe("FileSource.getPresignedURLPacket()", () => {
     const fileSource = new FileSource();
     let mockFile, urlElement, serverResponse;
 
@@ -288,7 +226,119 @@ describe("Presigned URLS:", () => {
 });
 
 
-describe("Uploading files to S3", () => {
+describe("FileSource.processFile() and FileSource.processAllFiles()", () => {
+    const fileSource = new FileSource();
+    let mockFile, uploadedImageURL, fakePacket, mockFileArray;
+    let responseBody, responseOptions, serverResponse;
+
+    beforeAll(function() {
+    });
+
+    beforeEach(function() {
+        // fake files to fake-upload to fake-S3. fake.
+        mockFile = new File([], 'mockFile1.jpg', {type: 'image/jpg'});
+        mockFileArray = [
+            new File([], 'mockFile1.jpg', {type: 'image/jpg'}),
+            new File([], 'mockFile2.jpg', {type: 'image/jpg'}),
+            new File([], 'mockFile3.jpg', {type: 'image/jpg'})
+        ];
+
+        uploadedImageURL = "https://path.to.image.jpg";
+        spyOn(fileSource, "uploadFileToS3").and.resolveTo(uploadedImageURL);
+        
+        // fake S3 presignedURL packet
+        fakePacket = {
+            file: mockFile,
+            data: {
+                key1: "value1",
+                key2: "value2",
+                key3: "value3"
+            },
+            url: uploadedImageURL
+        };
+        spyOn(fileSource, "getPresignedURLPacket").and.resolveTo(fakePacket);
+
+        // create a fake response
+        const imageURL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzID6RT9EwTVSFvNuTwh1vLSkKmUE4X_uDhA&usqp=CAU";
+        responseBody = JSON.stringify({html: '<img src="' + imageURL + '">'});
+        responseOptions = {headers: {'content-type': 'application/json'}};
+        serverResponse = new Response(responseBody, responseOptions);
+        spyOn(window, "makeFetch").and.resolveTo(serverResponse);
+
+        // spy on auxiliary method generateThumbnail
+        spyOn(fileSource, "generateThumbnail").and.resolveTo(true);
+        spyOn(fileSource, "refreshURLs");
+    });
+
+    it("should upload a single file", async () => {
+        let actualUploadedImageURL = await fileSource.processFile(mockFile);
+        expect(actualUploadedImageURL).toEqual(uploadedImageURL);
+        expect(fileSource.getPresignedURLPacket).toHaveBeenCalledWith(mockFile);
+        expect(fileSource.uploadFileToS3)
+            .toHaveBeenCalledWith(
+                fakePacket.file, 
+                fakePacket.data, 
+                fakePacket.url
+            );
+    });
+
+    it("should upload multiple files concurrently", async () => {
+        spyOn(fileSource, "collectImages").and.resolveTo(mockFileArray);
+        await fileSource.processAllFiles();
+        expect(fileSource.processedImageURLs.length).toEqual(3);
+        expect(fileSource.processedImageURLs[0]).toEqual(jasmine.any(String));
+        expect(fileSource.getPresignedURLPacket).toHaveBeenCalledTimes(3);
+        expect(fileSource.uploadFileToS3).toHaveBeenCalledTimes(3);
+    });
+});
+
+
+describe("FileSource.refreshURLs()", () => {
+    const fileSource = new FileSource();
+
+    let selectElement, optionElement1, optionElement2, optionElement3;
+
+    beforeEach(function() {
+        // generate the select element
+        selectElement = document.createElement("select");
+        selectElement.id = "id_images_select";
+        document.body.appendChild(selectElement);
+
+        optionElement1 = optionElement2 = optionElement3 = document.createElement("option");
+    });
+
+    afterEach(function() {
+        selectElement.remove();
+    })
+
+    it("should add new URLs to the select element", () => {
+        fileSource.processedImageURLs = ["fakeUrl1", "fakeUrl2", "fakeUrl3"];
+        fileSource.refreshURLs();
+        expect(selectElement.children.length).toBe(3);
+    });
+
+    it("should remove URLs from the select element", () => {
+        // prepopulate select element
+        selectElement.append(optionElement1, optionElement2, optionElement3);
+        // set processedImageURLs to only have 1 elements
+        fileSource.processedImageURLs = ["fakeUrl1"];
+        fileSource.refreshURLs();
+        expect(selectElement.children.length).toBe(1);      
+    });
+
+    it("should generate an error if select element doesn't exist", () => {
+        selectElement.remove();
+        try {
+            fileSource.refreshURLs();
+        }
+        catch(error) {
+            expect(document.getElementById("id_images_select")).toBe(null);
+        }
+    });
+});
+
+
+describe("FileSource.uploadFileToS3()", () => {
     const fileSource = new FileSource;
     let file, data, url;
 
@@ -337,40 +387,6 @@ describe("Uploading files to S3", () => {
 
         return fileSource.uploadFileToS3(file, data, url).then((returnedURL) => {
             expect(returnedURL).toEqual(url);
-        });
-    });
-});
-
-
-describe("The makeFetch() function", () => {
-    const options = {
-        method: "GET",
-    }
-
-    const responseStatustester = {
-        asymmetricMatch: function(actual) {
-            return actual >= 200 && actual <= 299;
-        }
-    }
-
-    it("should fetch any arbitrary response from a server", () => {
-        const successfulURL = "https://randomuser.me/api/";
-        return makeFetch(successfulURL).then((response) => {
-            expect(response.status).toEqual(responseStatustester);
-        });
-    });
-
-    it("should return an error if there was a problem", () => {
-        const unsuccessfulURL = "https://doesnt.exist.com";
-        let resolvedCheck = rejectedCheck = false;
-        return makeFetch(unsuccessfulURL)
-        .then((response) => {
-            resolvedCheck = true;
-        })
-        .catch((error) => {
-            rejectedCheck = true;
-            expect(resolvedCheck).toEqual(false);
-            expect(rejectedCheck).toEqual(true);
         });
     });
 });
