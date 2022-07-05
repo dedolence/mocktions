@@ -43,3 +43,39 @@ describe("FileSource.collectImages()", () => {
         expect(fileSource.sourceURL).toEqual(urlInputElement.value);
     });
 });
+
+describe("FileSource.getImageFromURL()", () => {
+    const fileSource = new FileSource();
+    
+    let serverResponse, responseBody, responseOptions;
+    let resolvedCheck, rejectedCheck;
+
+    beforeEach(function() {
+        responseBody = new File([], "fakeImage", {});
+        responseOptions = {'headers': {'content-type': 'image/jpg'}};
+        serverResponse = new Request(responseBody, responseOptions);
+    });
+
+    it("should return an image if provided a URL", () => {
+
+    });
+
+    it("should return a random image if no URL is provided", () => {
+
+    });
+
+    it("should reject any file that has the wrong content-type", () => {
+        resolvedCheck = rejectedCheck = false;
+        responseOptions = {'headers': {'content-type': 'applicatin/json'}};
+        serverResponse = new Request(responseBody, responseOptions);
+        spyOn(window, "makeFetch").and.resolveTo(serverResponse);
+        return fileSource.getImageFromURL("fake.url").then((response) => {
+            resolvedCheck = true;
+        })
+        .catch((error) => {
+            rejectedCheck = true;
+            expect(resolvedCheck).toBe(false);
+            expect(rejectedCheck).toBe(true);
+        });
+    });
+});
