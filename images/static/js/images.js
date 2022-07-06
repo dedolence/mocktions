@@ -3,11 +3,12 @@
  * 
  * All params are the ID attributes of their respective DOM elements, for use
  * with document.getElementById().
- * @param {String} urlSelectElementId 
- * @param {String} urlInputElementId 
- * @param {String} loadingModalElementId 
- * @param {String} sourceFileElementId 
- * @param {String} thumbnailContainerElementId 
+ * @param {Object} ids  ID attributes of DOM elements.
+ * @param {String} ids.urlSelectElementId 
+ * @param {String} ids.urlInputElementId 
+ * @param {String} ids.loadingModalElementId 
+ * @param {String} ids.sourceFileElementId 
+ * @param {String} ids.thumbnailContainerElementId 
  * 
  * @property {Array<PresignedURLPacket>} presignedURLPackets
  * Objects returned from the server's S3 request, to be used for uploading file.
@@ -32,22 +33,16 @@
  *  A div in which thumbnails of uploaded images will be displayed to the user.
  */
  class FileSource {
-    constructor(
-        urlSelectElementId,
-        urlInputElementId,
-        loadingModalElementId,
-        sourceFileElementId,
-        thumbnailContainerElementId,
-    ) {
+    constructor() {
         this.presignedURLPackets = [];
         this.processedImageURLs = [];
         this.sourceFileArray = [];
         this.sourceURL;
-        this.urlSelectElement = $(urlSelectElementId);
-        this.urlInputElement = $(urlInputElementId);
-        this.loadingModalElement = $(loadingModalElementId);
-        this.sourceFileElement = $(sourceFileElementId);
-        this.thumbnailContainerElement = $(thumbnailContainerElementId);
+        this.urlSelectElement = $("id_image_select");
+        this.urlInputElement = $("id_image_url_input");
+        this.loadingModalElement = $("id_image_loading_modal");
+        this.sourceFileElement = $("id_file_input");
+        this.thumbnailContainerElement = $("id_thumbnail_container");
     }
 }
 
@@ -57,21 +52,23 @@
  * The URL itself defaults to a random image API, so sourceFileArray will always
  * contain at least one image file.
  * @async
+ * @param {HTMLElement} urlInputElement A text input containing the value of an image URL.
+ * @param {HTMLElement} sourceFileElement A file input element for uploading from local storage.
  * @returns {Array<PresignedURLPacket>}
  */
- FileSource.prototype.collectImages = async function() {
+ FileSource.prototype.collectImages = async function(urlInputElement, sourceFileElement) {
     let image;
 
     // get image URL if provided
-    if ($('id_image_url').value) {
-        this.sourceURL = $('id_image_url').value;
+    if (urlInputElement.value) {
+        this.sourceURL = urlInputElement.value;
     } else {
         this.sourceURL = "https://picsum.photos/300";
     }
 
     // get source files to be uploaded, if any.
-    if ($('id_image_upload')) {
-        this.sourceFileArray = Array.from($('id_image_upload')).files;
+    if (sourceFileElement.files[0]) {
+        this.sourceFileArray = Array.from(sourceFileElement).files;
         return this.sourceFileArray;
     } else {
         image = await this.getImageFromURL(this.sourceURL);
@@ -127,12 +124,12 @@
  * Server responds with a JSON object with an html property.
  * @async
  * @param {String} url 
- *  The image src
+ * @param {HTMLElement} thumbnailContainerElement Div container for thumbnails.
  * @returns {Promise}
  */
-FileSource.prototype.generateThumbnail = function(imageURL) {
+FileSource.prototype.generateThumbnail = function(imageURL, thumbnailContainerElement) {
     return new Promise((res, rej) => {
-        let html, thumbCont, div;
+        let html, thumbCont = thumbnailContainerElement;
         const fetchURL = getAJAXURL("imageThumbnail") + "?url=" + imageURL;
         makeFetch(fetchURL)
         .then((response) => {
@@ -143,7 +140,6 @@ FileSource.prototype.generateThumbnail = function(imageURL) {
         .then((response) => {
             html = response.html;
             try {
-                thumbCont = $('id_image_thumbnails');
                 thumbCont.innerHTML += html;
                 res();
             }
