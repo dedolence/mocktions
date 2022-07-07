@@ -24,6 +24,10 @@ const elements = [
  */
 const ids = Object.fromEntries(elements.map((e) => { return [e.id, e.id] }));
 
+/**
+ * Iterates through the elements array and creates/appends each to DOM.
+ * @returns {void}
+ */
 function elementGenerator() {
     for (el of elements) {
         let _ = document.createElement(el.node);
@@ -36,6 +40,10 @@ function elementGenerator() {
     }
 }
 
+/**
+ * Removes all elements with class "tempDOMelement" from DOM.
+ * @returns {void}
+ */
 function elementRemover() {
     let nodes = document.querySelectorAll(".tempDOMelement");
     for (node of nodes) {
@@ -160,20 +168,19 @@ describe("FileSource.getImageFromURL()", () => {
 
 describe("FileSource.generateThumbnail()", () => {
 
-    beforeAll(function() {
-        elementGenerator();
-    });
+    beforeAll(elementGenerator);
 
-    afterAll(function() {
-        elementRemover();
-    });
+    afterAll(elementRemover);
 
-    const fileSource = new FileSource(ids);
+    const fileSource = new FileSource();
+
+    console.log("Element after elementGenerator called and fileSource instantiated: ", fileSource.thumbnailContainerElement);
     let imageUrl, thumbnailElement, response, responseBody, responseOptions;
    
     beforeEach(function() {
 
-        thumbnailElement = document.getElementById('id_thumbnail_container');
+        //thumbnailElement = document.getElementById('id_thumbnail_container');
+        thumbnailElement = fileSource.thumbnailContainerElement;
 
         // create a dummy server response
         responseBody = JSON.stringify(
@@ -195,6 +202,7 @@ describe("FileSource.generateThumbnail()", () => {
 
     it("should request formatted HTML from the server", () => { 
         spyOn(window, "makeFetch").and.resolveTo(response);
+        console.log("thumbnail element right before method is called: ", fileSource.thumbnailContainerElement);
         return fileSource.generateThumbnail(imageUrl, thumbnailElement).then(() => {
             expect(window.getAJAXURL).toHaveBeenCalledWith("imageThumbnail");
             expect(window.makeFetch).toHaveBeenCalled();

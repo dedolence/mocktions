@@ -31,6 +31,8 @@
  *  to be uploaded. 
  * @property {HTMLElement} thumbnailContainerElement
  *  A div in which thumbnails of uploaded images will be displayed to the user.
+ * @property {String} sourceURL
+ *  A random image API. Will be the default if neither files nor an alternate URL are provided.
  */
  class FileSource {
     constructor() {
@@ -43,6 +45,8 @@
         this.loadingModalElement = $("id_image_loading_modal");
         this.sourceFileElement = $("id_file_input");
         this.thumbnailContainerElement = $("id_thumbnail_container");
+        this.sourceURL = "https://picsum.photos/300";
+        console.log("File Source instance created: ", this);
     }
 }
 
@@ -56,19 +60,18 @@
  * @param {HTMLElement} sourceFileElement A file input element for uploading from local storage.
  * @returns {Array<PresignedURLPacket>}
  */
- FileSource.prototype.collectImages = async function(urlInputElement, sourceFileElement) {
+ FileSource.prototype.collectImages = async function() {
     let image;
 
     // get image URL if provided
-    if (urlInputElement.value) {
-        this.sourceURL = urlInputElement.value;
-    } else {
-        this.sourceURL = "https://picsum.photos/300";
+    if (this.urlInputElement.value) {
+        this.sourceURL = this.urlInputElement.value;
     }
 
-    // get source files to be uploaded, if any.
-    if (sourceFileElement.files[0]) {
-        this.sourceFileArray = Array.from(sourceFileElement).files;
+    // get source files to be uploaded. if user doesn't provide any,
+    // retrieve one from the internet.
+    if (this.sourceFileElement.files[0]) {
+        this.sourceFileArray = Array.from(this.sourceFileElement).files;
         return this.sourceFileArray;
     } else {
         image = await this.getImageFromURL(this.sourceURL);
@@ -127,9 +130,12 @@
  * @param {HTMLElement} thumbnailContainerElement Div container for thumbnails.
  * @returns {Promise}
  */
-FileSource.prototype.generateThumbnail = function(imageURL, thumbnailContainerElement) {
+FileSource.prototype.generateThumbnail = function(imageURL) {
     return new Promise((res, rej) => {
-        let html, thumbCont = thumbnailContainerElement;
+        console.log("this from generateThumbnail(): ", this);
+        let html;
+        let thumbCont = this.thumbnailContainerElement;
+        console.log("thumbnail container from generateThumbnail(): ", this.thumbnailContainerElement);
         const fetchURL = getAJAXURL("imageThumbnail") + "?url=" + imageURL;
         makeFetch(fetchURL)
         .then((response) => {
