@@ -29,24 +29,51 @@ const ids = Object.fromEntries(elements.map((e) => { return [e.id, e.id] }));
  * @returns {void}
  */
 function elementGenerator() {
-    for (el of elements) {
-        let _ = document.createElement(el.node);
-        _.id = el.id;
-        if (el.type) {
-            _.type = el.type;
+    return new Promise((res, rej) => {
+        promises = [];
+        for (el of elements) {
+            promises.push(new Promise((rslve, rjct) => {
+                let _ = document.createElement(el.node);
+                _.id = el.id;
+                if (el.type) {
+                    _.type = el.type;
+                }
+                _.classList.add("tempDOMelement");  // for removing later
+                document.body.appendChild(_);
+                rslve();
+            }));
         }
-        _.classList.add("tempDOMelement");  // for removing later
-        document.body.appendChild(_);
-    }
+        Promise.all(promises).then(() => {
+            res();
+        })
+    });
 }
+/* function elementGenerator(caller) {
+    return new Promise((res, rej) => {
+        //console.log("Generating elements for " + caller);
+        for (el of elements) {
+            //console.log("--- generating element with ID " + el.id);
+            let _ = document.createElement(el.node);
+            _.id = el.id;
+            if (el.type) {
+                _.type = el.type;
+            }
+            _.classList.add("tempDOMelement");  // for removing later
+            document.body.appendChild(_);
+        }
+        res();
+    });
+} */
 
 /**
  * Removes all elements with class "tempDOMelement" from DOM.
  * @returns {void}
  */
-function elementRemover() {
+function elementRemover(caller) {
+    //console.log("Removing elements for " + caller);
     let nodes = document.querySelectorAll(".tempDOMelement");
     for (node of nodes) {
+        //console.log("--- Removing node: " + node.id);
         node.remove();
     }
 }
@@ -57,11 +84,11 @@ describe("FileSource.collectImages()", () => {
     let fileSource, mockFile1, mockFile2, mockFile3, urlInputElement, serverResponse;
     
     beforeAll(function() {
-        elementGenerator();
+        elementGenerator("collectImages()");
     });
 
     afterAll(function() {
-        elementRemover();
+        elementRemover("collectImages()");
     });
 
     beforeEach(function() {
@@ -107,14 +134,14 @@ describe("FileSource.collectImages()", () => {
 describe("FileSource.getImageFromURL()", () => {
     
     beforeAll(function() {
-        elementGenerator();
+        elementGenerator("getImageFromURL()");
     });
 
     afterAll(function() {
-        elementRemover();
+        elementRemover("getImageFromURL()");
     });
 
-    const fileSource = new FileSource(ids);
+    const fileSource = new FileSource();
     
     let serverResponse, responseBody, responseOptions;
     let resolvedCheck, rejectedCheck;
@@ -166,21 +193,25 @@ describe("FileSource.getImageFromURL()", () => {
     });
 });
 
+
 describe("FileSource.generateThumbnail()", () => {
+    let div;
+    beforeAll(async function() {
+        await elementGenerator("generateThumbnail()");
+    });
 
-    beforeAll(elementGenerator);
+    afterAll(function() {
+        elementRemover("generateThumbnail()");
+    });
 
-    afterAll(elementRemover);
+    const fileSource = new FileSource("generateThumbnail");
 
-    const fileSource = new FileSource();
-
-    console.log("Element after elementGenerator called and fileSource instantiated: ", fileSource.thumbnailContainerElement);
+    it("should be true", function() {
+        expect(true).toBe(true);
+    });
     let imageUrl, thumbnailElement, response, responseBody, responseOptions;
    
     beforeEach(function() {
-
-        //thumbnailElement = document.getElementById('id_thumbnail_container');
-        thumbnailElement = fileSource.thumbnailContainerElement;
 
         // create a dummy server response
         responseBody = JSON.stringify(
@@ -202,7 +233,6 @@ describe("FileSource.generateThumbnail()", () => {
 
     it("should request formatted HTML from the server", () => { 
         spyOn(window, "makeFetch").and.resolveTo(response);
-        console.log("thumbnail element right before method is called: ", fileSource.thumbnailContainerElement);
         return fileSource.generateThumbnail(imageUrl, thumbnailElement).then(() => {
             expect(window.getAJAXURL).toHaveBeenCalledWith("imageThumbnail");
             expect(window.makeFetch).toHaveBeenCalled();

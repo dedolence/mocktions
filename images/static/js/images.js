@@ -35,7 +35,7 @@
  *  A random image API. Will be the default if neither files nor an alternate URL are provided.
  */
  class FileSource {
-    constructor() {
+    constructor(caller=null) {
         this.presignedURLPackets = [];
         this.processedImageURLs = [];
         this.sourceFileArray = [];
@@ -46,7 +46,6 @@
         this.sourceFileElement = $("id_file_input");
         this.thumbnailContainerElement = $("id_thumbnail_container");
         this.sourceURL = "https://picsum.photos/300";
-        console.log("File Source instance created: ", this);
     }
 }
 
@@ -132,10 +131,8 @@
  */
 FileSource.prototype.generateThumbnail = function(imageURL) {
     return new Promise((res, rej) => {
-        console.log("this from generateThumbnail(): ", this);
         let html;
         let thumbCont = this.thumbnailContainerElement;
-        console.log("thumbnail container from generateThumbnail(): ", this.thumbnailContainerElement);
         const fetchURL = getAJAXURL("imageThumbnail") + "?url=" + imageURL;
         makeFetch(fetchURL)
         .then((response) => {
