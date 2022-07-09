@@ -133,7 +133,7 @@ FileSource.prototype.generateThumbnail = function(imageURL) {
     return new Promise((res, rej) => {
         let html;
         let thumbCont = this.thumbnailContainerElement;
-        const fetchURL = getAJAXURL("imageThumbnail") + "?url=" + imageURL;
+        const fetchURL = getAJAXURL("imageThumbnail", imageURL) + "?url=" + imageURL;
         makeFetch(fetchURL)
         .then((response) => {
             // clone may only be necessary in testing since i'm reusing a response

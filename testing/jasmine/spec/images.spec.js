@@ -212,7 +212,7 @@ describe("FileSource.generateThumbnail()", () => {
     it("should request formatted HTML from the server", () => { 
         spyOn(window, "makeFetch").and.resolveTo(response);
         return fileSource.generateThumbnail(imageUrl, thumbnailElement).then(() => {
-            expect(window.getAJAXURL).toHaveBeenCalledWith("imageThumbnail");
+            expect(window.getAJAXURL).toHaveBeenCalledWith("imageThumbnail", imageUrl);
             expect(window.makeFetch).toHaveBeenCalled();
         });
     });

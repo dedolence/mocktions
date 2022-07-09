@@ -22,9 +22,11 @@ const $ = function(element_id) {
  * @param {String} func 
  *  A string keyword that maps to a particular AJAX URL. I'd like to come up
  *  with a cooler way of doing this.
+ * @param {Object} params
+ *  For appending keys/values to a URL for a GET request.
  * @returns {String} url
  */
-function getAJAXURL(func) {
+function getAJAXURL(func, params=null) {
     let url;
     switch(func) {
         case "imageThumbnail":
@@ -32,9 +34,16 @@ function getAJAXURL(func) {
             break;
         case "presignedURL":
             url = "ajax/get_presigned_URL";
+            break;
         default:
             url = "ajax/default_url";
             break;
+    }
+    if (params) {
+        let extra = '?';
+        for (const param in params) {
+            extra += encodeURIComponent(param) + "=" + encodeURIComponent(params[param]) + "&";
+        }
     }
     return url;
 }
