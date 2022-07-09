@@ -35,7 +35,7 @@
  *  A random image API. Will be the default if neither files nor an alternate URL are provided.
  */
  class FileSource {
-    constructor(caller=null) {
+    constructor() {
         this.presignedURLPackets = [];
         this.processedImageURLs = [];
         this.sourceFileArray = [];

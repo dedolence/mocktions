@@ -1,6 +1,7 @@
 // SETUP: 
 // Add a beforeAll() to each suite that calls elementGenerator();
 // Add an afterAll() to each suite that calls elementRemover();
+// Instantiate FileSource in the beforeEach() method, not before!
 
 /**
  * Add a line for each DOM element that needs to be appended in order
@@ -20,7 +21,7 @@ const elements = [
 
 
 /**
- * Returns an object of element parameters to their IDs.
+ * Returns an object of element parameters to their IDs. {id: 'id'}
  */
 const ids = Object.fromEntries(elements.map((e) => { return [e.id, e.id] }));
 
@@ -28,31 +29,9 @@ const ids = Object.fromEntries(elements.map((e) => { return [e.id, e.id] }));
  * Iterates through the elements array and creates/appends each to DOM.
  * @returns {void}
  */
-function elementGenerator() {
+function elementGenerator(caller) {
     return new Promise((res, rej) => {
-        promises = [];
         for (el of elements) {
-            promises.push(new Promise((rslve, rjct) => {
-                let _ = document.createElement(el.node);
-                _.id = el.id;
-                if (el.type) {
-                    _.type = el.type;
-                }
-                _.classList.add("tempDOMelement");  // for removing later
-                document.body.appendChild(_);
-                rslve();
-            }));
-        }
-        Promise.all(promises).then(() => {
-            res();
-        })
-    });
-}
-/* function elementGenerator(caller) {
-    return new Promise((res, rej) => {
-        //console.log("Generating elements for " + caller);
-        for (el of elements) {
-            //console.log("--- generating element with ID " + el.id);
             let _ = document.createElement(el.node);
             _.id = el.id;
             if (el.type) {
@@ -63,21 +42,18 @@ function elementGenerator() {
         }
         res();
     });
-} */
+}
 
 /**
  * Removes all elements with class "tempDOMelement" from DOM.
  * @returns {void}
  */
 function elementRemover(caller) {
-    //console.log("Removing elements for " + caller);
     let nodes = document.querySelectorAll(".tempDOMelement");
     for (node of nodes) {
-        //console.log("--- Removing node: " + node.id);
         node.remove();
     }
 }
-
 
 
 describe("FileSource.collectImages()", () => {
@@ -93,12 +69,13 @@ describe("FileSource.collectImages()", () => {
 
     beforeEach(function() {
         fileSource = new FileSource();
+
         // create some dummy files to use
         mockFile1 = new File([], 'mockFile1.jpg', {type: 'image/jpg'});
         mockFile2 = new File([], 'mockFile2.jpg', {type: 'image/jpg'});
         mockFile3 = new File([], 'mockFile3.jpg', {type: 'image/jpg'});
 
-        
+        // add an image URL to the input
         urlInputElement = document.getElementById("id_image_url_input");
         urlInputElement.value = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzID6RT9EwTVSFvNuTwh1vLSkKmUE4X_uDhA&usqp=CAU";
 
@@ -110,11 +87,12 @@ describe("FileSource.collectImages()", () => {
 
         // return a fake presigned URL packet 
         spyOn(fileSource, "getPresignedURLPacket").and.resolveTo({
-                file: 'file object',
-                data: {key: 'value'},
-                url: 'url'
-            });
+            file: 'file object',
+            data: {key: 'value'},
+            url: 'url'
+        });
 
+        // just need a resolved promise that looks like a string
         spyOn(fileSource, "uploadFileToS3").and.resolveTo(
             "https://moctions-static.s3.whatever/path-to-image.jpg"
         );
@@ -131,6 +109,7 @@ describe("FileSource.collectImages()", () => {
     });
 });
 
+
 describe("FileSource.getImageFromURL()", () => {
     
     beforeAll(function() {
@@ -140,13 +119,13 @@ describe("FileSource.getImageFromURL()", () => {
     afterAll(function() {
         elementRemover("getImageFromURL()");
     });
-
-    const fileSource = new FileSource();
     
-    let serverResponse, responseBody, responseOptions;
+    let fileSource, serverResponse, responseBody, responseOptions;
     let resolvedCheck, rejectedCheck;
 
     beforeEach(function() {
+        fileSource = new FileSource();
+
         responseBody = new File([], "fakeImage", {});
         responseOptions = {'headers': {'content-type': 'image/jpg'}};
         serverResponse = new Request(responseBody, responseOptions);
@@ -195,23 +174,22 @@ describe("FileSource.getImageFromURL()", () => {
 
 
 describe("FileSource.generateThumbnail()", () => {
-    let div;
-    beforeAll(async function() {
-        await elementGenerator("generateThumbnail()");
+    
+    beforeAll(function() {
+        elementGenerator("generateThumbnail()");
     });
 
     afterAll(function() {
         elementRemover("generateThumbnail()");
     });
 
-    const fileSource = new FileSource("generateThumbnail");
-
-    it("should be true", function() {
-        expect(true).toBe(true);
-    });
-    let imageUrl, thumbnailElement, response, responseBody, responseOptions;
+    let fileSource, imageUrl, thumbnailElement, response, responseBody, responseOptions;
    
     beforeEach(function() {
+
+        fileSource = new FileSource();
+
+        thumbnailElement = document.getElementById('id_thumbnail_container');
 
         // create a dummy server response
         responseBody = JSON.stringify(
