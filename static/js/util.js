@@ -1,16 +1,19 @@
 /**
- * Copies the Jquery function to access DOM elements.
+ * Copies the Jquery function to access DOM elements. Deffaults to an
+ * ID selection if no selector is provided. Currently doesn't work with
+ * multiple selections.
  * 
- * @param {String} element_id
+ * @param {String} selector
  * 
- * @returns {HTMLElement} An HTMLElement
+ * @returns {HTMLElement} 
  */
-/* export const $ = function(element_id) {
-    return document.getElementById(element_id);
-} */
-
-const $ = function(element_id) {
-    return document.getElementById(element_id);
+const $ = function(selector) {
+    const cssSelectors = ['.', '#'];
+    if (!cssSelectors.includes(selector[0])) {
+        return $('#' + selector);
+    } else {
+        return document.querySelector(selector);
+    }
 }
 
 
@@ -40,10 +43,12 @@ function getAJAXURL(func, params=null) {
             break;
     }
     if (params) {
-        let extra = '?';
+        let extras = '?';
         for (const param in params) {
-            extra += encodeURIComponent(param) + "=" + encodeURIComponent(params[param]) + "&";
+            extras += param + "=" + encodeURIComponent(params[param]) + "&";
         }
+        extras = extras.slice(0, -1); // remove trailing &, not important
+        url += extras;
     }
     return url;
 }

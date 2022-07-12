@@ -1,51 +1,71 @@
 /**
  * Handles user uploads of files (typically images). 
  * 
- * All params are the ID attributes of their respective DOM elements, for use
- * with document.getElementById().
- * @param {Object} ids  ID attributes of DOM elements.
- * @param {String} ids.urlSelectElementId 
- * @param {String} ids.urlInputElementId 
- * @param {String} ids.loadingModalElementId 
- * @param {String} ids.sourceFileElementId 
- * @param {String} ids.thumbnailContainerElementId 
+ * When constructed, make sure all the required elements are loaded into the
+ * DOM or nothing will work. Importantly, a button with id 
  * 
+ * TODO: convert all methods but processAllFiles() to private.
+ * 
+ * @param {Object} elements HTMLElements required for methods to function.
+ * @param {HTMLElement} elements.loadingModalElement (See property {@link FileSource#loadingModalElement})
+ * @param {HTMLElement} elements.processTriggerElement (See property {@link FileSource#processTriggerElement})
+ * @param {HTMLElement} elements.sourceFileElement (See property {@link FileSource#sourceFileElement})
+ * @param {HTMLElement} elements.thumbnailContainerElement (See property {@link FileSource.thumbnailContainerElement})
+ * @param {HTMLElement} elements.urlInputElement (See property {@link FileSource#urlInputElement})
+ * @param {HTMLElement} elements.urlSelectElement (See property {@link FileSource#urlSelectElement})
+ * 
+ * @property {HTMLElement} loadingModalElement 
+ *  A &lt;div&gt; with Bootstrap class "modal" used for displaying a "loading" indicator. 
  * @property {Array<PresignedURLPacket>} presignedURLPackets
  * Objects returned from the server's S3 request, to be used for uploading file.
  * @property {Array<String>} processedImageURLs 
  *  The URLs to images that have been fully processed and uploaded.
+ * @property {HTMLElement} processTriggerElement
+ *  A clickable element that triggers processAllFiles. Represents the single UI interface of
+ *  FileSource.
  * @property {Array<File>} sourceFileArray 
  *  Files to be uploaded 
- * @property {String} sourceURL
- *  A user-provided URL that points to an image to be uploaded 
- * @property {HTMLElement} urlSelectElement
- *  A hidden <select> element that contains a list (as the value of <option> elements)
- *  of all the images that were uploaded, to be submitted with other form data. 
- * @property {HTMLElement} urlInputElement
- *  An <input> element that can be filled in by the user to point to the URL of an image
- *  to be uploaded.
- * @property {HTMLElement} loadingModalElement
- *  A &lt;div&gt; with Bootstrap class "modal" used for displaying a "loading" indicator. 
  * @property {HTMLElement} sourceFileElement
  *  A input element of type="file" for the user to provide images from their computer
  *  to be uploaded. 
- * @property {HTMLElement} thumbnailContainerElement
- *  A div in which thumbnails of uploaded images will be displayed to the user.
+ * @property {String} sourceURL
+ *  A user-provided URL that points to an image to be uploaded 
  * @property {String} sourceURL
  *  A random image API. Will be the default if neither files nor an alternate URL are provided.
+ * @property {HTMLElement} thumbnailContainerElement
+ *  A div in which thumbnails of uploaded images will be displayed to the user.
+ * @property {HTMLElement} urlInputElement 
+ *  An <input> element that can be filled in by the user to point to the URL of an image.
+ * @property {HTMLElement} urlSelectElement
+ *  A hidden <select> element that contains a list (as the value of <option> elements)
+ *  of all the images that were uploaded, to be submitted with other form data. 
+ *  to be uploaded.
  */
  class FileSource {
-    constructor() {
+    constructor(elements=null) {
         this.presignedURLPackets = [];
         this.processedImageURLs = [];
         this.sourceFileArray = [];
         this.sourceURL;
-        this.urlSelectElement = $("id_image_select");
-        this.urlInputElement = $("id_image_url_input");
-        this.loadingModalElement = $("id_image_loading_modal");
-        this.sourceFileElement = $("id_file_input");
-        this.thumbnailContainerElement = $("id_thumbnail_container");
         this.sourceURL = "https://picsum.photos/300";
+
+        // get necessary HTML elements; defaults provided
+        if (elements) {
+            this.loadingModalElement = elements.loadingModalElement;
+            this.processTriggerElement = elements.processTriggerElement;
+            this.sourceFileElement = elements.sourceFileElement;
+            this.thumbnailContainerElement = elements.thumbnailContainerElement;
+            this.urlInputElement = elements.urlInputElement;
+            this.urlSelectElement = elements.urlSelectElement;
+        } else {
+            this.loadingModalElement = $("id_image_loading_modal");
+            this.processTriggerElement = $('id_process_uploads_trigger');
+            this.sourceFileElement = $("id_file_input");
+            this.thumbnailContainerElement = $("id_thumbnail_container");
+            this.urlInputElement = $("id_image_url_input");
+            this.urlSelectElement = $("id_image_select");
+        }
+        console.log(this.processTriggerElement);
     }
 }
 
@@ -77,6 +97,42 @@
         this.sourceFileArray = [image];
         return this.sourceFileArray;
     }
+}
+
+
+/**
+ * Requests a formatted chunk of URL from the server to append to DOM.
+ * Server responds with a JSON object with an html property.
+ * @async
+ * @param {String} url 
+ * @param {HTMLElement} thumbnailContainerElement Div container for thumbnails.
+ * @returns {Promise}
+ */
+ FileSource.prototype.generateThumbnail = function(imageURL) {
+    return new Promise((res, rej) => {
+        let html;
+        let thumbCont = this.thumbnailContainerElement;
+        const fetchURL = getAJAXURL("imageThumbnail", {imageURL: imageURL});
+        makeFetch(fetchURL)
+        .then((response) => {
+            // clone may only be necessary in testing since i'm reusing a response
+            // object for every makeFetch call.
+            return response.clone().json();
+        })
+        .then((response) => {
+            html = response.html;
+            try {
+                thumbCont.innerHTML += html;
+                res();
+            }
+            catch(err) {
+                rej(new Error("No place to put image thumbnails!", err));
+            }
+        })
+        .catch((error) => {
+            rej(handleFetchError(error));
+        });
+    });
 }
 
 
@@ -122,42 +178,6 @@
 
 
 /**
- * Requests a formatted chunk of URL from the server to append to DOM.
- * Server responds with a JSON object with an html property.
- * @async
- * @param {String} url 
- * @param {HTMLElement} thumbnailContainerElement Div container for thumbnails.
- * @returns {Promise}
- */
-FileSource.prototype.generateThumbnail = function(imageURL) {
-    return new Promise((res, rej) => {
-        let html;
-        let thumbCont = this.thumbnailContainerElement;
-        const fetchURL = getAJAXURL("imageThumbnail", imageURL) + "?url=" + imageURL;
-        makeFetch(fetchURL)
-        .then((response) => {
-            // clone may only be necessary in testing since i'm reusing a response
-            // object for every makeFetch call.
-            return response.clone().json();
-        })
-        .then((response) => {
-            html = response.html;
-            try {
-                thumbCont.innerHTML += html;
-                res();
-            }
-            catch(err) {
-                rej(new Error("No place to put image thumbnails!", err));
-            }
-        })
-        .catch((error) => {
-            rej(handleFetchError(error));
-        });
-    });
-}
-
-
-/**
  * An object returned by AWS containing relevant information for uploading a
  * file to an S3 bucket.
  * @typedef     {Object}   PresignedURLPacket
@@ -185,8 +205,11 @@ FileSource.prototype.generateThumbnail = function(imageURL) {
  */
  FileSource.prototype.getPresignedURLPacket = function(file) {
     return new Promise((res, rej) => {
-        const fetchURL = getAJAXURL('presignedURL') 
-            + "?name=" + file.name + "type=" + file.type;
+        let params = {
+            name: file.name,
+            type: file.type
+        }
+        const fetchURL = getAJAXURL('presignedURL', params);
 
         makeFetch(fetchURL)
         .then((response) => {
@@ -235,9 +258,11 @@ FileSource.prototype.processFile = function(file) {
 
 
 /**
- * Takes all the files contained in sourceFileArray and uploads them to S3.
+ * First collects any images, whether from file uploads or URLs provided,
+ * then gathers presigned URLs for them and uploads them to S3.
  * @async
- * @returns {Promise}
+ * @returns {Promise<string[]>} Array of URLs for the newly uploaded
+ * files. The same as the instances this.proccessedImageURLs property.
  */
 FileSource.prototype.processAllFiles = function() {
     return new Promise((res, rej) => {
@@ -251,12 +276,13 @@ FileSource.prototype.processAllFiles = function() {
                 rej();
             }
             
-            // display a loading modal
+            // try displaying a loading modal
             try {
-                modal = new bootstrap.Modal($('id_loading_image_modal'));
+                modal = new bootstrap.Modal(this.loadingModalElement);
                 modal.show();
             }
             catch(err) {
+                // no modal in DOM; fake its hide method.
                 modal = { hide: () => { return; } };
             }
 
@@ -272,7 +298,7 @@ FileSource.prototype.processAllFiles = function() {
                 this.processedImageURLs = this.processedImageURLs.concat(urls);
                 this.refreshURLs(urls);
                 modal.hide();
-                res();
+                res(this.processedImageURLs);
             });
         })
     });
@@ -282,23 +308,27 @@ FileSource.prototype.processAllFiles = function() {
 /**
  * Called when images are added or removed to make sure the select element
  * containing their values is accurate.
+ * @param {Array<String>} urls 
+ *  An array of URLs pointing to files that have already been uploaded to S3.
  * @returns {void}
  */
 FileSource.prototype.refreshURLs = function(urls=this.processedImageURLs) {
     let selectElement;
 
     try {
-        selectElement = $('id_images_select');
+        selectElement = this.urlSelectElement;
     } 
     catch(error) {
         // no element, most likely
         throw new Error("Error: form element not found; new images will not be appened to POST data.");
     }
-
+    
+    // flush all existing children
     while (selectElement.children.length > 0) {
         selectElement.removeChild(selectElement.children[0]);
     }
 
+    // add back all current images
     for (const url of urls) {
         let optionElement = document.createElement("option");
             optionElement.defaultSelected = true;

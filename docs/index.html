@@ -47,15 +47,15 @@
                       </a></li>
                       
                       <li><a
-                        href='#filesourcegetimagefromurl'
-                        class='regular pre-open'>
-                        #getImageFromURL
-                      </a></li>
-                      
-                      <li><a
                         href='#filesourcegeneratethumbnail'
                         class='regular pre-open'>
                         #generateThumbnail
+                      </a></li>
+                      
+                      <li><a
+                        href='#filesourcegetimagefromurl'
+                        class='regular pre-open'>
+                        #getImageFromURL
                       </a></li>
                       
                       <li><a
@@ -116,6 +116,66 @@
                 
                 </li>
               
+                
+                <li><a
+                  href='#'
+                  class="">
+                  $
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#getajaxurl'
+                  class="">
+                  getAJAXURL
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#getcsrftoken'
+                  class="">
+                  getCSRFToken
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#handlefetcherror'
+                  class="">
+                  handleFetchError
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#fetchoptions'
+                  class="">
+                  FetchOptions
+                  
+                </a>
+                
+                </li>
+              
+                
+                <li><a
+                  href='#makefetch'
+                  class="">
+                  makeFetch
+                  
+                </a>
+                
+                </li>
+              
             </ul>
           </div>
           <div class='mt1 h6 quiet'>
@@ -140,10 +200,11 @@
   
 
   <p>Handles user uploads of files (typically images).</p>
-<p>All params are the ID attributes of their respective DOM elements, for use
-with document.getElementById().</p>
+<p>When constructed, make sure all the required elements are loaded into the
+DOM or nothing will work. Importantly, a button with id</p>
+<p>TODO: convert all methods but processAllFiles() to private.</p>
 
-    <div class='pre p1 fill-light mt0'>new FileSource(ids: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+    <div class='pre p1 fill-light mt0'>new FileSource(elements: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
   
   
 
@@ -160,8 +221,9 @@ with document.getElementById().</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>ids</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
-	    ID attributes of DOM elements.
+            <span class='code bold'>elements</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            = <code>null</code>)</code>
+	    HTMLElements required for methods to function.
 
           </div>
           
@@ -179,41 +241,67 @@ with document.getElementById().</p>
             <tbody class='mt1'>
               
                 <tr>
-  <td class='break-word'><span class='code bold'>ids.urlSelectElementId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  <td class='break-word'><span class='code bold'>elements.loadingModalElement</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a></code>
   </td>
-  <td class='break-word'><span></span></td>
+  <td class='break-word'><span>(See property 
+<a href="FileSource#loadingModalElement">FileSource#loadingModalElement</a>
+)
+</span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>ids.urlInputElementId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  <td class='break-word'><span class='code bold'>elements.processTriggerElement</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a></code>
   </td>
-  <td class='break-word'><span></span></td>
+  <td class='break-word'><span>(See property 
+<a href="FileSource#processTriggerElement">FileSource#processTriggerElement</a>
+)
+</span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>ids.loadingModalElementId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  <td class='break-word'><span class='code bold'>elements.sourceFileElement</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a></code>
   </td>
-  <td class='break-word'><span></span></td>
+  <td class='break-word'><span>(See property 
+<a href="FileSource#sourceFileElement">FileSource#sourceFileElement</a>
+)
+</span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>ids.sourceFileElementId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  <td class='break-word'><span class='code bold'>elements.thumbnailContainerElement</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a></code>
   </td>
-  <td class='break-word'><span></span></td>
+  <td class='break-word'><span>(See property 
+<a href="FileSource.thumbnailContainerElement">FileSource.thumbnailContainerElement</a>
+)
+</span></td>
 </tr>
 
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>ids.thumbnailContainerElementId</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+  <td class='break-word'><span class='code bold'>elements.urlInputElement</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a></code>
   </td>
-  <td class='break-word'><span></span></td>
+  <td class='break-word'><span>(See property 
+<a href="FileSource#urlInputElement">FileSource#urlInputElement</a>
+)
+</span></td>
+</tr>
+
+
+              
+                <tr>
+  <td class='break-word'><span class='code bold'>elements.urlSelectElement</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a></code>
+  </td>
+  <td class='break-word'><span>(See property 
+<a href="FileSource#urlSelectElement">FileSource#urlSelectElement</a>
+)
+</span></td>
 </tr>
 
 
@@ -231,6 +319,13 @@ with document.getElementById().</p>
     <div>
       
         <div class='space-bottom0'>
+          <span class='code bold'>loadingModalElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
+          : A &#x3C;div> with Bootstrap class "modal" used for displaying a "loading" indicator.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
           <span class='code bold'>presignedURLPackets</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#presignedurlpacket">PresignedURLPacket</a>>)</code>
           : Objects returned from the server's S3 request, to be used for uploading file.
 
@@ -245,41 +340,16 @@ with document.getElementById().</p>
         </div>
       
         <div class='space-bottom0'>
+          <span class='code bold'>processTriggerElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
+          : A clickable element that triggers processAllFiles. Represents the single UI interface of
+FileSource.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
           <span class='code bold'>sourceFileArray</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;File>)</code>
           : Files to be uploaded
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>sourceURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-          : A user-provided URL that points to an image to be uploaded
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>urlSelectElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
-          : A hidden 
- element that contains a list (as the value of 
- elements)
-of all the images that were uploaded, to be submitted with other form data.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>urlInputElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
-          : An 
- element that can be filled in by the user to point to the URL of an image
-to be uploaded.
-
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <span class='code bold'>loadingModalElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
-          : A &#x3C;div> with Bootstrap class "modal" used for displaying a "loading" indicator.
 
           
         </div>
@@ -293,8 +363,41 @@ to be uploaded.
         </div>
       
         <div class='space-bottom0'>
+          <span class='code bold'>sourceURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+          : A user-provided URL that points to an image to be uploaded
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>sourceURL</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+          : A random image API. Will be the default if neither files nor an alternate URL are provided.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
           <span class='code bold'>thumbnailContainerElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
           : A div in which thumbnails of uploaded images will be displayed to the user.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>urlInputElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
+          : An 
+ element that can be filled in by the user to point to the URL of an image.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>urlSelectElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
+          : A hidden 
+ element that contains a list (as the value of 
+ elements)
+of all the images that were uploaded, to be submitted with other form data.
+to be uploaded.
 
           
         </div>
@@ -320,7 +423,7 @@ to be uploaded.
       <div class="clearfix small pointer toggle-sibling">
         <div class="py1 contain">
             <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>collectImages()</span>
+            <span class='code strong strong truncate'>collectImages(urlInputElement, sourceFileElement)</span>
         </div>
       </div>
       <div class="clearfix display-none toggle-target">
@@ -332,7 +435,7 @@ to be uploaded.
 The URL itself defaults to a random image API, so sourceFileArray will always
 contain at least one image file.</p>
 
-    <div class='pre p1 fill-light mt0'>collectImages(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#presignedurlpacket">PresignedURLPacket</a>></div>
+    <div class='pre p1 fill-light mt0'>collectImages(urlInputElement: <a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>, sourceFileElement: <a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#presignedurlpacket">PresignedURLPacket</a>></div>
   
   
 
@@ -343,6 +446,29 @@ contain at least one image file.</p>
   
   
 
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>urlInputElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
+	    A text input containing the value of an image URL.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>sourceFileElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
+	    A file input element for uploading from local storage.
+
+          </div>
+          
+        </div>
+      
+    </div>
   
 
   
@@ -351,6 +477,93 @@ contain at least one image file.</p>
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
       <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="#presignedurlpacket">PresignedURLPacket</a>></code>:
+        
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='filesourcegeneratethumbnail'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>generateThumbnail(imageURL, url, thumbnailContainerElement)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <p>Requests a formatted chunk of URL from the server to append to DOM.
+Server responds with a JSON object with an html property.</p>
+
+    <div class='pre p1 fill-light mt0'>generateThumbnail(imageURL: any, url: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, thumbnailContainerElement: <a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>imageURL</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>url</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>thumbnailContainerElement</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a>)</code>
+	    Div container for thumbnails.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
         
       
     
@@ -445,85 +658,6 @@ intended for images.</p>
       <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;File></code>:
         A Javascript File object containing the new image.
 
-      
-    
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-</section>
-
-      </div>
-    </div>
-  
-    <div class='border-bottom' id='filesourcegeneratethumbnail'>
-      <div class="clearfix small pointer toggle-sibling">
-        <div class="py1 contain">
-            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
-            <span class='code strong strong truncate'>generateThumbnail(imageURL, url)</span>
-        </div>
-      </div>
-      <div class="clearfix display-none toggle-target">
-        <section class='p2 mb2 clearfix bg-white minishadow'>
-
-  
-
-  <p>Requests a formatted chunk of URL from the server to append to DOM.
-Server responds with a JSON object with an html property.</p>
-
-    <div class='pre p1 fill-light mt0'>generateThumbnail(imageURL: any, url: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
-    <div class='py1 quiet mt1 prose-big'>Parameters</div>
-    <div class='prose'>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>imageURL</span> <code class='quiet'>(any)</code>
-	    
-          </div>
-          
-        </div>
-      
-        <div class='space-bottom0'>
-          <div>
-            <span class='code bold'>url</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
-	    The image src
-
-          </div>
-          
-        </div>
-      
-    </div>
-  
-
-  
-
-  
-    
-      <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        
       
     
   
@@ -702,9 +836,10 @@ presigned URL, uploads file, and returns the URL of the image.</p>
 
   
 
-  <p>Takes all the files contained in sourceFileArray and uploads them to S3.</p>
+  <p>First collects any images, whether from file uploads or URLs provided,
+then gathers presigned URLs for them and uploads them to S3.</p>
 
-    <div class='pre p1 fill-light mt0'>processAllFiles(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+    <div class='pre p1 fill-light mt0'>processAllFiles(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>></div>
   
   
 
@@ -722,8 +857,10 @@ presigned URL, uploads file, and returns the URL of the image.</p>
   
     
       <div class='py1 quiet mt1 prose-big'>Returns</div>
-      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
-        
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>>></code>:
+        Array of URLs for the newly uploaded
+files. The same as the instances this.proccessedImageURLs property.
+
       
     
   
@@ -761,7 +898,7 @@ presigned URL, uploads file, and returns the URL of the image.</p>
   <p>Called when images are added or removed to make sure the select element
 containing their values is accurate.</p>
 
-    <div class='pre p1 fill-light mt0'>refreshURLs(urls: any): void</div>
+    <div class='pre p1 fill-light mt0'>refreshURLs(urls: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>): void</div>
   
   
 
@@ -778,9 +915,10 @@ containing their values is accurate.</p>
       
         <div class='space-bottom0'>
           <div>
-            <span class='code bold'>urls</span> <code class='quiet'>(any
+            <span class='code bold'>urls</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>>
             = <code>this.processedImageURLs</code>)</code>
-	    
+	    An array of URLs pointing to files that have already been uploaded to S3.
+
           </div>
           
         </div>
@@ -1039,6 +1177,454 @@ will be the location of the image once uploaded to S3.
 
   
 
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id=''>
+      $
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Copies the Jquery function to access DOM elements. Deffaults to an
+ID selection if no selector is provided. Currently doesn't work with
+multiple selections.</p>
+
+    <div class='pre p1 fill-light mt0'>$</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>selector</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/HTML/Element">HTMLElement</a></code>:
+        
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='getajaxurl'>
+      getAJAXURL
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Returns the appropriate URL for an AJAX request.
+In the future I'll probably have a script that loads all URLs
+to an object and pull from those. That would be easy enough with a context
+variable and context processor in Django. For now it is hard-coded.</p>
+
+    <div class='pre p1 fill-light mt0'>getAJAXURL(func: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, params: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>func</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    A string keyword that maps to a particular AJAX URL. I'd like to come up
+with a cooler way of doing this.
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>params</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+            = <code>null</code>)</code>
+	    For appending keys/values to a URL for a GET request.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        url
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='getcsrftoken'>
+      getCSRFToken
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Searches the DOM for a hidden form input containing the session's CSRF token.</p>
+
+    <div class='pre p1 fill-light mt0'>getCSRFToken(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='handlefetcherror'>
+      handleFetchError
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Handles server error by either updating the UI or logging.</p>
+
+    <div class='pre p1 fill-light mt0'>handleFetchError(error: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>error</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a></code>:
+        
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='fetchoptions'>
+      FetchOptions
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>An object describing the optional parameters for a fetch() request</p>
+
+    <div class='pre p1 fill-light mt0'>FetchOptions</div>
+  
+    <p>
+      Type:
+      <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>
+    </p>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Properties</div>
+    <div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>method</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+          : GET or POST
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>body</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/API/FormData">FormData</a>)</code>
+          : Body of request.
+
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <span class='code bold'>headers</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+          : Standard HTTP request headers.
+
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+          
+        
+          
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='makefetch'>
+      makeFetch
+    </h3>
+    
+    
+  </div>
+  
+
+  <p>Using this instead of the built-in fetch() API in order to provide better
+error-handling.</p>
+
+    <div class='pre p1 fill-light mt0'>makeFetch(url: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, options: <a href="#fetchoptions">FetchOptions</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5">Response</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>url</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    Points to the server path to use for a fetch() request
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="#fetchoptions">FetchOptions</a>
+            = <code>{}</code>)</code>
+	    The same options object normally included in a fetch() request.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/Guide/HTML/HTML5">Response</a>></code>:
+        
+      
+    
   
 
   
