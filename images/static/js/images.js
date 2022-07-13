@@ -65,7 +65,11 @@
             this.urlInputElement = $("id_image_url_input");
             this.urlSelectElement = $("id_image_select");
         }
-        console.log(this.processTriggerElement);
+        
+        // set up the button that triggers uploads
+        this.processTriggerElement.addEventListener('click', (event) => {
+            this.processAllFiles();
+        });
     }
 }
 
@@ -103,6 +107,9 @@
 /**
  * Requests a formatted chunk of URL from the server to append to DOM.
  * Server responds with a JSON object with an html property.
+ * 
+ * The thumbnail generated will have its own onclick event dispatchers,
+ * an ID attribute
  * @async
  * @param {String} url 
  * @param {HTMLElement} thumbnailContainerElement Div container for thumbnails.
@@ -259,7 +266,10 @@ FileSource.prototype.processFile = function(file) {
 
 /**
  * First collects any images, whether from file uploads or URLs provided,
- * then gathers presigned URLs for them and uploads them to S3.
+ * then gathers presigned URLs for them and uploads them to S3. Once processed,
+ * the new URLs are added to the instances array of image URLs (NOT replaced!).
+ * Then refreshURLs() is called which makes sure all the image URLs in that array
+ * match the select options in the form, in case any are added/removed.
  * @async
  * @returns {Promise<string[]>} Array of URLs for the newly uploaded
  * files. The same as the instances this.proccessedImageURLs property.
@@ -306,8 +316,10 @@ FileSource.prototype.processAllFiles = function() {
 
 
 /**
- * Called when images are added or removed to make sure the select element
- * containing their values is accurate.
+ * Flushes the children of the hidden select element that tracks image URLs, then
+ * adds back in all the elements corresponding to the instance's processedImageURLs
+ * array. Call this any time images are added or removed to the processedImageURLs
+ * array to ensure the correct images are delivered to the server.
  * @param {Array<String>} urls 
  *  An array of URLs pointing to files that have already been uploaded to S3.
  * @returns {void}
@@ -336,6 +348,9 @@ FileSource.prototype.refreshURLs = function(urls=this.processedImageURLs) {
         selectElement.appendChild(optionElement);
     }
 }
+
+
+
 
 
 /**

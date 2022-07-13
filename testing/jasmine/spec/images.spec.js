@@ -128,7 +128,7 @@ describe("FileSource.constructor", () => {
         spyOn(fileSource, 'processAllFiles');
     });
 
-    xit("should, on instantiating, add a button that triggers uploads", () => {
+    it("should, on instantiating, add a button that triggers uploads", () => {
         fileSource.processTriggerElement.click();
         expect(fileSource.processAllFiles).toHaveBeenCalled();
     });
@@ -269,10 +269,20 @@ describe("FileSource.getImageFromURL()", () => {
 
 
 describe("FileSource.getPresignedURLPacket()", () => {
-    const fileSource = new FileSource();
-    let mockFile, serverResponse;
+
+    beforeAll(function() {
+        elementGenerator("getImageFromURL()");
+    });
+
+    afterAll(function() {
+        elementRemover("getImageFromURL()");
+    });
+
+    let fileSource, mockFile, serverResponse;
 
     beforeEach(function() {
+        fileSource = new FileSource();
+        
         // create a fake file
         mockFile = new File([], 'mockFile.jpg', {type: 'image/jpg'});
 
@@ -308,15 +318,24 @@ describe("FileSource.getPresignedURLPacket()", () => {
     });
 });
 
+
 describe("FileSource.processFile() and FileSource.processAllFiles()", () => {
-    const fileSource = new FileSource();
+
+    beforeAll(function() {
+        elementGenerator("getImageFromURL()");
+    });
+
+    afterAll(function() {
+        elementRemover("getImageFromURL()");
+    });
+
+    let fileSource;
     let mockFile, uploadedImageURL, fakePacket, mockFileArray;
     let responseBody, responseOptions, serverResponse;
 
-    beforeAll(function() {
-    });
-
     beforeEach(function() {
+        fileSource = new FileSource();
+
         // fake files to fake-upload to fake-S3. fake.
         mockFile = new File([], 'mockFile1.jpg', {type: 'image/jpg'});
         mockFileArray = [
@@ -374,10 +393,8 @@ describe("FileSource.processFile() and FileSource.processAllFiles()", () => {
     });
 });
 
-describe("FileSource.refreshURLs()", () => {
-    let fileSource;
 
-    let selectElement, optionElement1, optionElement2, optionElement3;
+describe("FileSource.refreshURLs()", () => {
 
     beforeAll(function() {
         elementGenerator("getImageFromURL()");
@@ -386,6 +403,9 @@ describe("FileSource.refreshURLs()", () => {
     afterAll(function() {
         elementRemover("getImageFromURL()");
     });
+
+    let fileSource;
+    let selectElement, optionElement1, optionElement2, optionElement3;
 
     beforeEach(function() {
         fileSource = new FileSource();
@@ -421,11 +441,50 @@ describe("FileSource.refreshURLs()", () => {
 });
 
 
+describe("FileSource.removeFiles()", () => {
+
+    beforeAll(function() {
+        elementGenerator("getImageFromURL()");
+    });
+
+    afterAll(function() {
+        elementRemover("getImageFromURL()");
+    });
+
+    let fileSource, thumbnail;
+
+    beforeEach(function() {
+        fileSource = new FileSource();
+        fileSource.processedImageURLs = ['url1', 'url2', 'url3'];
+
+        // create an image thumbnail with a delete button
+        thumbnail = document.createElement("div");
+        thumbnail.id = "1";
+
+    });
+
+    xit("should be able to remove a previously added image when a button is clicked", () => {
+
+    });
+});
+
+
 describe("FileSource.uploadFileToS3()", () => {
-    const fileSource = new FileSource;
+
+    beforeAll(function() {
+        elementGenerator("getImageFromURL()");
+    });
+
+    afterAll(function() {
+        elementRemover("getImageFromURL()");
+    });
+
+    let fileSource;
     let file, data, url;
 
     beforeEach(function() {
+        fileSource = new FileSource();
+
         file = new File([], 'mockFile.jpg', {type: 'image/jpg'});
         data = {
             url: "https://path.to.aws.bucket/",
