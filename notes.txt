@@ -1,0 +1,29 @@
+!!Important!!
+This document is version-controlled, so don't put anything sensitive here!!!
+!!
+
+10/10/21
+    - Starting over, once again, from scratch. this time deployment comes first, until i reach some arbitrary stage of stability.
+    - the goal here is, again: deployment first.
+    - Road map (Add notes below, keep this clean):
+        - [X] hello world
+        - [X] postgres in production
+        - [X] postgres in development
+        - [X] development/production settings
+        - [X] templates
+        - [X] Sentry
+        - [ ] version control (should've been first, whoops)
+        - [ ] static files
+        - [ ] logging
+        (App features)
+        - [ ] Image uploader
+        - [ ] Users/accounts app
+        - [ ] Auctions site
+        - [ ] Comments
+        - [ ] Stripe payment
+        - [ ] Email integration
+
+    - Dev/prod settings:
+        - see if django-environ works on both environments. definitely easiest to use .env file locally, so that'd be preferred
+        if it also works on the server.
+            - Yes! i guess the server also includes env variables in a .env file so it's able to read it. convenient.
