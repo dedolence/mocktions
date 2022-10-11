@@ -15,7 +15,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['mocktions.fly.dev']
+ALLOWED_HOSTS = ['mocktions.fly.dev', '0.0.0.0']
+
 CSRF_TRUSTED_ORIGINS = ['https://mocktions.fly.dev']
 
 # Sentry initialization to log errors/security issues

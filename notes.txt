@@ -4,15 +4,18 @@ This document is version-controlled, so don't put anything sensitive here!!!
 
 10/10/21
     - Starting over, once again, from scratch. this time deployment comes first, until i reach some arbitrary stage of stability.
-    - the goal here is, again: deployment first.
+    - the goal here is, again: deployment first. until i can feel confident that local changes will propogate remotely, i test on live
+    server first. not efficient but it's the only way at the moment to avoid these boondoggles where i hit a wall and need to start over.
+
     - Road map (Add notes below, keep this clean):
-        - [X] hello world
+        (Scaffolding)
+        - [X] LIVE hello world
         - [X] postgres in production
         - [X] postgres in development
-        - [X] development/production settings
+        - [X] development/production settings (bonus: local docker works too)
         - [X] templates
         - [X] Sentry
-        - [ ] version control (should've been first, whoops)
+        - [X] version control
         - [ ] static files
         - [ ] logging
         (App features)
@@ -23,7 +26,26 @@ This document is version-controlled, so don't put anything sensitive here!!!
         - [ ] Stripe payment
         - [ ] Email integration
 
+    Roadmap notes:
     - Dev/prod settings:
         - see if django-environ works on both environments. definitely easiest to use .env file locally, so that'd be preferred
         if it also works on the server.
             - Yes! i guess the server also includes env variables in a .env file so it's able to read it. convenient.
+        - !Important!
+        FIXED>>>>>>>>>
+            - The way it's set up, I have settings that will work either for live production (deployed to fly.io) OR
+            running locally via manage.py runserver. Creating a local docker image/container does not seem to work.
+            - To fix this i would need a third suite of settings to specify, for instance, ALLOWED_HOSTS=['0.0.0.0:8000']
+            - Choosing between which settings to load could be done by, once again, returning to an __init__ that checks for an
+            environment variable. but i like how simple/clean the current setup is (if there's a local settings file, load it; 
+            that file will override any values so that it works locally).
+            - another try condition that looks for a local_docker_settings.py file wouldn't work: it would be excluded from 
+            .dockerignore and therefore deployed to production. 
+            - Maybe one solution is to simply check for a single environment variable that flags certain values to be specific to 
+            a local docker container. 
+        <<<<<<<<<FIXED
+            - simply added '0.0.0.0' to ALLOWED_HOSTS and a local docker container runs fine so far. of course it will not be using
+            any local settings; i.e. will be using production APIs etc. but good for staging.
+    - Postgres: seems to be working (tested with creating superuser and logging into /admin/)
+    - Version control
+        - renamed mocktions2, created a new "mocktions" repo.
