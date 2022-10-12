@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'base',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -122,13 +123,75 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# note to self:
+# env variables are always strings. therefore even an env variable like,
+# USE_S3=False will evaluate as a string, and would be evaluated as True.
+USE_S3 = env('USE_S3') == 'True'
 
+if USE_S3:
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = env('AWS_BUCKET_NAME')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+    
+    AWS_LOCATION = 'static'
+    AWS_REGION = env('AWS_REGION')
+    AWS_S3_CUSTOM_DOMAIN = '{bucket}.s3.{region}.amazonaws.com'.format(
+        bucket=AWS_STORAGE_BUCKET_NAME, region=AWS_REGION)
+    
+    # Django appends STATIC_URL to the beginning of URLs that are loaded via {% static %}
+    # i.e. <img src="{% static 'images/user.png' %}">" gets parsed as <img src="https://s3.bucket.aws.../images/user.png">
+    STATIC_URL = '{domain}/{location}/'.format(
+        domain=AWS_S3_CUSTOM_DOMAIN,
+        location=AWS_LOCATION
+    )
+else:
+    STATIC_URL = '/staticfiles/'
+    # STATIC_ROOT defines where staticfiles will be copied and then served from.
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_URL = '/mediafiles/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'Simple_Format': {
+            'format': '{levelname}: {message}',
+            'style': '{'
+        },
+        'verbose': {
+            'format': '({levelname}) Raised at {asctime} from {module}:\n"{message}"\nFull path: {pathname}\n',
+            'style': '{',
+        }
+    },
+
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+
+    'filters': {},
+
+    'loggers': {
+        'fly_stream': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
+    },
+}
 
 # In a local environment, these will override previously defined production settings.
 # Obviously, should be added to .gitignore and .dockerignore.

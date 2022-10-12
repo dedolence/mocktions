@@ -16,7 +16,7 @@ This document is version-controlled, so don't put anything sensitive here!!!
         - [X] templates
         - [X] Sentry
         - [X] version control
-        - [ ] static files
+        - [X] static files
         - [ ] logging
         (App features)
         - [ ] Image uploader
@@ -49,3 +49,9 @@ This document is version-controlled, so don't put anything sensitive here!!!
     - Postgres: seems to be working (tested with creating superuser and logging into /admin/)
     - Version control
         - renamed mocktions2, created a new "mocktions" repo.
+    - Staticfiles
+        - it appears that Docker does not have access to environment variables at build-time. therefore, collecting static as a
+        command in the Dockerfile will fail, since it relies on environment variables.
+        - the solution is to build image without collecting static, then run collectstatic via the ssh console manually.
+        - now, those environment variables COULD be added to fly.toml, maybe; it would just have to be ommitted from versioning
+        control, which for now would probably be less convenient than just manually running collectstatic.
