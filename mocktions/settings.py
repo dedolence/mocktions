@@ -1,6 +1,7 @@
 import dj_database_url, environ, os, sentry_sdk
 from pathlib import Path
 from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk import set_level
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,6 +21,7 @@ ALLOWED_HOSTS = ['mocktions.fly.dev', '0.0.0.0']
 CSRF_TRUSTED_ORIGINS = ['https://mocktions.fly.dev']
 
 # Sentry initialization to log errors/security issues
+set_level("info")
 sentry_sdk.init(
     dsn="https://36e84563aec64d1a96f99b86840f4984@o4503955967377408.ingest.sentry.io/4503955970260992",
     integrations=[
@@ -35,6 +37,40 @@ sentry_sdk.init(
     # django.contrib.auth) you may enable sending PII data.
     send_default_pii=True
 )
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'Simple_Format': {
+            'format': '{levelname}: {message}',
+            'style': '{'
+        },
+        'verbose': {
+            'format': '({levelname}) Raised at {asctime} from {module}:\n"{message}"\nFull path: {pathname}\n',
+            'style': '{',
+        }
+    },
+
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+
+    'filters': {},
+
+    'loggers': {
+        'fly_stream': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        }
+    },
+}
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -159,39 +195,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-
-    'formatters': {
-        'Simple_Format': {
-            'format': '{levelname}: {message}',
-            'style': '{'
-        },
-        'verbose': {
-            'format': '({levelname}) Raised at {asctime} from {module}:\n"{message}"\nFull path: {pathname}\n',
-            'style': '{',
-        }
-    },
-
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        }
-    },
-
-    'filters': {},
-
-    'loggers': {
-        'fly_stream': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        }
-    },
-}
 
 # In a local environment, these will override previously defined production settings.
 # Obviously, should be added to .gitignore and .dockerignore.

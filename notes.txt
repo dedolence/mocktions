@@ -55,3 +55,10 @@ This document is version-controlled, so don't put anything sensitive here!!!
         - the solution is to build image without collecting static, then run collectstatic via the ssh console manually.
         - now, those environment variables COULD be added to fly.toml, maybe; it would just have to be ommitted from versioning
         control, which for now would probably be less convenient than just manually running collectstatic.
+    - Logging
+        - sentry automatically captures logs at level error or higher (maybe warning too?) but even so they are still listed as
+        "info" level in the sentry dashboard. 
+        - they are also always listed as "info" in the monitoring tab of the fly.io app's page.
+        - trying to log an info level message is ignored.
+        - happens regardless of whether or not django's own logging is setup or not.
+        - sentry's set_level("info") does nothing
