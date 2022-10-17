@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'base',
+    'accounts',
     'storages',
     'whitenoise.runserver_nostatic',
 ]
@@ -92,6 +93,8 @@ DATABASES = {
     'default': dj_database_url.config(conn_max_age=600)
 }
 
+# Default user model
+AUTH_USER_MODEL = 'accounts.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
