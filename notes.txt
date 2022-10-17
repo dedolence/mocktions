@@ -51,6 +51,8 @@ This document is version-controlled, so don't put anything sensitive here!!!
                 changing USE_S3 to True seems to have worked. 
                 - so the only way to run Docker locally is to set USE_S3 to True so that it loads statics from Amazon. i can see
                 problems ahead when new statics are added without being collected first. 
+        FIXED FOR REAL
+        - started using whitenoise for serving static files, which works in all environments.
     - Postgres: seems to be working (tested with creating superuser and logging into /admin/)
     - Version control
         - renamed mocktions2, created a new "mocktions" repo.
