@@ -46,6 +46,11 @@ This document is version-controlled, so don't put anything sensitive here!!!
         <<<<<<<<<FIXED
             - simply added '0.0.0.0' to ALLOWED_HOSTS and a local docker container runs fine so far. of course it will not be using
             any local settings; i.e. will be using production APIs etc. but good for staging.
+                - not quite: local docker build wasn't working because USE_S3 was set to false, meaning it was attempting to load
+                local static files, but collecstatic doesn't get run during the build (because it fails during deployment). 
+                changing USE_S3 to True seems to have worked. 
+                - so the only way to run Docker locally is to set USE_S3 to True so that it loads statics from Amazon. i can see
+                problems ahead when new statics are added without being collected first. 
     - Postgres: seems to be working (tested with creating superuser and logging into /admin/)
     - Version control
         - renamed mocktions2, created a new "mocktions" repo.

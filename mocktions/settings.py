@@ -38,40 +38,6 @@ sentry_sdk.init(
     send_default_pii=True
 )
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-
-    'formatters': {
-        'Simple_Format': {
-            'format': '{levelname}: {message}',
-            'style': '{'
-        },
-        'verbose': {
-            'format': '({levelname}) Raised at {asctime} from {module}:\n"{message}"\nFull path: {pathname}\n',
-            'style': '{',
-        }
-    },
-
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        }
-    },
-
-    'filters': {},
-
-    'loggers': {
-        'fly_stream': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        }
-    },
-}
-
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -81,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'base',
-    'storages'
+    'storages',
 ]
 
 MIDDLEWARE = [
