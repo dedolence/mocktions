@@ -1,15 +1,6 @@
+{% extends 'base/html/templates/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mocktions</title>
-</head>
-<body>
+{% block body %}
     {{ message }}
     <img src="{% static 'images/gavel_icon.png' %}">
-    this is working.
-</body>
-</html>
+{% endblock body %}

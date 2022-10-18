@@ -1,0 +1,9 @@
+{% extends "base/html/templates/base.html" %}
+
+{% block body %}
+
+    {% include 'accounts/html/includes/profile_form.html' with form=form form_action='register' %}
+
+    <p>Already have an account? <a href="{% url 'accounts:login' %}">Log In here.</a></p>
+
+{% endblock %}

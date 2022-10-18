@@ -21,13 +21,13 @@
         <script src="{% static 'js/util.js' %}"></script>
     </head>
     <body>
-        {% include "html/includes/navbar.html" %}
+        {% include "base/html/includes/navbar.html" %}
         <main class="container pt-2 pt-md-4 pb-4 mb-4">
             {% block body %}
             {% endblock %}
         </main>
         
-        {% include "html/includes/footer.html" %}
+        {% include "base/html/includes/footer.html" %}
         
         <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
     </body>
