@@ -9,10 +9,10 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('login/', 
         auth_views.LoginView.as_view(
-            template_name = 'accounts/html/templates/login.html'
+            template_name = 'accounts/html/templates/login.html',
         ), 
         name="login"),
-    path('logout', views.Logout.as_view(), name='logout'),
-    path('profile', views.profile, name="profile"),
-    path('register', views.register, name="register"),
+    path('logout/', views.Logout.as_view(), name='logout'),
+    path('profile/', views.Profile.as_view(), name="profile"),
+    path('register/', views.register, name="register"),
 ]

@@ -15,19 +15,25 @@ def index(request):
     else:
         return HttpResponseRedirect(reverse('accounts:login'))
 
-""" 
-def logout(request):
 
-    return logout_then_login(request, login_url=reverse('accounts:login'))
- """
 class Logout(View):
     success_message = "You have been logged out."
     def post(self, request):
         messages.success(request, self.success_message)
         return logout_then_login(request, login_url=reverse('accounts:login'))
 
-def profile(request):
-    pass
+
+class Profile(View):
+    """
+        Why just redirect? Because the reverse to index here isn't available in
+        accounts.urls, so it can't be set in the URL path for login's redirect URL.
+    """
+    def get(self, request):
+        return HttpResponseRedirect(reverse('base:index'))
+
+    def post(self, request):
+        # to be used for setting user's profile information
+        pass
 
 
 def register(request):
