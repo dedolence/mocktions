@@ -38,9 +38,11 @@
                 </li>
                 <li class="nav-item p-2">
                     {% if user.is_authenticated %}
-                        <a href="{% url 'accounts:logout' %}" class="nav-link">
-                            Logout
-                        </a>
+                        {# Logging out via GET depracated, hence the form. #}
+                        <form action="{% url 'accounts:logout' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="submit" class="btn btn-link nav-link" value="Logout">
+                        </form>
                     {% else %}
                         <a href="{% url 'accounts:login' %}" class="nav-link">
                         Login

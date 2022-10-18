@@ -69,3 +69,18 @@ This document is version-controlled, so don't put anything sensitive here!!!
         - trying to log an info level message is ignored.
         - happens regardless of whether or not django's own logging is setup or not.
         - sentry's set_level("info") does nothing
+
+10/18
+    >>>>>>> Abandoned for now
+        What I'd like to do is create a middleware that, on every page load, checks to see if I am logged in (me, specifically) and 
+        to only display the page if I am, redirecting to a "Coming Soon" page if not. that way i can keep pushing to production and 
+        checking on how things are working there while maintaining a consistent, static message to visitors (not that there's anyone
+        visiting...).
+            - maybe check for admin user status, that might be built in already
+            - maybe add a setting that specifies a permission level; add a decorator that checks for that permission level
+                - the reason being if i'm adding this decorator to every view it'd be easier to just change the permission to public
+                - instead of manually deleting them all
+    <<<<<<<
+    Messages: to replace my original notification system, use the built-in messaging middleware.
+        - potentially override storages to make use of DB?
+    

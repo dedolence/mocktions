@@ -1,7 +1,11 @@
-from django.shortcuts import render
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.views import logout_then_login
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
+from django.views import View
+
 from accounts.forms import RegistrationForm
 
 
@@ -11,6 +15,16 @@ def index(request):
     else:
         return HttpResponseRedirect(reverse('accounts:login'))
 
+""" 
+def logout(request):
+
+    return logout_then_login(request, login_url=reverse('accounts:login'))
+ """
+class Logout(View):
+    success_message = "You have been logged out."
+    def post(self, request):
+        messages.success(request, self.success_message)
+        return logout_then_login(request, login_url=reverse('accounts:login'))
 
 def profile(request):
     pass
