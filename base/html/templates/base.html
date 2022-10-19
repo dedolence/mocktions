@@ -23,8 +23,8 @@
     <body>
         {% include "base/html/includes/navbar.html" %}
         <main class="container pt-2 pt-md-4 pb-4 mb-4">
-            {% block body %}
-            {% endblock %}
+            {% include 'base/html/includes/messages.html' with messages=messages %}
+            {% block body %}{% endblock %}
         </main>
         
         {% include "base/html/includes/footer.html" %}

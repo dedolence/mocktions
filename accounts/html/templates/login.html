@@ -1,9 +1,6 @@
 {% extends 'base/html/templates/base.html' %}
 {% load static %}
 {% block body %}
-{% for message in messages %}
-    <div class="alert alert-{{ message.tags }}" role="alert">{{ message }}</div>
-{% endfor %}
     <h1>Login</h1>
     <form action="{% url 'accounts:login' %}" method="post" class="container my-5 p-0">
         {% csrf_token %}
