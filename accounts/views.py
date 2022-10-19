@@ -35,6 +35,52 @@ class Profile(View):
         # to be used for setting user's profile information
         pass
 
+class Register(View):
+    form_class = RegistrationForm()
+    registration_template = 'accounts/html/templates/register.html'
+    def get(self, request):
+        return render(request, self.registration_template, {
+            'form': self.form_class
+        })
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            # create and authenticate user
+            user = form.save()
+            user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1']
+                )
+            login(request, user)
+            
+            # set profile picture, if provided
+            """ image_ids = request.POST.getlist('images', None)
+            if (image_ids):
+                image_id = image_ids[0]
+                image = UserImage.objects.get(pk=image_id)
+                image.owner = user
+                image.save()
+                user.profile_pic = image
+                user.save() """
+            
+            """ # create a welcome message
+            notification.build(
+                user,
+                TYPE_SUCCESS,
+                ICON_SUCCESS,
+                MESSAGE_REG_SUCCESS,
+                False,
+                reverse('index')
+            )
+            notification.save() """
+
+            return HttpResponseRedirect(reverse('base:index'))
+        else:
+            return render(request, self.registration_template, {
+                'form': form
+            })
+
 
 def register(request):
     if request.method == 'GET':
