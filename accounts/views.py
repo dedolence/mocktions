@@ -1,14 +1,16 @@
 from django.contrib import messages
-from django.contrib.auth.views import logout_then_login
+from django.contrib.auth.views import logout_then_login, LoginView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DetailView, DeleteView
 
 from accounts.forms import RegistrationForm
 
 from .strings import en as english_strings
+from .models import User
+from .forms import DeleteAccountForm, LoginForm
 
 
 def index(request):
@@ -18,24 +20,38 @@ def index(request):
         return HttpResponseRedirect(reverse('accounts:login'))
 
 
+class DeleteAccount(DeleteView):
+    form_class = DeleteAccountForm
+    model = User
+    success_url = reverse_lazy('base:index')
+    template_name = 'accounts/html/templates/delete_account.html'
+
+
+class Login(LoginView):
+    template_name = 'accounts/html/templates/login.html'
+    form_class = LoginForm
+
+    def get_success_url(self) -> str:
+        return reverse_lazy('accounts:profile', kwargs={'pk': self.request.user.id})
+
+
 class Logout(View):
     success_message = "You have been logged out."
+
     def post(self, request):
         messages.success(request, self.success_message)
         return logout_then_login(request, login_url=reverse('accounts:login'))
 
 
-class Profile(View):
+class Profile(DetailView):
     """
-        Why just redirect? Because the reverse to index here isn't available in
-        accounts.urls, so it can't be set in the URL path for login's redirect URL.
+        In templates, Django automatically passes the model instance as a
+        variable that is the lowercase version of the model name, in this
+        case: user. Therefore, in the template, the instance can be accessed
+        such as {{ user.username }}.
     """
-    def get(self, request):
-        return HttpResponseRedirect(reverse('base:index'))
-
-    def post(self, request):
-        # to be used for setting user's profile information
-        pass
+    model = User
+    template_name = 'accounts/html/templates/profile.html'
 
 
 class Register(SuccessMessageMixin, CreateView):

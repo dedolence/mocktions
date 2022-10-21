@@ -3,6 +3,7 @@ from pathlib import Path
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk import set_level
 from django.contrib.messages import constants as messages
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -147,9 +148,9 @@ USE_TZ = True
 # note to self:
 # env variables are always strings. therefore even an env variable like,
 # USE_S3=False will evaluate as a string, and would be evaluated as True.
-USE_S3 = env('USE_S3') == 'True'
+USE_LOCAL = env('USE_LOCAL') == 'True'
 
-if USE_S3:
+if USE_LOCAL:
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')

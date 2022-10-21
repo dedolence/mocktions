@@ -83,4 +83,7 @@ This document is version-controlled, so don't put anything sensitive here!!!
     <<<<<<<
     Messages: to replace my original notification system, use the built-in messaging middleware.
         - potentially override storages to make use of DB?
-    
+
+10/20
+    Important! When running a docker container locally, add --network=host in order to use the database!!! ah this was so annoying to
+    try to figure out!!!

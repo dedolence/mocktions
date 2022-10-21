@@ -1,0 +1,11 @@
+{% extends 'base/html/templates/base.html' %}
+{% load static %}
+{% block body %}
+    <h1>User profile for {{ user.username }}</h1>
+
+
+    <br class="m-5 p-5"/>
+
+    <h2>Delete your account</h2>
+    <a href="{% url 'accounts:delete_account' pk=request.user.id %}">Click here to delete your account.</a>
+{% endblock body %}
