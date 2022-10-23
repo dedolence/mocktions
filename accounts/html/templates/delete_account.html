@@ -1,7 +1,13 @@
 {% extends 'base/html/templates/base.html' %}
 {% load static %}
+{% load breadcrumbs %}
+
+{% block breadcrumb %}
+    {% breadcrumb_url 'Home' 'base:index' %}
+    {% breadcrumb 'Delete profile' %}
+{% endblock breadcrumb %}
+
 {% block body %}
-    <h1>Delete account "{{ user.username }}"?</h1>
 
     <form method="post">
         {% csrf_token %}

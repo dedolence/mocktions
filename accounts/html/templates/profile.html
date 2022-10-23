@@ -1,9 +1,15 @@
 {% extends 'base/html/templates/base.html' %}
 {% load static %}
+{% load breadcrumbs %}
+
+{% block breadcrumb %}
+    {% breadcrumb_url 'Home' 'base:index' %}
+    {% breadcrumb_url 'Profiles' %}
+    {% breadcrumb_url request.user.username %}
+{% endblock breadcrumb %}
+
 {% block body %}
-    <h1>User profile for {{ user.username }}</h1>
-
-
+    
     <br class="m-5 p-5"/>
 
     <h2>Delete your account</h2>
