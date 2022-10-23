@@ -8,7 +8,7 @@ from django.views.generic import CreateView, DetailView, DeleteView
 
 from accounts.forms import RegistrationForm
 
-from .strings import en as english_strings
+from .strings import en as strings
 from .models import User
 from .forms import DeleteAccountForm, LoginForm
 
@@ -32,11 +32,16 @@ class Login(LoginView):
     form_class = LoginForm
 
     def get_success_url(self) -> str:
-        return reverse_lazy('accounts:profile', kwargs={'pk': self.request.user.id})
+        return reverse_lazy(
+            'accounts:profile', 
+            kwargs={
+                'pk': self.request.user.id
+            }
+        )
 
 
 class Logout(View):
-    success_message = "You have been logged out."
+    success_message = strings.LOGOUT_MESSAGE
 
     def post(self, request):
         messages.success(request, self.success_message)
@@ -63,6 +68,6 @@ class Register(SuccessMessageMixin, CreateView):
         """
             Format the success message to include the user's username.
         """
-        return english_strings.REGISTRATION_SUCCESS.format(
+        return strings.REGISTRATION_SUCCESS.format(
             username=self.object.username
         )
