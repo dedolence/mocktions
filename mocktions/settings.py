@@ -150,7 +150,7 @@ USE_TZ = True
 # USE_S3=False will evaluate as a string, and would be evaluated as True.
 USE_LOCAL = env('USE_LOCAL') == 'True'
 
-if USE_LOCAL:
+if not USE_LOCAL:
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')

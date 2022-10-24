@@ -20,11 +20,12 @@ def index(request):
         return HttpResponseRedirect(reverse('accounts:login'))
 
 
-class DeleteAccount(DeleteView):
+class DeleteAccount(SuccessMessageMixin, DeleteView):
     form_class = DeleteAccountForm
     model = User
     success_url = reverse_lazy('base:index')
     template_name = 'accounts/html/templates/delete_account.html'
+    success_message = strings.ACCOUNT_DELETE_SUCCESS
 
 
 class Login(LoginView):
