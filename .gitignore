@@ -16,7 +16,7 @@ venv.bak/
 .vscode/
 
 staticfiles/
-mocktions/local_settings.py
+#mocktions/local_settings.py
 
 #Dockerfile
 #fly.toml
