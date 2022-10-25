@@ -1,0 +1,17 @@
+{% extends 'base/html/templates/base.html' %}
+{% load static %}
+{% load breadcrumbs %}
+
+{% block breadcrumb %}
+    {% breadcrumb_url 'Home' 'base:index' %}
+    {% breadcrumb 'Logout' %}
+{% endblock breadcrumb %}
+
+{% block body %}
+
+    <form action="{% url 'accounts:logout' %}" method="POST" class="my-5">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-outline-dark" value="Click here to log out of your account.">
+    </form>
+      
+{% endblock body %}

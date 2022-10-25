@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.views import logout_then_login, LoginView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DetailView, DeleteView
@@ -44,6 +45,9 @@ class Login(LoginView):
 class Logout(View):
     success_message = strings.LOGOUT_MESSAGE
 
+    def get(self, request):
+        return render(request, 'accounts/html/templates/logout.html')
+
     def post(self, request):
         messages.success(request, self.success_message)
         return logout_then_login(request, login_url=reverse('accounts:login'))
@@ -58,6 +62,9 @@ class Profile(DetailView):
     """
     model = User
     template_name = 'accounts/html/templates/profile.html'
+
+    def get(self, request):
+        return HttpResponseRedirect(reverse)
 
 
 class Register(SuccessMessageMixin, CreateView):
