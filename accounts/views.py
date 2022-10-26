@@ -1,7 +1,8 @@
+from curses.ascii import HT
 from django.contrib import messages
 from django.contrib.auth.views import logout_then_login, LoginView
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -29,7 +30,7 @@ class DeleteAccount(SuccessMessageMixin, DeleteView):
     success_message = strings.ACCOUNT_DELETE_SUCCESS
 
 
-class Login(LoginView):
+class Login(SuccessMessageMixin, LoginView):
     template_name = 'accounts/html/templates/login.html'
     form_class = LoginForm
 
@@ -40,7 +41,6 @@ class Login(LoginView):
                 'pk': self.request.user.id
             }
         )
-
 
 class Logout(View):
     success_message = strings.LOGOUT_MESSAGE
@@ -62,9 +62,6 @@ class Profile(DetailView):
     """
     model = User
     template_name = 'accounts/html/templates/profile.html'
-
-    def get(self, request):
-        return HttpResponseRedirect(reverse)
 
 
 class Register(SuccessMessageMixin, CreateView):
