@@ -3,21 +3,31 @@
 {% block body %}
     <h1>Login</h1>
     <form action="{% url 'accounts:login' %}" method="post" class="container my-5 p-0">
-        {% csrf_token %}
-        {% for field in form %}
+        {% csrf_token %}{% for field in form %}
             <div class="row mb-3">
                 <div class="col-sm-4">
                     <div class="form-floating">
                         {{ field }}
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field.errors }}
-                        {{ errors }}
+                        <div class="text-danger text-small">
+                            <ul class="ml-0">
+                                {% for error in field.errors  %}
+                                    <li class="text-danger small">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm-8"></div>
             </div>
         {% endfor %}
-
+        <div class="text-danger text-small">
+            <ul class="ml-0">
+                {% for error in form.non_field_errors %}
+                    <li class="text-danger small">{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
 
         <input class="btn btn-primary" type="submit" value="Login">
     </form>

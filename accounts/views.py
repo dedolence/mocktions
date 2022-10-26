@@ -33,7 +33,6 @@ class DeleteAccount(SuccessMessageMixin, DeleteView):
 class Login(SuccessMessageMixin, LoginView):
     template_name = 'accounts/html/templates/login.html'
     form_class = LoginForm
-
     def get_success_url(self) -> str:
         return reverse_lazy(
             'accounts:profile', 
