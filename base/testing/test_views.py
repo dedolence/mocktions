@@ -6,7 +6,7 @@ from mocktions.urls import urlpatterns
 
 
 def deliver_500(request):
-    pass
+    return 1/0
 
 urlpatterns = [
     path('/test_500', deliver_500, name="deliver_500")
@@ -36,5 +36,4 @@ class Test_500(SimpleTestCase):
     def test_render_custom_500_template(self):
         self.client.raise_request_exception = False
         response = self.client.get(reverse('deliver_500'))
-        print(response)
-        self.assertContains(response, "500 Error: Server error")
+        self.assertTemplateUsed("osijefoisej")
