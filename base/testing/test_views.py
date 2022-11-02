@@ -13,6 +13,25 @@ urlpatterns = [
 ]
 
 
+class TestIndexView(SimpleTestCase):
+
+    def test_url_exists_at_correct_location(self):
+        """
+            URL redirects according to its relative path.
+        """
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_template_is_used(self):
+        """
+            URL redirects according to its reversale name property.
+        """
+        response = self.client.get(reverse("base:index"))
+        self.assertContains(response, "/staticfiles/images/gavel_icon")
+
+
+
 @override_settings(ROOT_URLCONF='mocktions.urls')
 class Test_404(SimpleTestCase):
     
