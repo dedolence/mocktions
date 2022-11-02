@@ -1,19 +1,20 @@
 from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 from mocktions.settings import ROOT_URLCONF
-from ..views import handler500
 from django.urls import path
-from django.http import HttpResponseServerError
+from django.shortcuts import render
+from ..views import handler500
 
 
 def raise_500(request):
-    raise HttpResponseServerError
+    return 1/0
 
 urlpatterns = [
     path('500/', raise_500),
 ]
 
 handler500 = handler500
+
 
 class TestIndexView(SimpleTestCase):
 
@@ -44,5 +45,7 @@ class Test_404(SimpleTestCase):
 class Test_500(SimpleTestCase):
 
     def test_handler_renders_template_response(self):
+        self.client.raise_request_exception = False
         response = self.client.get('/500/')
-        self.assertContains(response, "500 Error: Server error", status_code=500)
+        self.assertEqual(response.status_code, 500)
+        self.assertTemplateUsed('base/html/templates/500.html')
