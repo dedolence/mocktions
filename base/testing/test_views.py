@@ -2,18 +2,12 @@ from django.test import SimpleTestCase, override_settings
 from django.urls import reverse
 from mocktions.settings import ROOT_URLCONF
 from django.urls import path
-from django.shortcuts import render
-from ..views import handler500
-
+from ..urls import urlpatterns
 
 def raise_500(request):
     return 1/0
 
-urlpatterns = [
-    path('500/', raise_500),
-]
-
-handler500 = handler500
+urlpatterns.append(path('raise_500', raise_500, name="raise_500"))
 
 
 class TestIndexView(SimpleTestCase):
@@ -38,14 +32,12 @@ class Test_404(SimpleTestCase):
 
     def test_render_custom_404_template(self):
         response = self.client.get("/aoseijfoaisejf")
-        self.assertContains(response, "404 Error: Page not found", status_code=400)
+        self.assertContains(response, "404 Page Not Found", status_code=400)
 
 
-@override_settings(ROOT_URLCONF=__name__)
 class Test_500(SimpleTestCase):
 
     def test_handler_renders_template_response(self):
         self.client.raise_request_exception = False
-        response = self.client.get('/500/')
-        self.assertEqual(response.status_code, 500)
-        self.assertTemplateUsed('base/html/templates/500.html')
+        response = self.client.get(reverse('base:raise_500'))
+        self.assertContains(response, "500 Server Error", status_code=500)
