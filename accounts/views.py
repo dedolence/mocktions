@@ -1,6 +1,7 @@
 from curses.ascii import HT
 from django.contrib import messages
 from django.contrib.auth.views import logout_then_login, LoginView
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -22,13 +23,24 @@ def index(request):
         return HttpResponseRedirect(reverse('accounts:login'))
 
 
-class DeleteAccount(SuccessMessageMixin, DeleteView):
+class DeleteAccount(UserPassesTestMixin, SuccessMessageMixin, DeleteView):
     form_class = DeleteAccountForm
     model = User
     success_url = reverse_lazy('base:index')
+    login_url = reverse_lazy('accounts:login')
     template_name = 'accounts/html/templates/delete_account.html'
     success_message = strings.ACCOUNT_DELETE_SUCCESS
+    login_required_message = strings.LOGIN_REQUIRED
+    permission_denied_message = strings.PERMISSION_DENIED
 
+    def test_func(self) -> bool:
+        #return self.request.user.id == self.kwargs['pk']
+        return False == True
+
+    def handle_no_permission(self) -> HttpResponseRedirect:
+        messages.warning(self.request, self.permission_denied_message)
+        return super().handle_no_permission()
+        
 
 class Login(SuccessMessageMixin, LoginView):
     template_name = 'accounts/html/templates/login.html'
@@ -40,6 +52,7 @@ class Login(SuccessMessageMixin, LoginView):
                 'pk': self.request.user.id
             }
         )
+
 
 class Logout(View):
     success_message = strings.LOGOUT_MESSAGE
