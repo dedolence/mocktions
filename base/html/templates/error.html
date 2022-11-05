@@ -2,10 +2,9 @@
 {% load static %}
 {% block body %}
     <div class="alert alert-warning">
-        <h4 class="alert-heading">404 Page Not Found</h4>
+        <h4 class="alert-heading">{{ error_header }}</h4>
         <p>
-            That URL didn't lead anywhere that the server could find. If this happened because of a link you clicked
-            please let me know: <a href="mailto:nhahoyt@gmail.com" class="alert-link">nhahoyt@gmail.com</a>. Thanks!
+            {{ error_message }}
         </p>
     </div>
 {% endblock body %}

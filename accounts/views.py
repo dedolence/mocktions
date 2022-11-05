@@ -34,12 +34,7 @@ class DeleteAccount(UserPassesTestMixin, SuccessMessageMixin, DeleteView):
     permission_denied_message = strings.PERMISSION_DENIED
 
     def test_func(self) -> bool:
-        #return self.request.user.id == self.kwargs['pk']
-        return False == True
-
-    def handle_no_permission(self) -> HttpResponseRedirect:
-        messages.warning(self.request, self.permission_denied_message)
-        return super().handle_no_permission()
+        return self.request.user.id == self.kwargs['pk']
         
 
 class Login(SuccessMessageMixin, LoginView):

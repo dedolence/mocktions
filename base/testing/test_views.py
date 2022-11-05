@@ -3,6 +3,8 @@ from django.urls import reverse
 from mocktions.settings import ROOT_URLCONF
 from django.urls import path
 from ..urls import urlpatterns
+from ..strings import en
+
 
 def raise_500(request):
     return 1/0
@@ -32,7 +34,7 @@ class Test_404(SimpleTestCase):
 
     def test_render_custom_404_template(self):
         response = self.client.get("/aoseijfoaisejf")
-        self.assertContains(response, "404 Page Not Found", status_code=400)
+        self.assertContains(response, en.PAGE_NOT_FOUND_H, status_code=400)
 
 
 class Test_500(SimpleTestCase):
@@ -40,4 +42,4 @@ class Test_500(SimpleTestCase):
     def test_handler_renders_template_response(self):
         self.client.raise_request_exception = False
         response = self.client.get(reverse('base:raise_500'))
-        self.assertContains(response, "500 Server Error", status_code=500)
+        self.assertContains(response, en.SERVER_ERROR_H, status_code=500)
