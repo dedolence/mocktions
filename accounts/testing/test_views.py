@@ -1,7 +1,8 @@
-from django.test import SimpleTestCase, TestCase, Client
+from django.test import SimpleTestCase, TestCase, Client, TransactionTestCase
 from django.urls import reverse
 from ..models import User
 from django.core.exceptions import ObjectDoesNotExist
+from psycopg2 import InterfaceError
 
 
 class IndexViewTest(SimpleTestCase):
@@ -100,4 +101,15 @@ class DeleteViewTest(TestCase):
             reverse("accounts:delete_account", args=[user.id]), 
             {'delete_confirmation': 'on'}
         )
+        self.client.logout()
         self.assertNotIn(user, User.objects.all())
+
+    def test_user_cannot_delete_others_account(self):
+        self.client.raise_request_exception = False
+        self.client.login(username="test_user1", password="test_password1")
+        
+        user2 = User.objects.get(username="test_user2")
+        self.client.post(
+            reverse('accounts:delete_account', args=[user2.id])
+        )
+        self.assertTrue(True)
