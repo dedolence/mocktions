@@ -109,7 +109,8 @@ class DeleteViewTest(TestCase):
         self.client.login(username="test_user1", password="test_password1")
         
         user2 = User.objects.get(username="test_user2")
-        self.client.post(
-            reverse('accounts:delete_account', args=[user2.id])
-        )
+        with self.assertRaises(InterfaceError):
+            self.client.get(
+                reverse('accounts:delete_account', args=[user2.id])
+            )
         self.assertTrue(True)

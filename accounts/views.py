@@ -35,6 +35,7 @@ class DeleteAccount(UserPassesTestMixin, SuccessMessageMixin, DeleteView):
 
     def test_func(self) -> bool:
         return self.request.user.id == self.kwargs['pk']
+
         
 
 class Login(SuccessMessageMixin, LoginView):
