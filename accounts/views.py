@@ -36,6 +36,22 @@ class DeleteAccount(UserPassesTestMixin, SuccessMessageMixin, DeleteView):
     def test_func(self) -> bool:
         return self.request.user.id == self.kwargs['pk']
 
+    def form_valid(self, form) -> HttpResponse:
+        """
+            Adds one more check that the object to be deleted,
+            which is the User ID from the querystring, matches
+            the user ID of the request session.
+
+            UserPassesTestMixin does the exact same thing! So why?
+            Because I want to have good unit tests but test_func seems
+            to bork every assert I throw at it, no matter how I 
+            mock or patch it, so I just disabled it in the unit test, 
+            but still needed a means of making sure one user can't 
+            delete another user's account.
+        """
+        if self.object.id != self.request.user.id:
+            return super().form_invalid(form)
+        return super().form_valid(form)
         
 
 class Login(SuccessMessageMixin, LoginView):
