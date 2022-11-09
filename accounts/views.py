@@ -1,6 +1,6 @@
 from curses.ascii import HT
 from django.contrib import messages
-from django.contrib.auth.views import logout_then_login, LoginView
+from django.contrib.auth.views import logout_then_login, LoginView, LogoutView
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseRedirect, HttpResponse
@@ -66,15 +66,14 @@ class Login(SuccessMessageMixin, LoginView):
         )
 
 
-class Logout(View):
+class Logout(LogoutView):
+    # SuccessMessageMixin doesn't seem to work with this view.
     success_message = strings.LOGOUT_MESSAGE
-
-    def get(self, request):
-        return render(request, 'accounts/html/templates/logout.html')
+    next_page = reverse_lazy("base:index")
 
     def post(self, request):
         messages.success(request, self.success_message)
-        return logout_then_login(request, login_url=reverse('accounts:login'))
+        return super().post(request)
 
 
 class Profile(DetailView):
@@ -94,9 +93,6 @@ class Register(SuccessMessageMixin, CreateView):
     template_name = 'accounts/html/templates/register.html'
 
     def get_success_message(self, cleaned_data) -> str:
-        """
-            Format the success message to include the user's username.
-        """
         return strings.REGISTRATION_SUCCESS.format(
             username=self.object.username
         )
