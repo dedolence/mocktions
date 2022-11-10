@@ -92,6 +92,12 @@ class Register(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('accounts:login')
     template_name = 'accounts/html/templates/register.html'
 
+    def get(self, request) -> HttpResponse:
+        if request.user.is_authenticated:
+            print(request.user.id)
+            return HttpResponseRedirect(reverse_lazy('accounts:profile', args=[request.user.id]))
+        return super().get(request)
+
     def get_success_message(self, cleaned_data) -> str:
         return strings.REGISTRATION_SUCCESS.format(
             username=self.object.username
