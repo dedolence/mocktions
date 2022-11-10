@@ -66,7 +66,11 @@ class DeleteViewTest(TestCase):
             self.assertIn(user2, User.objects.all())
 
 
-class IndexViewTest(SimpleTestCase):
+class IndexViewTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create_user(username="test_user", password="test_password")
 
     def test_url_exists_at_correct_location(self):
         """
@@ -83,12 +87,20 @@ class IndexViewTest(SimpleTestCase):
         self.assertEqual(response.status_code, 302)
 
 
-    def test_url_redirects_user_not_logged_in(self):
+    def test_redirects_user_not_logged_in(self):
         """
             Redirects an unauthenticated user to a login page.
         """
         response = self.client.get(reverse("accounts:index"))
         self.assertRedirects(response, reverse("accounts:login"))
+        self.assertEquals(response.status_code, 302)
+
+    def test_redirects_logged_in_user(self):
+        self.client.login(username="test_user", password="test_password")
+        user = auth.get_user(self.client)
+        response = self.client.get(reverse('accounts:index'))
+        self.assertRedirects(response, f"/accounts/profile/{user.id}", 302, 200)
+        self.assertEquals(response.status_code, 302)
 
 
 class LoginViewTest(TestCase):
@@ -179,20 +191,6 @@ class RegisterViewtest(TestCase):
             'phone': '(555) 555-5555'
         }
 
-        cls.invalid_no_username = {
-            'password1': 'test_password',
-            'password2': 'test_password',
-            'first_name': 'john',
-            'last_name': 'doe',
-            'email': 'test@example.com',
-            'street': '123 Example Rd.',
-            'city': 'Exampleville',
-            'state': 'EX',
-            'postcode': '12345',
-            'country': 'EXA',
-            'phone': '(555) 555-5555'
-        }
-
         cls.existing_user = User.objects.create_user(username="existing_user", password="test_password")
     
     def test_url_exists_at_correct_location(self):
@@ -209,21 +207,12 @@ class RegisterViewtest(TestCase):
 
     def test_valid_form_creates_user(self):
         response = self.client.post(reverse('accounts:register'), self.valid_data)
-        self.assertIsNotNone(User.objects.get(username="test_user"))
+        self.assertIsNotNone(User.objects.get(username=self.valid_data['username']))
 
-    def test_invalid_form_creates_error(self):
-        #response = self.client.post(reverse('accounts:register'), self.invalid_no_username)
-        pass
-
-    def test_cannot_duplicate_usernames(self):
-        print(self.existing_user)
-        response = self.client.post(
-            reverse('accounts:register'),
-            {
-                'username': 'existing_user',
-                'password1': 'different_password',
-                'password2': 'different_password'
-            }
+    def test_logged_in_user_redirected(self):
+        self.client.login(
+            username='existing_user',
+            password='test_password'
         )
-        print(User.objects.filter(username='existing_user').count())
-        self.assertTrue(True)
+        response = self.client.get(reverse('accounts:register'))
+        self.assertRedirects(response, reverse('accounts:profile', args=[self.existing_user.id]))

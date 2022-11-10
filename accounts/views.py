@@ -18,7 +18,7 @@ from .forms import DeleteAccountForm, LoginForm
 
 def index(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('accounts:profile'))
+        return HttpResponseRedirect(reverse('accounts:profile', args=[request.user.id]))
     else:
         return HttpResponseRedirect(reverse('accounts:login'))
 
@@ -94,7 +94,6 @@ class Register(SuccessMessageMixin, CreateView):
 
     def get(self, request) -> HttpResponse:
         if request.user.is_authenticated:
-            print(request.user.id)
             return HttpResponseRedirect(reverse_lazy('accounts:profile', args=[request.user.id]))
         return super().get(request)
 
