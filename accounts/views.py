@@ -85,6 +85,7 @@ class Profile(DetailView):
     """
     model = User
     template_name = 'accounts/html/templates/profile.html'
+    
 
 
 class Register(SuccessMessageMixin, CreateView):

@@ -8,6 +8,7 @@ from django.utils.encoding import smart_str
 from django.template.defaulttags import url
 from django.template import VariableDoesNotExist
 
+
 register = template.Library()
 
 @register.tag
@@ -63,6 +64,12 @@ class BreadcrumbNode(Node):
         self.vars = list(map(Variable,vars))
 
     def render(self, context):
+        """
+            Checks if the title is a string literal (presence of ' or "),
+            or a context variable. If the latter, the variable will need 
+            to be resolved.
+        """
+        
         title = self.vars[0].var
 
         if title.find("'")==-1 and title.find('"')==-1:
