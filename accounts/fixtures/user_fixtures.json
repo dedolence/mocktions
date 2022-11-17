@@ -1,0 +1,74 @@
+[
+{
+     "model": "accounts.user",
+     "pk": 1,
+     "fields": {
+          "password": "pbkdf2_sha256$390000$oh3J3TmqQsan7bsgkHwyf3$tSNU5lV8kvLjRVdJUo89UDoHe6edqpP6QSJSiV+ma+8=",
+          "last_login": "2022-10-25T06:26:58.076Z",
+          "is_superuser": false,
+          "username": "alice",
+          "first_name": "",
+          "last_name": "",
+          "email": "",
+          "is_staff": false,
+          "is_active": true,
+          "date_joined": "2022-10-25T06:26:26.602Z",
+          "street": "",
+          "city": "",
+          "state": "",
+          "postcode": "",
+          "country": "",
+          "phone": "",
+          "groups": [],
+          "user_permissions": []
+     }
+},
+{
+     "model": "accounts.user",
+     "pk": 2,
+     "fields": {
+          "password": "pbkdf2_sha256$390000$Yv3Lvkix40QLVVU7lAFWSH$WaHd8m8p9Mc0JNFWUXaYc6y7Sexfl9dz/sSk9qnULnw=",
+          "last_login": "2022-10-25T15:51:25.642Z",
+          "is_superuser": false,
+          "username": "bob",
+          "first_name": "",
+          "last_name": "",
+          "email": "",
+          "is_staff": false,
+          "is_active": true,
+          "date_joined": "2022-10-25T06:52:05.715Z",
+          "street": "",
+          "city": "",
+          "state": "",
+          "postcode": "",
+          "country": "",
+          "phone": "",
+          "groups": [],
+          "user_permissions": []
+     }
+},
+{
+     "model": "accounts.user",
+     "pk": 3,
+     "fields": {
+          "password": "pbkdf2_sha256$390000$gTqG4P5tRG6MkuECcVbDtW$9i6sFzoVpp44v1pMCIwoBOumCwXCfr3FMu7eGkrQk70=",
+          "last_login": "2022-11-17T17:54:36.483Z",
+          "is_superuser": true,
+          "username": "dedolence",
+          "first_name": "",
+          "last_name": "",
+          "email": "nhahoyt@gmail.com",
+          "is_staff": true,
+          "is_active": true,
+          "date_joined": "2022-10-25T15:52:50.261Z",
+          "street": "",
+          "city": "",
+          "state": "",
+          "postcode": "",
+          "country": "",
+          "phone": "",
+          "groups": [],
+          "user_permissions": []
+     }
+}
+]
