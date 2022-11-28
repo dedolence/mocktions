@@ -35,8 +35,11 @@ class LoginFormTest(LiveServerTestCase):
         cls.driver.quit()
         super().tearDownClass()
 
-    def test_visit_login(self):
-        # start at index, click on login
+    def test_login(self):
+        """
+            Simple login loop:
+            - start at index, click on login link, enter credentials, submit.
+        """
         self.driver.get(self.live_server_url + reverse_lazy('base:index'))
         login_link = self.driver.find_element(by=By.LINK_TEXT, value="Login")
         login_link.click()
