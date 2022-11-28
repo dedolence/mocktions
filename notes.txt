@@ -88,8 +88,14 @@ This document is version-controlled, so don't put anything sensitive here!!!
 10/20
     Important! When running a docker container locally, add --network=host in order to use the database!!! ah this was so annoying to
     try to figure out!!!
+        sudo docker run --name mocktions -p 8000:8000 --network=host mocktions
 
 10/26
     - TESTING
         - definitely easier to initiate tests after every addition to the codebase. do not let this get too far behind!!!!
         - all test methods within test classes MUST begin with "test_" to be discoverable.
+
+11/28
+    - Access shell to run tests within container:
+    - exec to run arbitrary commands
+    - start container, then run sudo docker exect -it <container_name> sh to start a shell
