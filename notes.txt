@@ -99,3 +99,13 @@ This document is version-controlled, so don't put anything sensitive here!!!
     - Access shell to run tests within container:
     - exec to run arbitrary commands
     - start container, then run sudo docker exect -it <container_name> sh to start a shell
+
+1/18
+    - building selenium page objects and tests:
+        - stale element? refresh the page object
+
+1/19
+    run coverage:
+        coverage run --source='.' manage.py test myapp
+        app is optional there obviously. full command omitting the unnecessary stuff:
+            coverage run --source='.' --omit="manage.py","*/testing/*","*/asgi.py","*/wsgi.py" manage.py test
