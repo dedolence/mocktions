@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'base',
     'accounts',
+    'images',
     'storages',
     'whitenoise.runserver_nostatic',
 ]
