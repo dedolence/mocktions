@@ -4,6 +4,8 @@ from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk import set_level
 from django.contrib.messages import constants as messages
 from django.urls import reverse_lazy
+import boto3
+from botocore.config import Config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'base',
     'accounts',
+    'images',
     'storages',
     'whitenoise.runserver_nostatic',
 ]
@@ -146,30 +149,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-# note to self:
-# env variables are always strings. therefore even an env variable like,
-# USE_S3=False will evaluate as a string, and would be evaluated as True.
-USE_LOCAL = env('USE_LOCAL') == 'True'
+# USE_LOCAL:
+# A flag for where static files are stored, either locally or by CDN,
+# True/False respectively.
+#
+# Note to self:
+# .env variables are always strings. VARIABLE=True evaluates as the 
+# string, "True", not a boolean.
+USE_LOCAL: bool = env('USE_LOCAL') == 'True'  
 
 if not USE_LOCAL:
     STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = env('AWS_BUCKET_NAME')
-    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-    
-    AWS_LOCATION = 'static'
-    AWS_REGION = env('AWS_REGION')
-    AWS_S3_CUSTOM_DOMAIN = '{bucket}.s3.{region}.amazonaws.com'.format(
-        bucket=AWS_STORAGE_BUCKET_NAME, region=AWS_REGION)
-    
     # Django appends STATIC_URL to the beginning of URLs that are loaded via {% static %}
     # i.e. <img src="{% static 'images/user.png' %}">" gets parsed as <img src="https://s3.bucket.aws.../images/user.png">
-    STATIC_URL = '{domain}/{location}/'.format(
-        domain=AWS_S3_CUSTOM_DOMAIN,
-        location=AWS_LOCATION
-    )
+    STATIC_URL = "https://s3.us-west-004.backblazeb2.com/static/"
 else:
     STATIC_URL = '/staticfiles/'
     # STATIC_ROOT defines where staticfiles will be copied and then served from.
