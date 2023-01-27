@@ -6,6 +6,7 @@ from django.contrib.messages import constants as messages
 from django.urls import reverse_lazy
 import boto3
 from botocore.config import Config
+import django_backblaze_b2
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -159,9 +160,27 @@ USE_TZ = True
 USE_LOCAL: bool = env('USE_LOCAL') == 'True'  
 
 if not USE_LOCAL:
-    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            #'LOCATION': 'unique-snowflake',
+        },
+        "django-backblaze-b2": {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'django_backblaze_b2_cache_table',
+        }
+    }
+
+    BACKBLAZE_CONFIG = {
+        "application_key_id": os.getenv("B2_KEY_ID"),
+        "application_key": os.getenv("B2_APPLICATION_KEY"),
+        "bucket": os.getenv("B2_BUCKET_NAME")
+    }
+
+    STATICFILES_STORAGE = 'django_backblaze_b2.BackblazeB2Storage'
     # Django appends STATIC_URL to the beginning of URLs that are loaded via {% static %}
-    # i.e. <img src="{% static 'images/user.png' %}">" gets parsed as <img src="https://s3.bucket.aws.../images/user.png">
+    # i.e. <img src="{% static 'images/user.png' %}">" gets parsed as: 
+    # <img src="https://static-bucket.cdn-provider.com/images/user.png">
     STATIC_URL = "https://s3.us-west-004.backblazeb2.com/static/"
 else:
     STATIC_URL = '/staticfiles/'
