@@ -1,12 +1,15 @@
+"""
+    Production settings!
+
+    Any development settings should be in local_settings, where they will 
+    overwrite anything set here.
+"""
+
 import dj_database_url, environ, os, sentry_sdk
 from pathlib import Path
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk import set_level
 from django.contrib.messages import constants as messages
-from django.urls import reverse_lazy
-import boto3
-from botocore.config import Config
-import django_backblaze_b2
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -147,6 +150,12 @@ USE_I18N = True
 USE_TZ = True
 
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
@@ -159,11 +168,15 @@ USE_TZ = True
 # string, "True", not a boolean.
 USE_LOCAL: bool = env('USE_LOCAL') == 'True'  
 
-if not USE_LOCAL:
+if USE_LOCAL:
+    STATIC_URL = '/staticfiles/'
+    # STATIC_ROOT defines where staticfiles will be copied and then served from.
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+else:
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            #'LOCATION': 'unique-snowflake',
         },
         "django-backblaze-b2": {
             'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
@@ -174,7 +187,7 @@ if not USE_LOCAL:
     BACKBLAZE_CONFIG = {
         "application_key_id": os.getenv("B2_KEY_ID"),
         "application_key": os.getenv("B2_APPLICATION_KEY"),
-        "bucket": os.getenv("B2_BUCKET_NAME")
+        "bucket": "mocktions-pub"
     }
 
     STATICFILES_STORAGE = 'django_backblaze_b2.BackblazeB2Storage'
@@ -182,22 +195,14 @@ if not USE_LOCAL:
     # i.e. <img src="{% static 'images/user.png' %}">" gets parsed as: 
     # <img src="https://static-bucket.cdn-provider.com/images/user.png">
     STATIC_URL = "https://s3.us-west-004.backblazeb2.com/static/"
-else:
-    STATIC_URL = '/staticfiles/'
-    # STATIC_ROOT defines where staticfiles will be copied and then served from.
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# In a local environment, these will override previously defined production settings.
-# Obviously, should be added to .gitignore and .dockerignore.
+# In the presence of the local_settings module, they will override
+# anything here. So, these are all production settings by default.
+# Obviously, local_settings should be omitted from version control.
 try:
     from .local_settings import *
 except ImportError:
