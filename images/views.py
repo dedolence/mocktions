@@ -1,12 +1,27 @@
-import environ, os, boto3
-from botocore.config import Config
-from pathlib import Path
 from django import http
-from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from mocktions.settings import BASE_DIR, USE_LOCAL
-from typing import Dict, Any
+from .models import Image
+from django.forms import BaseModelForm
 
-class IndexView(TemplateView):
-    template_name = "images/html/templates/index.html"
-    
+class ImageCreateView(LoginRequiredMixin, CreateView):
+    template_name = "images/html/templates/add.html"
+    model = Image
+    fields = ["image_field"]
+
+    def form_valid(self, form: BaseModelForm) -> http.HttpResponse:
+        form.instance.uploaded_by = self.request.user
+        return super().form_valid(form)
+
+
+class ImageUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = "images/html/templates/update.html"
+    model = Image
+    fields = ["image_field"]
+
+
+class ImageDeleteView(LoginRequiredMixin, DeleteView):
+    template_name = "images/html/templates/delete.html"
+    model = Image
+    success_url = reverse_lazy("images:index")

@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'images',
     'storages',
     'whitenoise.runserver_nostatic',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [

@@ -109,3 +109,8 @@ This document is version-controlled, so don't put anything sensitive here!!!
         coverage run --source='.' manage.py test myapp
         app is optional there obviously. full command omitting the unnecessary stuff:
             coverage run --source='.' --omit="manage.py","*/testing/*","*/asgi.py","*/wsgi.py" manage.py test
+
+1/30
+    django_backblaze_b2 has CHANGED MY LIFE. once i figured out that, as a storage class, i can just call it as storage in my model class and it would handle uploading to my b2 bucket.... incredible. so i don't have to deal with pre-signed URL BS or anything... i'm in awe. and django-cleanup works as well to handle deleting the objects from the bucket. so easy. my goodness, i'm so psyched.
+
+    
