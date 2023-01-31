@@ -174,6 +174,7 @@ if USE_LOCAL:
     # STATIC_ROOT defines where staticfiles will be copied and then served from.
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 else:
     CACHES = {
         'default': {
@@ -190,7 +191,7 @@ else:
         "application_key": os.getenv("B2_APPLICATION_KEY"),
         "bucket": "mocktions-pub"
     }
-
+    DEFAULT_FILE_STORAGE = 'django_backblaze_b2.BackblazeB2Storage'
     STATICFILES_STORAGE = 'django_backblaze_b2.BackblazeB2Storage'
     # Django appends STATIC_URL to the beginning of URLs that are loaded via {% static %}
     # i.e. <img src="{% static 'images/user.png' %}">" gets parsed as: 
@@ -206,5 +207,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 # Obviously, local_settings should be omitted from version control.
 try:
     from .local_settings import *
+    print("-------------\nLocal development settings loading!\n-------------")
 except ImportError:
     pass

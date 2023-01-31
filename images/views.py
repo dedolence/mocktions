@@ -6,6 +6,10 @@ from .models import Image
 from django.forms import BaseModelForm
 
 class ImageCreateView(LoginRequiredMixin, CreateView):
+    """
+        Creates an Image model instance, saves it (which uploads it to B2 
+        bucket), and returns a redirect to that image UpdateView.
+    """
     template_name = "images/html/templates/add.html"
     model = Image
     fields = ["image_field"]
