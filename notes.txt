@@ -119,3 +119,11 @@ This document is version-controlled, so don't put anything sensitive here!!!
     to access images after uploading:
     {% static object.image_field.name %}
     static appends the https://backblazeb2.yadda.yadda/" and then image_field.name appends the relative path, filename, and extension.
+
+1/31
+    ok i think i need to revamp this a bit.
+    uploaded images should be "media" not static files.
+    static files get saved to their own directory and are accessed with {% static %}, which appends the full URL for the b2 bucket where they are 
+    kept.
+
+    media files should get uploaded to their own bucket/directory. they are accessed in the template with {{ MEDIA_URL }}{{ object.image_field.name }} which should parse as the full file URL in the bucket.
