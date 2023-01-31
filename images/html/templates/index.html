@@ -1,6 +1,15 @@
 {% extends 'base/html/templates/base.html' %}
 {% load static %}
 {% block body %}
-    {{ message }}
-    <h1>Image Upload</h1>
+    <h1>Images</h1>
+    {% for image in object_list %}
+        <div class="d-flex flex-row">
+            <div>
+                <a href="{% url 'images:update' image.id %}">
+                    <img src="{% static image.image_field.name %}" class="img-thumbnail my-4">
+                </a>
+            </div>
+            <div></div>
+        </div>
+    {% endfor %}
 {% endblock body %}
