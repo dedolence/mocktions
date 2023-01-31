@@ -1,6 +1,6 @@
 from django import http
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.urls import reverse_lazy
 from .models import Image
 from django.forms import BaseModelForm
@@ -25,3 +25,7 @@ class ImageDeleteView(LoginRequiredMixin, DeleteView):
     template_name = "images/html/templates/delete.html"
     model = Image
     success_url = reverse_lazy("images:index")
+
+class ImageListView(LoginRequiredMixin, ListView):
+    template_name = "images/html/templates/index.html"
+    model = Image

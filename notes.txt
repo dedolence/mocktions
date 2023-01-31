@@ -113,4 +113,9 @@ This document is version-controlled, so don't put anything sensitive here!!!
 1/30
     django_backblaze_b2 has CHANGED MY LIFE. once i figured out that, as a storage class, i can just call it as storage in my model class and it would handle uploading to my b2 bucket.... incredible. so i don't have to deal with pre-signed URL BS or anything... i'm in awe. and django-cleanup works as well to handle deleting the objects from the bucket. so easy. my goodness, i'm so psyched.
 
-    
+    uploading images:
+    just use an ImageField in a form, or a CreateView. the model storage property is set to BackblazeB2Storage (or PublicStorage or whatever) which automatically uploads to B2. so that's taken care of.
+
+    to access images after uploading:
+    {% static object.image_field.name %}
+    static appends the https://backblazeb2.yadda.yadda/" and then image_field.name appends the relative path, filename, and extension.

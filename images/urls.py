@@ -3,7 +3,8 @@ import images.views as views
 
 app_name = 'images'
 urlpatterns = [
-    path("", views.ImageCreateView.as_view(), name="add"),
+    path("", views.ImageListView.as_view(), name="index"),
+    path("add/", views.ImageCreateView.as_view(), name="add"),
     path("<int:pk>/", views.ImageUpdateView.as_view(), name="update"),
     path("<int:pk>/delete", views.ImageDeleteView.as_view(), name="delete"),
 ]

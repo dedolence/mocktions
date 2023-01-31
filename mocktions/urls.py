@@ -5,7 +5,7 @@ from django.conf.urls import handler400, handler500, handler403
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('base.urls', namespace='base')),
-    path('', include("django_backblaze_b2.urls")),
+    path('', include("django_backblaze_b2.urls", namespace="b2")),
     path('accounts/', include('accounts.urls', namespace="accounts")),
     path('images/', include("images.urls", namespace="images"))
 ]
