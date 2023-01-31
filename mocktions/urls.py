@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import handler400, handler500, handler403
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -8,7 +10,7 @@ urlpatterns = [
     path('', include("django_backblaze_b2.urls", namespace="b2")),
     path('accounts/', include('accounts.urls', namespace="accounts")),
     path('images/', include("images.urls", namespace="images"))
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 handler404 = 'base.views.handler404'
