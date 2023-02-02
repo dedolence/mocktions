@@ -11,5 +11,6 @@
     <br/>
     <a href="{% url 'images:delete' object.id %}" class="btn btn-primary">Delete</a>
     <br/>
-    <img src="{% static object.image_field.name %}">
+    <p>MEDIA_URL: {{ MEDIA_URL }}</p>
+    <img src="{{ object.image_field.url }}">
 {% endblock body %}

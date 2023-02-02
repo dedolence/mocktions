@@ -175,6 +175,8 @@ if USE_LOCAL:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+    MEDIA_URL = '/mediafiles/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles/tests')
 else:
     CACHES = {
         'default': {
@@ -191,15 +193,11 @@ else:
         "application_key": os.getenv("B2_APPLICATION_KEY"),
         "bucket": "mocktions-pub"
     }
-    DEFAULT_FILE_STORAGE = 'django_backblaze_b2.BackblazeB2Storage'
     STATICFILES_STORAGE = 'django_backblaze_b2.BackblazeB2Storage'
-    # Django appends STATIC_URL to the beginning of URLs that are loaded via {% static %}
-    # i.e. <img src="{% static 'images/user.png' %}">" gets parsed as: 
-    # <img src="https://static-bucket.cdn-provider.com/images/user.png">
     STATIC_URL = "https://s3.us-west-004.backblazeb2.com/static/"
 
-MEDIA_URL = '/mediafiles/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+    DEFAULT_FILE_STORAGE = 'django_backblaze_b2.PublicStorage'
+    MEDIA_URL = "https://s3.us-west-004.backblazeb2.com/media/"
 
 
 # In the presence of the local_settings module, they will override

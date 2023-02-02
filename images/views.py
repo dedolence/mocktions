@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 from .models import Image
 from django.forms import BaseModelForm
 
+from django.core.files.storage import default_storage
+
 class ImageCreateView(LoginRequiredMixin, CreateView):
     """
         Creates an Image model instance, saves it (which uploads it to B2 

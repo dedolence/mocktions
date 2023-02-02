@@ -127,3 +127,42 @@ This document is version-controlled, so don't put anything sensitive here!!!
     kept.
 
     media files should get uploaded to their own bucket/directory. they are accessed in the template with {{ MEDIA_URL }}{{ object.image_field.name }} which should parse as the full file URL in the bucket.
+
+    OR
+
+    i guess, apparently, i can still use the {% static %} tag and it will load 
+    media files that have been uploaded to their own directory in the bucket, 
+    separately from regular static files. i guess!! this is sorta convenient for
+    production's sake, but it doesn't solve my problem of wanting to take the
+    django_backblaze_b2 package out of the picture for doing unit tests because
+    the cachetable seems to break the testing environment.
+
+    am i imagining it or are things really slow now? all the files are being routed through a local /b2/ url - is that why? seems like overhead. for a minute there they were being loaded directly from the bucket and it seemed
+    faster (makes sense).
+
+    just deployed this to Fly and in production i don't notice any lag - seems
+    like everything is being cached correctly. but also, just noticed that in 
+    prod it's loading from the full file URL, not a relative URL via /b2/ so 
+    that probably does explain it. but why? i deployed straight from what i 
+    have saved.
+
+    maybe because locally, debug=true and therefore Django doesn't serve media
+    the same?
+
+    test: USE_LOCAL = False, DEBUG = False.
+        - result: fast, loading from full file URL
+    test: USE_LOCAL = False, DEBUG = True.
+        - results: no change, still loading from full file URL.
+    test: USE_LOCAL = True, DEBUG = True
+        - results: attemping to load files from /staticfiles/
+
+    the MEDIA_URL and STATIC_URL seem to be ignored.
+
+    So one thing I've noticed:
+    in the template, there are two ways to denote the src attribute of an img tag:
+        1) src="{% static object.image_field.name %}"
+        2) src="{{ object.image_field.url }}"
+
+    1) will load the file directly from the B2 bucket and seems fastest.
+    2) will load it via the /b2/ url routing. why use that? the docs for django_backblaze_b2 state that these url routes are for controlling access
+    to objects that may or may not be public/private. is that important to me?  

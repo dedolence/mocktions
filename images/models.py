@@ -1,13 +1,11 @@
 from django.db import models
 from django.urls import reverse
-from django_backblaze_b2 import BackblazeB2Storage
-from django_backblaze_b2 import PublicStorage, StaffStorage, LoggedInStorage
 from mocktions.settings import AUTH_USER_MODEL as User
 from django.core.files.storage import default_storage
 
 class Image(models.Model):
     image_field = models.ImageField(
-        upload_to = "images/user_uploads", 
+        upload_to = "user_uploads", 
         storage = default_storage,
         height_field = None, 
         width_field = None, 
