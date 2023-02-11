@@ -156,6 +156,8 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# custom, not part of Django's built-in settings
+UPLOAD_MAX_SIZE = 2621440   # 2.5MB
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -176,7 +178,7 @@ if USE_LOCAL:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
     MEDIA_URL = '/mediafiles/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles/tests')
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 else:
     CACHES = {
         'default': {

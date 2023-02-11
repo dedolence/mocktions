@@ -6,7 +6,7 @@
         {% csrf_token %}
         {{ form.as_p }}
         <br/><br/>
-        <input type="submit" value="submit">
+        <input type="submit" value="delete">
     </form>
     <br/><br/>
     <img src="{{ object.image_field.url }}">

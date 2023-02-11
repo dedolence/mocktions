@@ -4,8 +4,9 @@ from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.urls import reverse_lazy
 from .models import Image
 from django.forms import BaseModelForm
+from typing import Any
+from .forms import ImageUploadForm
 
-from django.core.files.storage import default_storage
 
 class ImageCreateView(LoginRequiredMixin, CreateView):
     """
@@ -14,7 +15,7 @@ class ImageCreateView(LoginRequiredMixin, CreateView):
     """
     template_name = "images/html/templates/add.html"
     model = Image
-    fields = ["image_field"]
+    form_class = ImageUploadForm
 
     def form_valid(self, form: BaseModelForm) -> http.HttpResponse:
         form.instance.uploaded_by = self.request.user
@@ -24,7 +25,7 @@ class ImageCreateView(LoginRequiredMixin, CreateView):
 class ImageUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "images/html/templates/update.html"
     model = Image
-    fields = ["image_field"]
+    form_class = ImageUploadForm
 
 
 class ImageDeleteView(LoginRequiredMixin, DeleteView):
