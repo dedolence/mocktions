@@ -27,7 +27,6 @@ def size_validator(value: models.ImageField) -> ValidationError | None:
             "Image is too large. Images must be less than {max_size}".format(max_size = filesizeformat(UPLOAD_MAX_SIZE))
         ))
 
-
 class Image(models.Model):
     image_field = models.ImageField(
         upload_to = "user_uploads", 

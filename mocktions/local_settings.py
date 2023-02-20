@@ -1,11 +1,15 @@
 import dj_database_url
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0']
-
-DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    },
+    "django-backblaze-b2": {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_backblaze_b2_cache_table',
+    }
 }
-
 # Logging in production is handled by Sentry
 LOGGING = {
     'version': 1,
