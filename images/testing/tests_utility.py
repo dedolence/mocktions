@@ -30,7 +30,7 @@ def create_image(
 @override_settings(
     MEDIA_ROOT = os.path.join(settings.BASE_DIR, 'mediafiles/tests')
 )
-class BaseImageTestClass(TransactionTestCase):
+class BaseImageTestClass(TestCase):
     
     @classmethod
     def setUpClass(cls) -> None:
