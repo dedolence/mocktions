@@ -6,6 +6,9 @@ from .models import Image
 from django.forms import BaseModelForm
 from typing import Any
 from .forms import ImageUploadForm
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 
 
 class ImageCreateView(LoginRequiredMixin, CreateView):
@@ -28,10 +31,33 @@ class ImageUpdateView(LoginRequiredMixin, UpdateView):
     form_class = ImageUploadForm
 
 
-class ImageDeleteView(LoginRequiredMixin, DeleteView):
+class ImageDeleteView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     template_name = "images/html/templates/delete.html"
     model = Image
     success_url = reverse_lazy("images:index")
+    success_message = "Image uploaded successfully!"
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        """
+            I do not want to support GET requests to delete images. However, I also do
+            not want to return a 405 error by excluding GET from allowed_method_names, 
+            because that returns a blank page (unless I create a middleware to catch 405
+            errors and return a template - perhaps in the future).s
+        """
+        return HttpResponseRedirect(reverse_lazy("base:index"))
+
+    def get_object(self, queryset = None) -> Image:
+        obj: Image = super().get_object(queryset)
+        if self.request.user != obj.uploaded_by:
+            return None
+        return obj
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        self.object = self.get_object()
+        if self.object == None:
+            messages.add_message(self.request, messages.WARNING, "You do not have permission to delete that object.")
+            return HttpResponseRedirect(reverse_lazy("base:index"))
+        return super().post(request, *args, **kwargs)
 
 class ImageListView(LoginRequiredMixin, ListView):
     template_name = "images/html/templates/index.html"

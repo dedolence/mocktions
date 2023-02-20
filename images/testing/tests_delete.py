@@ -2,9 +2,9 @@ from .tests_utility import BaseImageTestClass
 from django.urls import reverse_lazy
 from images.models import Image
 from accounts.models import User
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
-class HintClass(TestCase):
+class HintClass(TransactionTestCase):
     """
         This exists purely so Pylance shows inherited properties from TestCase
         within its child classes... a little silly I know...
@@ -37,3 +37,5 @@ class ImageDeleteClass(BaseImageTestClass, HintClass):
         self.client.login(username=username2, password=password2)
 
         response = self.client.post(reverse_lazy("images:delete", args=[image.pk]))
+        self.assertRedirects(response, reverse_lazy("base:index"))
+        self.assertEqual(Image.objects.count(), 1)

@@ -1,6 +1,6 @@
 import os
 from io import BytesIO
-from django.test import TestCase, override_settings
+from django.test import TestCase, override_settings, TransactionTestCase
 from django.http import HttpResponse
 
 from accounts.models import User
@@ -30,7 +30,7 @@ def create_image(
 @override_settings(
     MEDIA_ROOT = os.path.join(settings.BASE_DIR, 'mediafiles/tests')
 )
-class BaseImageTestClass(TestCase):
+class BaseImageTestClass(TransactionTestCase):
     
     @classmethod
     def setUpClass(cls) -> None:

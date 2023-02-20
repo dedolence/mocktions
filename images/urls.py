@@ -7,5 +7,5 @@ urlpatterns = [
     path("add/", views.ImageCreateView.as_view(), name="add"),
     path("add/", views.ImageCreateView.as_view(), name="create"),   #redundant because i can never remember
     path("<int:pk>/", views.ImageUpdateView.as_view(), name="update"),
-    path("<int:pk>/delete", views.ImageDeleteView.as_view(), name="delete"),
+    path("delete/<int:pk>", views.ImageDeleteView.as_view(), name="delete"),
 ]
