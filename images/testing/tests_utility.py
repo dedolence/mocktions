@@ -8,6 +8,8 @@ from images.models import Image
 from django.urls import reverse_lazy
 from django.conf import settings
 
+import uuid
+
 from django.core.files.base import ContentFile
 from PIL import Image as PILImage
 
@@ -37,8 +39,8 @@ class BaseImageTestClass(TestCase):
         cls.temp_upload_path = os.path.join(
             settings.BASE_DIR, 'mediafiles/tests'
         )
-        cls.username = "test_user"
-        cls.password = "test_password"
+        cls.username = uuid.uuid4().hex
+        cls.password = uuid.uuid4().hex
         cls.user: User = User.objects.create_user(
             username=cls.username, password=cls.password
         )

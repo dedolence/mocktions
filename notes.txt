@@ -165,4 +165,9 @@ This document is version-controlled, so don't put anything sensitive here!!!
 
     1) will load the file directly from the B2 bucket and seems fastest.
     2) will load it via the /b2/ url routing. why use that? the docs for django_backblaze_b2 state that these url routes are for controlling access
-    to objects that may or may not be public/private. is that important to me?  
+    to objects that may or may not be public/private. is that important to me? 
+
+2/20
+    for unit tests, run in parallel with the --parallel flag, otherwise there 
+    are strange errors (duplicate usernames or filenotfound for images that 
+    definitely exist)
