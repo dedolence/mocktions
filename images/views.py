@@ -9,6 +9,7 @@ from .forms import ImageUploadForm
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
+from images.strings.en import *
 
 
 class ImageCreateView(LoginRequiredMixin, CreateView):
@@ -42,7 +43,7 @@ class ImageDeleteView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
             I do not want to support GET requests to delete images. However, I also do
             not want to return a 405 error by excluding GET from allowed_method_names, 
             because that returns a blank page (unless I create a middleware to catch 405
-            errors and return a template - perhaps in the future).s
+            errors and return a template - perhaps in the future).
         """
         return HttpResponseRedirect(reverse_lazy("base:index"))
 
@@ -55,7 +56,7 @@ class ImageDeleteView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         self.object = self.get_object()
         if self.object == None:
-            messages.add_message(self.request, messages.WARNING, "You do not have permission to delete that object.")
+            messages.add_message(self.request, messages.WARNING, DELETE_PERMISSION_DENIED)
             return HttpResponseRedirect(reverse_lazy("base:index"))
         return super().post(request, *args, **kwargs)
 
