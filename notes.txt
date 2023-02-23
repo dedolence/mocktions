@@ -171,3 +171,8 @@ This document is version-controlled, so don't put anything sensitive here!!!
     for unit tests, run in parallel with the --parallel flag, otherwise there 
     are strange errors (duplicate usernames or filenotfound for images that 
     definitely exist)
+
+2/22
+    starting up a DRF project for practice. feels bad taking time away from developing (and the inevitable refactoring if this provides the functionality i am looking for) but i do suspect this is the way i want to set up the Images app, which requires only URL endpoints for CRUD operations and doesn't need views or anything.
+
+    
