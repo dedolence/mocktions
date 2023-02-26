@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'base',
     'accounts',
     'images',
@@ -189,11 +190,15 @@ else:
             'LOCATION': 'django_backblaze_b2_cache_table',
         }
     }
+    B2_APPLICATION_KEY_ID = os.getenv("B2_KEY_ID")
+    B2_APPLICATION_KEY = os.getenv("B2_APPLICATION_KEY")
+    B2_BUCKET_NAME = os.getenv("B2_BUCKET_NAME")
+    B2_BUCKET_ENDPOINT = os.getenv("B2_BUCKET_ENDPOINT")
 
     BACKBLAZE_CONFIG = {
-        "application_key_id": os.getenv("B2_KEY_ID"),
-        "application_key": os.getenv("B2_APPLICATION_KEY"),
-        "bucket": "mocktions-pub"
+        "application_key_id": B2_APPLICATION_KEY_ID,
+        "application_key": B2_APPLICATION_KEY,
+        "bucket": B2_BUCKET_NAME
     }
     STATICFILES_STORAGE = 'django_backblaze_b2.BackblazeB2Storage'
     STATIC_URL = "https://s3.us-west-004.backblazeb2.com/static/"
