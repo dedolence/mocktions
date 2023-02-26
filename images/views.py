@@ -1,6 +1,6 @@
 from django import http
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.urls import reverse_lazy
 from .models import Image
 from django.forms import BaseModelForm
@@ -10,7 +10,14 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from images.strings.en import *
-
+from django.template.loader import render_to_string
+from images.forms import ImageUploadForm
+import boto3
+from botocore.exceptions import ClientError
+from django.conf import settings
+import requests
+from time import sleep
+from b2sdk.api import Services
 
 class ImageCreateView(LoginRequiredMixin, CreateView):
     """
@@ -63,3 +70,35 @@ class ImageDeleteView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
 class ImageListView(LoginRequiredMixin, ListView):
     template_name = "images/html/templates/index.html"
     model = Image
+
+
+class TestPath(DetailView):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        sleep(2)
+        return HttpResponse("Here is a message.")
+
+class ImageAddInline(LoginRequiredMixin, CreateView):
+    model = Image
+    fields = ["image_field"]
+
+    def form_valid(self, form: BaseModelForm) -> http.HttpResponse:
+        form.instance.uploaded_by = self.request.user
+        self.object = form.save()
+        return HttpResponse(
+            render_to_string(
+                "images/html/includes/image.html", 
+                {"image": self.object}, 
+                self.request)
+            )
+    
+def presigned_url(request):
+    if request.method == "POST":
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['image_field']
+            try:
+                pass
+            except ClientError as e:
+                return None
+        else:
+            return HttpResponse("Post didn't work.")

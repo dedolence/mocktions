@@ -1,1 +1,64 @@
 Upload form goes here.
+
+<button hx-get="{% url 'images:test_click' %}" class="btn btn-primary my-3" type="button">
+    <span class="htmx-indicator spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    Click me
+</button>
+
+
+<div class="my-3">
+    <button class="btn btn-primary" type="button" 
+        hx-get="{% url 'images:test_click' %}" 
+        hx-indicator="#remote-indicator" 
+        hx-target="#remote-target"
+    >
+        Click to load in separate div.
+    </button>
+    <div id="remote-target" class="my-2">
+        <div id="remote-indicator" class="htmx-indicator">
+            <span class="htmx-indicator spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </div>    
+    </div>
+</div>
+
+<form hx-encoding="multipart/form-data">
+    Select File:
+    <input type="file" id="id_image_field" name="image_field" accepts="image/*" />
+    <button
+      hx-post="{% url 'images:add_image_inline' %}"
+      hx-include="[name='csrfmiddlewaretoken']"
+      hx-target="#image_list"
+    >
+      Upload File!
+    </button>
+</form>
+
+<hr/>
+<h3>DRF Upload</h3>
+<form hx-encoding="multipart/form-data">
+    Select File:
+    <input type="file" id="id_image_field" name="image_field" accepts="image/*" />
+    <button
+      hx-post="{% url 'images:add_drf' %}"
+      hx-include="[name='csrfmiddlewaretoken']"
+      hx-target="#image_list"
+    >
+      Upload File!
+    </button>
+</form>
+<hr/>
+<h3>Presigned URL</h3>
+<form hx-encoding="multipart/form-data">
+  Select File:
+  <input type="file" id="id_image_field" name="image_field" accepts="image/*" />
+  <button
+    hx-post="{% url 'images:presigned_url' %}"
+    hx-include="[name='csrfmiddlewaretoken']"
+    hx-target="#url_output"
+  >
+    Upload File!
+  </button>
+</form>
+<div id="url_output"></div>
+<hr/>
+<div id="image_list"></div>
