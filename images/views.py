@@ -17,7 +17,11 @@ from botocore.exceptions import ClientError
 from django.conf import settings
 import requests
 from time import sleep
-from b2sdk.api import Services
+from b2sdk.api import B2Api
+from typing import TypedDict
+from django.http import JsonResponse
+from django.conf import settings
+from django_backblaze_b2.storage import BackblazeB2Storage
 
 class ImageCreateView(LoginRequiredMixin, CreateView):
     """
@@ -92,13 +96,18 @@ class ImageAddInline(LoginRequiredMixin, CreateView):
             )
     
 def presigned_url(request):
-    if request.method == "POST":
-        form = ImageUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            file = request.FILES['image_field']
-            try:
-                pass
-            except ClientError as e:
-                return None
-        else:
-            return HttpResponse("Post didn't work.")
+    """
+        Gets the storage class from settings (B2 Backblaze) and uses it to 
+        access the B2 API to get and return a URL for uploading. Trying to
+        access the B2 API directly isn't working, I'm not sure why.
+    """
+    b2_storage = BackblazeB2Storage()
+    app_key = settings.B2_APPLICATION_KEY
+    app_key_id = settings.B2_APPLICATION_KEY_ID
+    realm = "https://api.backblazeb2.com"
+    b2_bucket_id = settings.B2_BUCKET_ID
+    auth_dict = b2_storage.b2Api.raw_api.authorize_account(realm, app_key_id, app_key)
+    response_dict = b2_storage.b2Api.raw_api.get_upload_url(auth_dict['apiUrl'], auth_dict['authorizationToken'], b2_bucket_id)["uploadUrl"]
+    
+    
+    return HttpResponse(response_dict)

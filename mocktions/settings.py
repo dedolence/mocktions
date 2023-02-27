@@ -194,6 +194,7 @@ else:
     B2_APPLICATION_KEY = os.getenv("B2_APPLICATION_KEY")
     B2_BUCKET_NAME = os.getenv("B2_BUCKET_NAME")
     B2_BUCKET_ENDPOINT = os.getenv("B2_BUCKET_ENDPOINT")
+    B2_BUCKET_ID =os.getenv("B2_BUCKET_ID")
 
     BACKBLAZE_CONFIG = {
         "application_key_id": B2_APPLICATION_KEY_ID,
