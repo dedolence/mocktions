@@ -5,14 +5,17 @@
 
     {% include 'images/html/includes/upload_form.html' %}
 
-    {% for image in object_list %}
-        <div class="position-relative" style="width: 200px; height: 200px;">
-            <div class="position-absolute top-50 start-50 translate-middle spinner-border"></div>
-            <div class="position-absolute top-0 start-0 w-100 h-100">
-                <a href="{% url 'images:update' image.id %}">
-                    <img src="{{ image.image_field.url }}">
-                </a>
-            </div>
+    <hr class="my-5"/>
+    <div style="width: 200px; height: 200px;">
+        <span id="id_image_loading_spinner" class="htmx-indicator spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <div id="id_image_list" class="position-relative">
+        {% for image in object_list %}
+                <div class="img-thumbnail">
+                    <a href="{% url 'images:update' image.id %}">
+                        <img src="{{ image.image_field.url }}">
+                    </a>
+                </div>
+        {% endfor %}
         </div>
-    {% endfor %}
+    </div>
 {% endblock body %}

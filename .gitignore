@@ -22,3 +22,6 @@ staticfiles/
 #fly.toml
 .coverage
 htmlcov/
+
+# i might stash some things i tried out but didn't want to implement here
+abandoned/

@@ -5,4 +5,4 @@ from images.models import Image
 class ImageUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ["image_field"]
+        fields = "__all__"

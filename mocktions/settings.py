@@ -193,6 +193,8 @@ else:
     B2_APPLICATION_KEY_ID = os.getenv("B2_KEY_ID")
     B2_APPLICATION_KEY = os.getenv("B2_APPLICATION_KEY")
     B2_BUCKET_NAME = os.getenv("B2_BUCKET_NAME")
+
+    # these can be deleted if not using get_upload_url()
     B2_BUCKET_ENDPOINT = os.getenv("B2_BUCKET_ENDPOINT")
     B2_BUCKET_ID =os.getenv("B2_BUCKET_ID")
 

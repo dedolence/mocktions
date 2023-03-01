@@ -10,18 +10,14 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from images.strings.en import *
-from django.template.loader import render_to_string
 from images.forms import ImageUploadForm
-import boto3
-from botocore.exceptions import ClientError
-from django.conf import settings
-import requests
-from time import sleep
-from b2sdk.api import B2Api
-from typing import TypedDict
-from django.http import JsonResponse
-from django.conf import settings
-from django_backblaze_b2.storage import BackblazeB2Storage
+
+from rest_framework.views import APIView
+from images.serializers import ImageUploadSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework import status
 
 class ImageCreateView(LoginRequiredMixin, CreateView):
     """
@@ -76,38 +72,21 @@ class ImageListView(LoginRequiredMixin, ListView):
     model = Image
 
 
-class TestPath(DetailView):
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        sleep(2)
-        return HttpResponse("Here is a message.")
+class ImageUpload(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [IsAuthenticated]
 
-class ImageAddInline(LoginRequiredMixin, CreateView):
-    model = Image
-    fields = ["image_field"]
-
-    def form_valid(self, form: BaseModelForm) -> http.HttpResponse:
-        form.instance.uploaded_by = self.request.user
-        self.object = form.save()
-        return HttpResponse(
-            render_to_string(
-                "images/html/includes/image.html", 
-                {"image": self.object}, 
-                self.request)
-            )
-    
-def presigned_url(request):
-    """
-        Gets the storage class from settings (B2 Backblaze) and uses it to 
-        access the B2 API to get and return a URL for uploading. Trying to
-        access the B2 API directly isn't working, I'm not sure why.
-    """
-    b2_storage = BackblazeB2Storage()
-    app_key = settings.B2_APPLICATION_KEY
-    app_key_id = settings.B2_APPLICATION_KEY_ID
-    realm = "https://api.backblazeb2.com"
-    b2_bucket_id = settings.B2_BUCKET_ID
-    auth_dict = b2_storage.b2Api.raw_api.authorize_account(realm, app_key_id, app_key)
-    response_dict = b2_storage.b2Api.raw_api.get_upload_url(auth_dict['apiUrl'], auth_dict['authorizationToken'], b2_bucket_id)["uploadUrl"]
-    
-    
-    return HttpResponse(response_dict)
+    def post(self, request, format=None):
+        data = {
+            'image_field': request.data['image_field'], 
+            'uploaded_by': request.user.pk
+        }
+        serializer = ImageUploadSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            # the following can also be used in case the uploaded_by field
+            # is omitted from the serializer class.
+            #obj = serializer.save(**{'uploaded_by': request.user})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

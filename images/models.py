@@ -34,7 +34,9 @@ class Image(models.Model):
         height_field = None, 
         width_field = None, 
         max_length = None,
-        validators=[type_validator, size_validator]
+
+        # this doesn't work with DRF because those validators don't recognize the _file attribute
+        #validators=[type_validator, size_validator]
     )
     uploaded_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="images"
