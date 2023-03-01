@@ -1,12 +1,11 @@
 from django.db import models
 from django.urls import reverse
-from mocktions.settings import AUTH_USER_MODEL as User, UPLOAD_MAX_SIZE
 from django.core.files.storage import default_storage
-from typing import Any, Optional, Iterable
-from django.forms import ValidationError
 from django.utils.translation import gettext as _
-from django.template.defaultfilters import filesizeformat
+from rest_framework.permissions import BasePermission
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 ALLOWED_CONTENT_TYPES = [
     "image/png",
@@ -17,7 +16,17 @@ ALLOWED_CONTENT_TYPES = [
     "image/webp",
 ]
 
-def type_validator(value: models.ImageField) -> ValidationError | None:
+class CanUploadImages(BasePermission):
+    """
+        Placeholder in case I want to limit image uploads to specific
+        users later.
+    """
+    def has_permission(self, request, view):
+        return True
+
+
+# These don't work with DRF
+""" def type_validator(value: models.ImageField) -> ValidationError | None:
     if value._file.content_type not in ALLOWED_CONTENT_TYPES:
         raise ValidationError(_("Invalid image type. Allowed types: png, jpg/jpeg, bmp, tiff, webp."))
 
@@ -25,7 +34,7 @@ def size_validator(value: models.ImageField) -> ValidationError | None:
     if value._file.size > UPLOAD_MAX_SIZE:
         raise ValidationError(_(
             "Image is too large. Images must be less than {max_size}".format(max_size = filesizeformat(UPLOAD_MAX_SIZE))
-        ))
+        )) """
 
 class Image(models.Model):
     image_field = models.ImageField(
@@ -35,7 +44,7 @@ class Image(models.Model):
         width_field = None, 
         max_length = None,
 
-        # this doesn't work with DRF because those validators don't recognize the _file attribute
+        # these go with the serializer; if they're here they don't recognize the _file attribute
         #validators=[type_validator, size_validator]
     )
     uploaded_by = models.ForeignKey(

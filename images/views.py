@@ -2,7 +2,7 @@ from django import http
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.urls import reverse_lazy
-from .models import Image
+from .models import Image, CanUploadImages
 from django.forms import BaseModelForm
 from typing import Any
 from .forms import ImageUploadForm
@@ -18,6 +18,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.template.loader import render_to_string
 
 class ImageCreateView(LoginRequiredMixin, CreateView):
     """
@@ -67,6 +69,7 @@ class ImageDeleteView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
             return HttpResponseRedirect(reverse_lazy("base:index"))
         return super().post(request, *args, **kwargs)
 
+
 class ImageListView(LoginRequiredMixin, ListView):
     template_name = "images/html/templates/index.html"
     model = Image
@@ -74,9 +77,14 @@ class ImageListView(LoginRequiredMixin, ListView):
 
 class ImageUpload(APIView):
     parser_classes = [MultiPartParser, FormParser]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, CanUploadImages]
 
     def post(self, request, format=None):
+        """
+            Right now this only returns an HTML string as a regular 
+            HTTPResponse, which is perhaps not the DRF-way, but at 
+            the moment all I need is an HTML response.
+        """
         data = {
             'image_field': request.data['image_field'], 
             'uploaded_by': request.user.pk
@@ -87,6 +95,11 @@ class ImageUpload(APIView):
             # the following can also be used in case the uploaded_by field
             # is omitted from the serializer class.
             #obj = serializer.save(**{'uploaded_by': request.user})
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            
+            html = render_to_string("images/html/includes/image.html", {'image': serializer.data})
+            
+            # Response object doesn't escape quotes properly
+            #return Response(html)
+            return HttpResponse(html, status=200)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

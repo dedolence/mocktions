@@ -1,9 +1,5 @@
-{% comment %}
-    For displaying an image. Requires these context variables:
-    src
-{% endcomment %}
-<div class="img-thumbnail">
-    <a href="{% url 'images:update' image.id %}">
-        <img src="{{ image.image_field.url }}">
+<div class='img-thumbnail'>
+    <a href='{% url "images:update" image.id %}'>
+        <img src='{{ image.image_field }}'>
     </a>
 </div>
