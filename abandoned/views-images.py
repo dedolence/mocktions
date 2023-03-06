@@ -2,7 +2,7 @@ from django import http
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.urls import reverse_lazy
-from .models import Image
+from .models import Image, CanUploadImages
 from django.forms import BaseModelForm
 from typing import Any
 from .forms import ImageUploadForm
@@ -10,9 +10,29 @@ from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 from images.strings.en import *
-from django.template.loader import render_to_string
 from images.forms import ImageUploadForm
-from time import sleep
+
+from rest_framework.views import APIView
+from images.serializers import ImageUploadSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework import status
+
+from django.template.loader import render_to_string
+
+class ImageCreateView(LoginRequiredMixin, CreateView):
+    """
+        Creates an Image model instance, saves it (which uploads it to B2 
+        bucket), and returns a redirect to that image UpdateView.
+    """
+    template_name = "images/html/templates/add.html"
+    model = Image
+    form_class = ImageUploadForm
+
+    def form_valid(self, form: BaseModelForm) -> http.HttpResponse:
+        form.instance.uploaded_by = self.request.user
+        return super().form_valid(form)
 
 
 class ImageUpdateView(LoginRequiredMixin, UpdateView):
@@ -49,38 +69,37 @@ class ImageDeleteView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
             return HttpResponseRedirect(reverse_lazy("base:index"))
         return super().post(request, *args, **kwargs)
 
+
 class ImageListView(LoginRequiredMixin, ListView):
     template_name = "images/html/templates/index.html"
     model = Image
 
 
-class TestPath(DetailView):
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        sleep(2)
-        return HttpResponse("Here is a message.")
+class ImageUpload(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    permission_classes = [IsAuthenticated, CanUploadImages]
 
-
-class ImageAddInline(LoginRequiredMixin, CreateView):
-    """
-        Saves an image instance, renders it to a template, and returns the
-        rendered template as HTML to be displayed on the page.
-    """
-    model = Image
-    fields = ["image_field"]
-
-    def form_valid(self, form: BaseModelForm) -> http.HttpResponse:
-        form.instance.uploaded_by = self.request.user
-        self.object = form.save()
-        return HttpResponse(
-            render_to_string(
-                "images/html/includes/image.html", 
-                {"image": self.object}, 
-                self.request)
-            )
-    
-    def form_invalid(self, form: BaseModelForm) -> HttpResponse:
-        print(form.errors)
-        error_list = ""
-        for e in form.errors:
-            error_list += f"{form.errors[e]}"
-        return HttpResponse(error_list, status=403)
+    def post(self, request, format=None):
+        """
+            Right now this only returns an HTML string as a regular 
+            HTTPResponse, which is perhaps not the DRF-way, but at 
+            the moment all I need is an HTML response.
+        """
+        data = {
+            'image_field': request.data['image_field'], 
+            'uploaded_by': request.user.pk
+        }
+        serializer = ImageUploadSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            # the following can also be used in case the uploaded_by field
+            # is omitted from the serializer class.
+            #obj = serializer.save(**{'uploaded_by': request.user})
+            
+            html = render_to_string("images/html/includes/image.html", {'image': serializer.data})
+            
+            # Response object doesn't escape quotes properly
+            #return Response(html)
+            return HttpResponse(html, status=200)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

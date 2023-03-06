@@ -12,7 +12,29 @@ from django.contrib import messages
 from images.strings.en import *
 from django.template.loader import render_to_string
 from images.forms import ImageUploadForm
+import boto3
+from botocore.exceptions import ClientError
+from django.conf import settings
+import requests
 from time import sleep
+from b2sdk.api import B2Api
+from typing import TypedDict
+from django.http import JsonResponse
+from django.conf import settings
+from django_backblaze_b2.storage import BackblazeB2Storage
+
+class ImageCreateView(LoginRequiredMixin, CreateView):
+    """
+        Creates an Image model instance, saves it (which uploads it to B2 
+        bucket), and returns a redirect to that image UpdateView.
+    """
+    template_name = "images/html/templates/add.html"
+    model = Image
+    form_class = ImageUploadForm
+
+    def form_valid(self, form: BaseModelForm) -> http.HttpResponse:
+        form.instance.uploaded_by = self.request.user
+        return super().form_valid(form)
 
 
 class ImageUpdateView(LoginRequiredMixin, UpdateView):
@@ -59,12 +81,7 @@ class TestPath(DetailView):
         sleep(2)
         return HttpResponse("Here is a message.")
 
-
 class ImageAddInline(LoginRequiredMixin, CreateView):
-    """
-        Saves an image instance, renders it to a template, and returns the
-        rendered template as HTML to be displayed on the page.
-    """
     model = Image
     fields = ["image_field"]
 
@@ -78,9 +95,28 @@ class ImageAddInline(LoginRequiredMixin, CreateView):
                 self.request)
             )
     
-    def form_invalid(self, form: BaseModelForm) -> HttpResponse:
-        print(form.errors)
-        error_list = ""
-        for e in form.errors:
-            error_list += f"{form.errors[e]}"
-        return HttpResponse(error_list, status=403)
+def presigned_url(request):
+    """
+        Gets the storage class from settings (B2 Backblaze) and uses it to 
+        access the B2 API to get and return a URL for uploading. Trying to
+        access the B2 API directly isn't working, I'm not sure why.
+    """
+    b2_storage = BackblazeB2Storage()
+    b2_app_key = settings.B2_APPLICATION_KEY
+    b2_app_key_id = settings.B2_APPLICATION_KEY_ID
+    b2_bucket_id = settings.B2_BUCKET_ID
+    b2_realm = "https://api.backblazeb2.com"
+    
+    auth_dict = b2_storage.b2Api.raw_api.authorize_account(
+        b2_realm, 
+        b2_app_key_id, 
+        b2_app_key
+    )
+    response_dict = b2_storage.b2Api.raw_api.get_upload_url(
+        auth_dict['apiUrl'], 
+        auth_dict['authorizationToken'], 
+        b2_bucket_id
+    )
+    
+    
+    return JsonResponse({"url": response_dict["uploadUrl"]})
