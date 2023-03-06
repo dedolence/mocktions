@@ -14,7 +14,9 @@ from django.template.loader import render_to_string
 from images.forms import ImageUploadForm
 from time import sleep
 
-
+"""
+wtf
+"""
 class ImageUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "images/html/templates/update.html"
     model = Image
