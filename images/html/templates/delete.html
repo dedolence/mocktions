@@ -2,12 +2,10 @@
 {% load static %}
 {% block body %}
     <h1>Images</h1>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" action="{% url 'images:image-post-destroy' image.pk %}" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
-        <br/><br/>
         <input type="submit" value="delete">
     </form>
     <br/><br/>
-    <img src="{{ object.image_field.url }}">
+    <img src="{{ image.image_field.url }}">
 {% endblock body %}

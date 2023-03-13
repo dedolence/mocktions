@@ -34,7 +34,7 @@ class Image(models.Model):
         height_field = None, 
         width_field = None, 
         max_length = None,
-        validators=[type_validator, size_validator]
+        #validators=[type_validator, size_validator]
     )
     uploaded_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="images"
@@ -45,3 +45,6 @@ class Image(models.Model):
 
     def __str__(self) -> str:
         return f"Image id={self.pk}, uploaded by {self.uploaded_by}."
+    
+    class Meta:
+        ordering = ['-pk']
