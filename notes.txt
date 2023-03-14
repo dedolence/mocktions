@@ -175,4 +175,5 @@ This document is version-controlled, so don't put anything sensitive here!!!
 2/22
     starting up a DRF project for practice. feels bad taking time away from developing (and the inevitable refactoring if this provides the functionality i am looking for) but i do suspect this is the way i want to set up the Images app, which requires only URL endpoints for CRUD operations and doesn't need views or anything.
 
-    
+3/14
+    OOb swap with HTMX for replacing only the most recently uploaded image

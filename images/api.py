@@ -14,6 +14,7 @@ from django.template.loader import render_to_string
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from urllib.request import urlopen
+import urllib.request
 
 from typing import Any
 
@@ -91,7 +92,9 @@ class ImageViewSet(viewsets.ModelViewSet):
         if url_serializer.is_valid():
             url = url_serializer.data["url"]
             img_temp = NamedTemporaryFile(delete=True)
-            img_temp.write(urlopen(url).read())
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'}
+            req = urllib.request.Request(url=url, headers=headers)
+            img_temp.write(urlopen(req).read())
             img_temp.flush()
 
             image = Image(uploaded_by = request.user)
