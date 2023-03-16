@@ -1,0 +1,16 @@
+{% extends 'base/html/templates/base.html' %}
+{% load static %}
+{% block body %}
+    
+    <div class="container m-5 p-5">
+        <h3>Test</h3>
+        
+            {% include 'images/test/form.html' with form=form %}
+        
+            <ul id="list" class="my-5 list-group" hx-swap-oob="afterbegin">
+                <li class="list-item">list item 1</li>
+                <li class="list-item">list item 2</li>
+            </ul>
+    </div>
+
+{% endblock body %}

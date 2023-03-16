@@ -10,5 +10,6 @@ router = routers.SimpleRouter()
 router.register('', ImageViewSet, basename="image")
 
 urlpatterns = [
+    path('test/', views.test_view, name="test-create"),
     path('', include(router.urls)),
 ]

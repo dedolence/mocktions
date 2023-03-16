@@ -177,3 +177,26 @@ This document is version-controlled, so don't put anything sensitive here!!!
 
 3/14
     OOb swap with HTMX for replacing only the most recently uploaded image
+
+    So, the form marks up its swap in reference to itself only:
+    <form hx-swap="outerHTML" hx-post="...">
+    The returned HTML will find the form element and swap it in the page as expected.
+
+    For the list of images, the enter list including the container with the swap strategy
+    gets returned:
+        <ul hx-swap-oob="afterbegin">
+            <li><!-- new item --></li>
+        </ul>
+    Because of the "afterbegin" strategy, only the <li> element gets swapped in, at the beginning.
+
+    So the server response would look like this:
+
+    response = """
+        <form hx-swap="outerHTML" hx-post="image-create/">
+            <input type="file">
+            <button>Upload</button>
+        </form>
+        <div id="image-list" hx-swap-oob="afterbegin">
+            <img src="1.jpg">
+        </div>
+    """

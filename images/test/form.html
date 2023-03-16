@@ -1,0 +1,8 @@
+<form id="form"
+        hx-post="{% url 'images:test-create' %}" 
+        hx-swap="outerHTML">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="counter" value="{{ counter|default:0 }}">
+    <button type="submit" class="btn btn-primary">Click</button>
+</form>

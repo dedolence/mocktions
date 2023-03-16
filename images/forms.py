@@ -4,7 +4,7 @@ from django import forms
 
 class ImageUploadForm(ModelForm):
     image_field = forms.ImageField(
-        widget=forms.ClearableFileInput(attrs={'multiple': True})
+        widget=forms.ClearableFileInput()
     )
 
     class Meta:
