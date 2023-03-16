@@ -1,6 +1,9 @@
 {# This is what gets included in a template to enable image uploads on that page. #}
-
-{% include 'images/html/includes/upload_response.html' %}
+<div class="card">
+    <div class="card-header border-bottom">&nbsp;</div>
+    <h5 class="card-title text-center mt-3 mb-0">Add an image</h5>
+    {% include 'images/html/includes/upload_response.html' %}
+</div>
     
 <script>
     $( document ).ready(function() {
