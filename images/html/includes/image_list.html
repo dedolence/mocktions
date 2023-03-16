@@ -1,16 +1,17 @@
+{# This is what gets included in a template to enable image uploads on that page. #}
+
 {% include 'images/html/includes/upload_response.html' %}
     
-    <script>
-        $( document ).ready(function() {
-            $("#id_image_list").sortable({
-                update: function(event, ui) {
-                    // serialize as array or hash for storing order on server
-                    let ar = $("#id_image_list").sortable("toArray");
-                    let se = $("#id_image_list").sortable("serialize", { key: "image" });
-                },
-            });
-            $("#id_image_list").disableSelection();
+<script>
+    $( document ).ready(function() {
+        $("#id_image_list").sortable({
+            update: function(event, ui) {
+                // serialize as array or hash for storing order on server
+                let ar = $("#id_image_list").sortable("toArray");
+                let se = $("#id_image_list").sortable("serialize", { key: "image" });
+            },
         });
+        $("#id_image_list").disableSelection();
+    });
 
-    </script>
-</div>
+</script>
