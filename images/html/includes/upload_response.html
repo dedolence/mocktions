@@ -46,8 +46,14 @@
             </button>
         </form>
     </div>
+        
+    <div class="row d-flex justify-content-center mt-3">
+        <div id="id_indicator" class="spinner-border htmx-indicator" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 </div>
-    
+
 <div id="id_image_list" class="row row-cols-auto gy-4 gx-2 p-3 justify-content-between" hx-swap-oob="afterbegin">
     {% if images %}
         {% for image in images %}
