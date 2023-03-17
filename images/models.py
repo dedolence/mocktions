@@ -34,7 +34,12 @@ class Image(models.Model):
         height_field = None, 
         width_field = None, 
         max_length = None,
-        #validators=[type_validator, size_validator]
+    )
+    alt = models.CharField(
+        max_length=250,
+        verbose_name="Description",
+        blank = True,
+        null = True
     )
     uploaded_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="images"

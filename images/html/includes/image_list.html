@@ -6,6 +6,7 @@
 </div>
     
 <script>
+
     $( document ).ready(function() {
         $("#id_image_list").sortable({
             update: function(event, ui) {
@@ -15,6 +16,13 @@
             },
         });
         $("#id_image_list").disableSelection();
+    });
+
+
+    document.body.addEventListener("displayToast", function(e) {
+        const toastEl = document.getElementById("id_message_toast");
+        const stoast = bootstrap.Toast.getOrCreateInstance(toastEl, {'delay': 1000});
+        stoast.show();
     });
 
 </script>

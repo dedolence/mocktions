@@ -133,3 +133,14 @@ class ImageViewSet(viewsets.ModelViewSet):
             },
             template_name="images/html/includes/upload_response.html",
         )
+
+    @action(methods=["POST"], detail=True)
+    def part_update(self, request, *args, **kwargs):
+        """
+            Performs a partial update using POST method.
+        """
+        return Response(
+                data = {"message": "Changes saved!"},
+                template_name = "images/html/templates/toast_message.html",
+                headers = {'HX-Trigger': "displayToast"},
+            )

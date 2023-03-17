@@ -1,4 +1,5 @@
 {% load static %}
+{% load rest_framework %}
 <div class="col" id="image_{{ image.id }}" >
     <div id="{{ image.id }}" class="card" style="width: 16rem;" draggable="true">
         <div class="card-header border-bottom text-center" data-bs-tooltip="tooltip" data-bs-placement="top" title="Drag to reorder">
@@ -12,7 +13,20 @@
             </a>
         </div>
         <div class="card-body">
-            <p class="card-text text-muted">{{ image.alt|default:"<small>No description.</small>" }}</p>
+            {% if image.alt %}
+                <small class="text-muted">{{ image.alt }}</small>
+            {% else %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <textarea 
+                        name="alt" class="form-control form-control-sm" 
+                        aria-label="(Optional) Add a description" 
+                        placeholder="(Optional) Add a description"
+                        hx-post="{% url 'images:image-part-update' image.id %}"
+                        hx-indicator="#id_saving_toast"
+                        hx-target="#id_server_message"></textarea>
+                </form>
+            {% endif %}
         </div>
         <div class="card-footer text-center">
             <form action="{% url 'images:image-post-destroy' image.id %}" method="POST">
