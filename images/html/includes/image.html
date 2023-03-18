@@ -13,20 +13,17 @@
             </a>
         </div>
         <div class="card-body">
-            {% if image.alt %}
-                <small class="text-muted">{{ image.alt }}</small>
-            {% else %}
-                <form method="POST">
-                    {% csrf_token %}
-                    <textarea 
-                        name="alt" class="form-control form-control-sm" 
-                        aria-label="(Optional) Add a description" 
-                        placeholder="(Optional) Add a description"
-                        hx-post="{% url 'images:image-part-update' image.id %}"
-                        hx-indicator="#id_saving_toast"
-                        hx-target="#id_server_message"></textarea>
-                </form>
-            {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <textarea 
+                    name="alt" class="form-control form-control-sm" 
+                    aria-label="(Optional) Add a description" 
+                    placeholder="(Optional) Add a description"
+                    hx-post="{% url 'images:image-update-alt' image.id %}"
+                    hx-indicator="#id_saving_toast"
+                    hx-target="#id_server_message"
+                    autocomplete="off">{{ image.alt|default:"" }}</textarea>
+            </form>
         </div>
         <div class="card-footer text-center">
             <form action="{% url 'images:image-post-destroy' image.id %}" method="POST">

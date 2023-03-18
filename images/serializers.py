@@ -16,3 +16,10 @@ class ImageURLSerializer(serializers.Serializer):
         label = "",
         style = {'template': 'images/html/includes/url_input.html'}
     )
+
+class ImageAltSerializer(serializers.Serializer):
+    alt = serializers.CharField(
+        max_length = 250,
+        allow_blank = True,
+        trim_whitespace = True,
+    )

@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from images.models import Image
-from images.serializers import ImageUploadSerializer, ImageURLSerializer
+from images.serializers import ImageUploadSerializer, ImageURLSerializer, ImageAltSerializer
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -135,12 +135,22 @@ class ImageViewSet(viewsets.ModelViewSet):
         )
 
     @action(methods=["POST"], detail=True)
-    def part_update(self, request, *args, **kwargs):
+    def update_alt(self, request, *args, **kwargs):
         """
             Performs a partial update using POST method.
         """
+        serializer = ImageAltSerializer(data=request.data)
+        if serializer.is_valid():
+            obj = self.get_object()
+            obj.alt = serializer.data["alt"]
+            print(obj.__dict__)
+            obj.save()
+            message = "Changes saved!"
+        else:
+            message = "Error saving changes: " + serializer.errors["alt"][0]
+
         return Response(
-                data = {"message": "Changes saved!"},
+                data = {"message": message},
                 template_name = "images/html/templates/toast_message.html",
                 headers = {'HX-Trigger': "displayToast"},
             )
