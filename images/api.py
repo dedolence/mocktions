@@ -143,7 +143,6 @@ class ImageViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             obj = self.get_object()
             obj.alt = serializer.data["alt"]
-            print(obj.__dict__)
             obj.save()
             message = "Changes saved!"
         else:
