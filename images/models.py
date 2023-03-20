@@ -44,6 +44,7 @@ class Image(models.Model):
     uploaded_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="images"
     )
+    order = models.PositiveIntegerField(blank=True, null=True,)
 
     def get_absolute_url(self):
         return reverse("images:update", kwargs={"pk": self.pk})
@@ -52,4 +53,4 @@ class Image(models.Model):
         return f"Image id={self.pk}, uploaded by {self.uploaded_by}."
     
     class Meta:
-        ordering = ['-pk']
+        ordering = ['order']

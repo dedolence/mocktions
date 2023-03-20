@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.decorators import action
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse_lazy
 from django.urls import reverse_lazy
 from django.core.files import File
@@ -151,6 +151,26 @@ class ImageViewSet(viewsets.ModelViewSet):
 
         return Response(
                 data = {"message": message},
+                template_name = "images/html/templates/toast_message.html",
+                headers = {'HX-Trigger': "displayToast"},
+            )
+    
+    @action(methods=["GET"], detail=False)
+    def set_order(self, request):
+        try:
+            order_list = request.query_params.getlist("image")
+            for i in range(len(order_list)):
+                img = Image.objects.get(pk=order_list[i])
+                img.order = i
+                img.save()
+            return Response(
+                data = {"message": "Changes saved!"},
+                template_name = "images/html/templates/toast_message.html",
+                headers = {'HX-Trigger': "displayToast"},
+            )
+        except:
+            return Response(
+                data = {"message": "There was an error saving changes."},
                 template_name = "images/html/templates/toast_message.html",
                 headers = {'HX-Trigger': "displayToast"},
             )

@@ -13,6 +13,9 @@
                 // serialize as array or hash for storing order on server
                 let ar = $("#id_image_list").sortable("toArray");
                 let ha = $("#id_image_list").sortable("serialize", { key: "image" });
+                let url = "{% url 'images:image-set-order' %}" + "?" + ha;
+                console.log(url);
+                fetch(url);
             },
         });
         $("#id_image_list").disableSelection();
