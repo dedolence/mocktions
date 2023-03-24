@@ -95,7 +95,7 @@ class ImageViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         return Response(
             {'image': self.get_object()}, 
-            template_name="images/html/includes/update.html"
+            template_name="images/html/templates/update.html"
         )
     
 
