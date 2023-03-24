@@ -26,7 +26,7 @@
             </form>
         </div>
         <div class="card-footer text-center">
-            <form action="{% url 'images:image-post-destroy' image.id %}" method="POST">
+            <form hx-post="{% url 'images:image-post-destroy' image.id %}" method="POST" hx-target="#image_{{ image.id }}" hx-swap="outerHTML">
                 {% csrf_token %}
                 <button class="btn btn-outline-danger btn-sm" type="submit">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
