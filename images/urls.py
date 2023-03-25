@@ -7,7 +7,7 @@ from rest_framework import routers
 app_name = 'images'
 
 router = routers.SimpleRouter()
-router.register('', ImageViewSet, basename="image")
+router.register('', ImageViewSet, basename="image-hx")
 
 urlpatterns = [
     path('test/', views.test_view, name="test-create"),

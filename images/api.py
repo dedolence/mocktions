@@ -7,13 +7,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.decorators import action
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.urls import reverse_lazy
 from django.core.files import File
-from django.core.files.temp import NamedTemporaryFile
-from urllib.request import urlopen
-import urllib.request
+from urllib import request as requests
 
         
 class ImageViewSet(viewsets.ModelViewSet):
@@ -79,14 +77,9 @@ class ImageViewSet(viewsets.ModelViewSet):
 
         if url_serializer.is_valid():
             url = url_serializer.data["url"]
-            img_temp = NamedTemporaryFile(delete=True)
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'}
-            req = urllib.request.Request(url=url, headers=headers)
-            img_temp.write(urlopen(req).read())
-            img_temp.flush()
-
-            image = Image(uploaded_by = request.user)
-            image.image_field.save("random.jpg", File(img_temp))
+            image = Image.objects.create(uploaded_by=request.user)
+            response = requests.urlretrieve(url)
+            image.image_field.save("random.jpeg", File(open(response[0], 'rb')))
             image.save()
 
         return self.dispatch_html(request, image, url_serializer=url_serializer)
@@ -111,9 +104,18 @@ class ImageViewSet(viewsets.ModelViewSet):
             unavailable to HTML forms. so here is a way to delete model
             instances that accepts POST requests.
         """
-        obj = self.get_object()
-        obj.delete()
-        return HttpResponseRedirect(reverse_lazy("images:image-list"))
+        message = ""
+        try:
+            obj = self.get_object()
+            obj.delete()
+            message = "Image deleted."
+        except:
+            message = "Error deleting image."
+        return Response(
+                data = {"message": message},
+                template_name = "images/html/templates/toast_message.html",
+                headers = {'HX-Trigger': "displayToast"},
+            )
     
 
     def dispatch_html(self, 

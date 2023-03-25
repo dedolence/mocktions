@@ -3,7 +3,7 @@
 <div id="id_image_add" class="card-body row">
     <div class="col-12 col-md-4 border-end border-top border-bottom p-3">
         <form
-            hx-post="{% url 'images:image-upload' %}"
+            hx-post="{% url 'images:image-hx-upload' %}"
             hx-encoding="multipart/form-data"
             hx-target="#id_image_add"
             hx-swap="outerHTML"
@@ -18,7 +18,7 @@
 
     <div class="col-12 col-md-4 p-3 border-top border-bottom">
         <form
-            hx-post="{% url 'images:image-fetch' %}"
+            hx-post="{% url 'images:image-hx-fetch' %}"
             hx-encoding="multipart/form-data"
             hx-target="#id_image_add"
             hx-swap="outerHTML"
@@ -34,7 +34,7 @@
     <div class="col-12 col-md-4 border-start border-top border-bottom p-3">
         <p class="">Or, get a random image:</p>
         <form
-            hx-post="{% url 'images:image-fetch' %}"
+            hx-post="{% url 'images:image-hx-fetch' %}"
             hx-encoding="multipart/form-data"
             hx-target="#id_image_add"
             hx-swap="outerHTML"

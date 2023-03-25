@@ -8,7 +8,7 @@
             </svg>
         </div>
         <div class="container-fluid text-center p-0 m-0">
-            <a href="{% url 'images:image-detail' image.id %}">
+            <a href="{% url 'images:image-hx-detail' image.id %}">
                 <img src="{{ image.image_field.url }}" class="img-fluid">
             </a>
         </div>
@@ -19,14 +19,17 @@
                     name="alt" class="form-control form-control-sm" 
                     aria-label="(Optional) Add a description" 
                     placeholder="(Optional) Add a description"
-                    hx-post="{% url 'images:image-update-alt' image.id %}"
+                    hx-post="{% url 'images:image-hx-update-alt' image.id %}"
                     hx-indicator="#id_saving_toast"
                     hx-target="#id_server_message"
                     autocomplete="off">{{ image.alt|default:"" }}</textarea>
             </form>
         </div>
         <div class="card-footer text-center">
-            <form hx-post="{% url 'images:image-post-destroy' image.id %}" method="POST" hx-target="#image_{{ image.id }}" hx-swap="outerHTML">
+            <form 
+                hx-post="{% url 'images:image-hx-post-destroy' image.id %}"
+                hx-indicator="#id_saving_toast"
+                hx-target="#id_server_message">
                 {% csrf_token %}
                 <button class="btn btn-outline-danger btn-sm" type="submit">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16">
