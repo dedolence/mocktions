@@ -92,10 +92,6 @@ class ImageViewSet(viewsets.ModelViewSet):
         )
     
 
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
-
-
     @action(methods=["POST"], detail=True)
     def post_destroy(self, request, pk=None):
         """
@@ -105,14 +101,19 @@ class ImageViewSet(viewsets.ModelViewSet):
             instances that accepts POST requests.
         """
         message = ""
+        img_id = None
         try:
             obj = self.get_object()
+            if request.user != obj.uploaded_by:
+                raise PermissionError("Could not delete image: permission denied.")
+            img_id = obj.id
             obj.delete()
             message = "Image deleted."
-        except:
-            message = "Error deleting image."
+        except PermissionError as e:
+            message = e
+
         return Response(
-                data = {"message": message},
+                data = {"message": message, "img_id": img_id},
                 template_name = "images/html/templates/toast_message.html",
                 headers = {'HX-Trigger': "displayToast"},
             )
