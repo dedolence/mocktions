@@ -14,18 +14,31 @@ from django.core.files import File
 from urllib import request as requests
 
         
-class ImageViewSet(viewsets.ModelViewSet):
+class HX_ImageViewSet(viewsets.ModelViewSet):
     """
         For use with HTMX, therefore all API responses are rendered as
         HTML.
 
-        GET returns a rendered form for uploading images.
-        POST returns the form for more uploads, along with any errors.
+        GET returns a widget that can be included in other pages that 
+        includes a form for uploading as well as an output list of 
+        image thumbnails.
+
+        The purpose is to allow images to be attached (via foreign key)
+        to model instances like Users (for avatars), blog posts, or, in
+        my case, auction listings. 
+
+        To help link uploaded images with their related model instance,
+        each time an image is uploaded it adds an <option> to a hidden
+        <select> input that contains the ID value of the image, and these
+        IDs are submitted with the rest of the model creation form.
+
+        To accomplish this, add the following HTML to the form:
+        <select id="id_image_upload_list" class="d-none" hx-swap-oob="innerHTML"></select>
     """
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     renderer_classes = [TemplateHTMLRenderer]
-    
+
 
     def get_queryset(self):
         """
