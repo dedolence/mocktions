@@ -10,7 +10,7 @@ def index(request):
     #logging.error("Testing error messages.")
     #LOGGER.info("Here's an info message using Django's Logging.")
     #LOGGER.error("Here's an error message using Django's Logging.")
-    return render(request, 'base/html/templates/index.html', {'message': "pumpkin pie"})
+    return render(request, 'base/html/templates/index.html')
 
 
 def handler403(request, exception):

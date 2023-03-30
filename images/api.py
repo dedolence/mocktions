@@ -13,6 +13,7 @@ from django.urls import reverse_lazy
 from django.core.files import File
 from urllib import request as requests
 
+from typing import List
         
 class HX_ImageViewSet(viewsets.ModelViewSet):
     """
@@ -33,7 +34,15 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
         IDs are submitted with the rest of the model creation form.
 
         To accomplish this, add the following HTML to the form:
-        <select id="id_image_upload_list" class="d-none" hx-swap-oob="innerHTML"></select>
+        <select id="id_image_upload_list" class="d-none" hx-swap-oob="afterbegin"></select>
+
+        Upon uploading, HTMX will look for an element with ID "id_image_upload_list" and
+        append an <option name="image_upload" value="{{ image.id }}" multiiple/> element 
+        to it.
+
+        Within that <select> element, add in any already-uploaded images however
+        you want, e.g. providing a dict called "images" and a for loop:
+        {% for image in images %}<option name="image_upload" value="{{ image.id }}" selected/>{% endfor %}
     """
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -49,17 +58,7 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
      
 
     def list(self, request):
-        upload_serializer = ImageUploadSerializer()
-        url_serializer = ImageURLSerializer()
-        images = self.get_queryset()
-        return Response(
-            {
-                'upload_serializer': upload_serializer, 
-                'url_serializer': url_serializer,
-                'images': images
-            },
-            template_name = "images/html/templates/index.html"
-        )
+        return self.dispatch_html(request)
     
 
     def create(self, request, *args, **kwargs):
@@ -69,7 +68,7 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
         
         return Response(
             {'images': self.get_queryset(), 'serializer': serializer},
-            template_name = "images/html/includes/image_list.html", 
+            template_name = "images/html/includes/main.html", 
             status=status.HTTP_201_CREATED,
         )
 
@@ -134,21 +133,32 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
 
     def dispatch_html(self, 
         request, 
-        image, 
-        upload_serializer = ImageUploadSerializer(),
-        url_serializer = ImageURLSerializer()):
+        instance: Image | List[Image] | None = None, 
+        upload_serializer: ImageUploadSerializer | None = ImageUploadSerializer(),
+        url_serializer: ImageURLSerializer | None = ImageURLSerializer()):
         """
             A convenience function to return the correct template that the 
             HTMX scripts expect on the client side.
         """
+        if instance:
+            try:
+                # doesn't change anything if instance is already a list
+                images = list(instance)
+            except TypeError:
+                # converts to list if it wasn't already.
+                images = [instance]
+        else:
+            images = None
+        
         return Response(
             {
                 'upload_serializer': upload_serializer, 
                 'url_serializer': url_serializer,
-                'image': image,
+                'images': images,
             },
             template_name="images/html/includes/upload_response.html",
         )
+
 
     @action(methods=["POST"], detail=True)
     def update_alt(self, request, *args, **kwargs):
@@ -170,6 +180,7 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
                 headers = {'HX-Trigger': "displayToast"},
             )
     
+
     @action(methods=["GET"], detail=False)
     def set_order(self, request):
         try:
