@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
-from images.models import Image
+from images.models import Image, ImageSet
 from images.serializers import ImageUploadSerializer, ImageURLSerializer, ImageAltSerializer
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -13,7 +13,7 @@ from django.urls import reverse_lazy
 from django.core.files import File
 from urllib import request as requests
 
-from typing import List
+from typing import List, Any
         
 class HX_ImageViewSet(viewsets.ModelViewSet):
     """
@@ -34,7 +34,7 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
         IDs are submitted with the rest of the model creation form.
 
         To accomplish this, add the following HTML to the form:
-        <select id="id_image_upload_list" class="d-none" hx-swap-oob="afterbegin"></select>
+        <select id="id_image_upload_list" style="display: none;" name="image_upload_ids" hx-swap-oob="afterbegin"></select>
 
         Upon uploading, HTMX will look for an element with ID "id_image_upload_list" and
         append an <option name="image_upload" value="{{ image.id }}" multiiple/> element 
@@ -48,7 +48,6 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
     parser_classes = [MultiPartParser, FormParser]
     renderer_classes = [TemplateHTMLRenderer]
 
-
     def get_queryset(self):
         """
             For now, filter images by the user. This can be modified to
@@ -58,7 +57,9 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
      
 
     def list(self, request):
-        return self.dispatch_html(request)
+        max_uploads = request.headers.get('Maxuploads', 10)
+        multiple_allowed = request.headers.get('Multiple', True)
+        return self.dispatch_html(request, max_uploads=max_uploads, multiple=multiple_allowed)
     
 
     def create(self, request, *args, **kwargs):
@@ -135,7 +136,9 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
         request, 
         instance: Image | List[Image] | None = None, 
         upload_serializer: ImageUploadSerializer | None = ImageUploadSerializer(),
-        url_serializer: ImageURLSerializer | None = ImageURLSerializer()):
+        url_serializer: ImageURLSerializer | None = ImageURLSerializer(),
+        max_uploads: int = 10,
+        multiple: bool = True):
         """
             A convenience function to return the correct template that the 
             HTMX scripts expect on the client side.
@@ -155,6 +158,8 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
                 'upload_serializer': upload_serializer, 
                 'url_serializer': url_serializer,
                 'images': images,
+                'max_uploads': max_uploads,
+                'multiple': multiple
             },
             template_name="images/html/includes/upload_response.html",
         )
@@ -200,3 +205,28 @@ class HX_ImageViewSet(viewsets.ModelViewSet):
                 template_name = "images/html/templates/toast_message.html",
                 headers = {'HX-Trigger': "displayToast"},
             )
+        
+class ImageUpload(HX_ImageViewSet):
+    def __init__(self, max_uploads: int = 10, allow_multiple: bool = True, **kwargs: Any) -> None:
+        self._max_uploads = max_uploads
+        self._allow_multiple = allow_multiple
+        self._imageset = ImageSet.objects.create()
+        super().__init__()
+
+    def get_images(self):
+        return self._imageset.images.all()
+    
+    @property
+    def imageset(self) -> ImageSet:
+        return self._imageset
+    
+    @property
+    def max_uploads(self) -> int:
+        return self._max_uploads
+    
+    @property
+    def allow_multiple(self) -> bool:
+        return self._allow_multiple
+
+    def render_form(self, request):
+        return self.dispatch_html(request, max_uploads=self._max_uploads, multiple=self._allow_multiple)

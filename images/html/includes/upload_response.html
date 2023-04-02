@@ -10,6 +10,7 @@
             hx-indicator="#id_saving_toast">
             {% csrf_token %}
             {% render_form upload_serializer %}
+            <input type="hidden" name="max_uploads" value="{{ max_uploads }}"/>
             <button type="submit" class="btn btn-primary">
                 Upload
             </button>
@@ -25,6 +26,7 @@
             hx-indicator="#id_saving_toast">
             {% csrf_token %}
             {% render_form url_serializer template_pack='rest_framework/inline' %}
+            <input type="hidden" name="max_uploads" value="{{ max_uploads }}"/>
             <button type="submit" class="btn btn-primary">
                 Upload
             </button>
@@ -40,6 +42,7 @@
             hx-swap="outerHTML"
             hx-indicator="#id_saving_toast">
             {% csrf_token %}
+            <input type="hidden" name="max_uploads" value="{{ max_uploads }}"/>
             <input type="hidden" name="url" value="https://picsum.photos/300"/>
             <button type="submit" class="btn btn-primary">
                 Upload random

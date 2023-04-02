@@ -27,6 +27,11 @@ def size_validator(value: models.ImageField) -> ValidationError | None:
             "Image is too large. Images must be less than {max_size}".format(max_size = filesizeformat(UPLOAD_MAX_SIZE))
         ))
 
+class ImageSet(models.Model):
+    """ Add any foreign keys to this model. """
+    # post = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="imageset")
+
+
 class Image(models.Model):
     image_field = models.ImageField(
         upload_to = "user_uploads", 
@@ -44,13 +49,13 @@ class Image(models.Model):
     uploaded_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="images"
     )
+    imageset = models.ForeignKey(
+        ImageSet, on_delete=models.CASCADE, related_name="images", null=True
+    )
     order = models.PositiveIntegerField(blank=True, null=True,)
 
     def get_absolute_url(self):
         return reverse("images:update", kwargs={"pk": self.pk})
-
-    def __str__(self) -> str:
-        return f"Image id={self.pk}, uploaded by {self.uploaded_by}."
     
     class Meta:
         ordering = ['order']

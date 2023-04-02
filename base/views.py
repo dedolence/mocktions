@@ -3,6 +3,7 @@ import logging
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
 from django.views.generic import TemplateView
 from .strings import en
+from images.api import ImageUpload
 
 LOGGER = logging.getLogger('fly_stream')
 
@@ -10,7 +11,11 @@ def index(request):
     #logging.error("Testing error messages.")
     #LOGGER.info("Here's an info message using Django's Logging.")
     #LOGGER.error("Here's an error message using Django's Logging.")
-    return render(request, 'base/html/templates/index.html')
+    image_upload = ImageUpload(69, False)
+    imageset = image_upload.imageset
+    return render(request, 'base/html/templates/index.html', {
+        'image_form': image_upload.render_form(request)
+    })
 
 
 def handler403(request, exception):

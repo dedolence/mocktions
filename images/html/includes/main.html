@@ -1,11 +1,15 @@
-{# Include this template in any form page to allow uploading images. #}
+{# Include this template on any page to allow uploading images. #}
 
 
 <div class="card">
     <div class="card-header border-bottom">&nbsp;</div>
     <h5 class="card-title text-center mt-3 mb-0">Add images</h5>
     
-    <div id="id_image_add" class="card-body row" hx-trigger="load" hx-get="{% url 'images:image-hx-list' %}"></div>
+    <div id="id_image_add" class="card-body row" 
+        hx-trigger="load" 
+        hx-get="{% url 'images:image-hx-list' %}" 
+        hx-headers='{"maxUploads": "{{ max_uploads }}", "multiple": "{{ multiple }}"}'
+    ></div>
 
     <div id="id_image_list" class="row row-cols-auto gy-4 gx-2 p-3" hx-swap-oob="afterbegin">
         {% for image in images %}
