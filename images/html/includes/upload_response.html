@@ -9,13 +9,10 @@
             hx-indicator="#id_saving_toast"
         >
             {% csrf_token %}
-            {{ upload_form }}
+            {% include 'images/html/includes/form_template.html' with form=upload_form %}
             <button type="submit" class="btn btn-primary">
                 Upload
             </button>
-            <h1>{{ Hx_Max_Uploads }}</h1>
-            <h1>{{ Hx_Allow_Multiple }}</h1>
-            <h1>{{ imageset }}</h1>
         </form>
     </div>
 
@@ -27,8 +24,8 @@
             hx-swap="outerHTML"
             hx-indicator="#id_saving_toast">
             {% csrf_token %}
-            {{ fetch_form }}
-            <input type="hidden" name="max_uploads" value="{{ max_uploads }}"/>
+            {% include 'images/html/includes/form_template.html' with form=fetch_form %}
+            <input type="hidden" name="imageset" value="{{ imageset.id }}"/>
             <button type="submit" class="btn btn-primary">
                 Upload
             </button>
@@ -44,7 +41,7 @@
             hx-swap="outerHTML"
             hx-indicator="#id_saving_toast">
             {% csrf_token %}
-            <input type="hidden" name="max_uploads" value="{{ max_uploads }}"/>
+            <input type="hidden" name="imageset" value="{{ imageset.id }}"/>
             <input type="hidden" name="url" value="https://picsum.photos/300"/>
             <button type="submit" class="btn btn-primary">
                 Upload random
@@ -70,20 +67,10 @@
         </div>
 
     </div>
-
-
-    <script>
-        // Add necessary headers to HTMX headers
-        document.body.addEventListener("htmx:configRequest", function(e) {
-            e.detail.headers["Hx-Max-Uploads"] = "{{ max_uploads }}";
-            e.detail.headers["Hx-Allow-Multiple"] = "{{ allow_multiple }}";
-            e.detail.headers["Hx-Imageset"] = "{{ imageset }}";
-        });
-    </script>
 </div>
 
 <div id="id_image_list" class="row row-cols-auto gy-4 gx-2 p-3" hx-swap-oob="afterbegin">
-    {% for image in images %}
+    {% for image in imageset.images.all %}
         {% include "images/html/includes/image.html" with image=image %}
     {% endfor %}
 </div>

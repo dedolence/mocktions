@@ -1,10 +1,8 @@
 from django.shortcuts import render
 import logging
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
-from django.views.generic import TemplateView
 from .strings import en
 
-from images.uploader import ImageUploader
 
 LOGGER = logging.getLogger('fly_stream')
 

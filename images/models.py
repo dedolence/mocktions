@@ -29,7 +29,10 @@ def size_validator(value: models.ImageField) -> ValidationError | None:
 
 class ImageSet(TimeStampMixin, models.Model):
     """ Add any foreign keys to this model. """
-    # post = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="imageset")
+    max_size = models.IntegerField()
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="imagesets"
+    )
 
 
 class Image(TimeStampMixin, models.Model):

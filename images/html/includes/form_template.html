@@ -1,0 +1,10 @@
+{% for field in form %}
+    {{ field }}
+    {% if field.errors %}
+        <ul>
+        {% for error in field.errors  %}
+            <li class="text-danger small">{{ error }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endfor %}
