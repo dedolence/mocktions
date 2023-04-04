@@ -6,7 +6,7 @@ from typing import Any, Optional, Iterable
 from django.forms import ValidationError
 from django.utils.translation import gettext as _
 from django.template.defaultfilters import filesizeformat
-
+from base.models import TimeStampMixin
 
 ALLOWED_CONTENT_TYPES = [
     "image/png",
@@ -27,12 +27,12 @@ def size_validator(value: models.ImageField) -> ValidationError | None:
             "Image is too large. Images must be less than {max_size}".format(max_size = filesizeformat(UPLOAD_MAX_SIZE))
         ))
 
-class ImageSet(models.Model):
+class ImageSet(TimeStampMixin, models.Model):
     """ Add any foreign keys to this model. """
     # post = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="imageset")
 
 
-class Image(models.Model):
+class Image(TimeStampMixin, models.Model):
     image_field = models.ImageField(
         upload_to = "user_uploads", 
         storage = default_storage,
@@ -55,7 +55,7 @@ class Image(models.Model):
     order = models.PositiveIntegerField(blank=True, null=True,)
 
     def get_absolute_url(self):
-        return reverse("images:update", kwargs={"pk": self.pk})
+        return reverse("images:hx-update", kwargs={"pk": self.pk})
     
     class Meta:
         ordering = ['order']

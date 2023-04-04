@@ -1,15 +1,13 @@
 from django.urls import path, include
-import images.views as views
-from rest_framework.generics import ListCreateAPIView
-from images.api import ImageUpload
-from rest_framework import routers
+from .uploader import *
 
 app_name = 'images'
 
-router = routers.SimpleRouter()
-router.register('', ImageUpload, basename="image-hx")
-
 urlpatterns = [
-    path('test/', views.test_view, name="test-create"),
-    path('', include(router.urls)),
+    path('hx-upload', HX_Upload.as_view(), name="hx_upload"),
+    path('hx-fetch', HX_Upload.as_view(), name="hx_fetch"),
+    path('hx-load', HX_LoadForm.as_view(), name="hx-load"),
+    path('hx-detail', HX_Detail.as_view(), name="hx-detail"),
+    path('hx-update/<int:pk>', HX_Update.as_view(), name="hx-update"),
+    path('hx-destroy', HX_Destroy.as_view(), name="hx-destroy"),
 ]

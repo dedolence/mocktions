@@ -1,14 +1,15 @@
-{# Include this template on any page to allow uploading images. #}
-
+{# This is the template that should be included to generate an image upload form. #}
 
 <div class="card">
     <div class="card-header border-bottom">&nbsp;</div>
     <h5 class="card-title text-center mt-3 mb-0">Add images</h5>
     
-    <div id="id_image_add" class="card-body row" 
+    <div 
+        id="id_image_add" 
+        hx-get="{% url 'images:hx-load' %}" 
         hx-trigger="load" 
-        hx-get="{% url 'images:image-hx-list' %}" 
-        hx-headers='{"maxUploads": "{{ max_uploads }}", "multiple": "{{ multiple }}"}'
+        hx-swap="outerHTML" 
+        hx-headers='{"Hx-Max-Uploads": "{{ max_uploads }}", "Hx-Allow-Multiple": "{{ allow_multiple }}"}'
     ></div>
 
     <div id="id_image_list" class="row row-cols-auto gy-4 gx-2 p-3" hx-swap-oob="afterbegin">
@@ -16,12 +17,11 @@
             {% include "images/html/includes/image.html" with image=image %}
         {% endfor %}
     </div>
-
 </div>
     
 <script>
 
-    $(document).ready(function() {
+    {% comment %} $(document).ready(function() {
         $("#id_image_list").sortable({
             update: function(event, ui) {
                 // serialize as array or hash for storing order on server
@@ -31,7 +31,7 @@
             },
         });
         $("#id_image_list").disableSelection();
-    });
+    }); {% endcomment %}
 
 
     // Gets called by HTMX when the response headers include HX-Trigger: "displayToast"
@@ -40,5 +40,4 @@
         const stoast = bootstrap.Toast.getOrCreateInstance(toastEl, {/*'delay': 1000*/});
         stoast.show();
     });
-
 </script>

@@ -226,3 +226,36 @@ This document is version-controlled, so don't put anything sensitive here!!!
         image_upload = ImageUpload(max_uploads = 10, allow_multiple = True)
         image_set: ImageSet = image_upload.get_image_set()
         image_form_html = image_upload.get_html()
+
+4/2
+    ok so none of that shit is working and i think i want to go back to as simple an implementation as possible.
+
+    since i'm ONYL returning HTML via HX, just simple function views are probably sufficient.
+
+    but I have requirements:
+        "images" needs to be able to be dropped into any other app.
+            - instantiate a class that provides the images (collected as an imageset) and the initial HTML to insert
+            into a template.
+            - all image uploading and control occurs independently by the images app. it just needs to be dropped into
+            another app's template.
+            - the other app access the uploaded images via an imageset that is exposed by the ImageUploader 
+            
+    so the plan:
+        - images gets loaded with an {% include %} tag like before.
+        - the include has a <div> that calls a GET request for the form. in this way the form loads separately from 
+        the page. this is so that the configurations can be set (max uploads).
+        - headers get added to each HX request tracking the number of uploads 
+
+        Done:
+            (arbitrary template) includes main.html with max_uploads and allow_multiple.
+            main.html has a div that makes a GET request for the upload form, including headers for max_uploads and allow_multiple 
+            uploader.py mixin captures those headers and adds them to context dictionary for any class that subclasses HXUploadCounter.
+
+        Todo:
+            mixing the Imageset variable
+            display images and load already-uploaded images to form 
+
+        Done:
+            All necessary headers (max_uploads, allow_multiple, imageset) are rendered when the form first loads and thereafter 
+            affixed to each HTMX request. They also get re-rendered each time upload_response.html gets rendered, so they can 
+            be modified.
