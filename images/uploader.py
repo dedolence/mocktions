@@ -1,5 +1,5 @@
 from .models import Image, ImageSet
-from typing import Any, Iterable, Dict, Optional
+from typing import Any, Iterable, Dict, Optional, List
 from django.template.loader import render_to_string
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 import django.views.generic as views
@@ -24,16 +24,25 @@ class HXBase:
     def render_hx_response(
             self, 
             request: HttpRequest, 
-            imageset: Optional[ImageSet],
+            images: Optional[List[Image]] = None,
             upload_form: Optional[ImageUploadForm] = ImageUploadForm(),
-            fetch_form: Optional[ImageFetchForm] = ImageFetchForm()):
+            fetch_form: Optional[ImageFetchForm] = ImageFetchForm()
+            ) -> HttpResponse:
+        
+        # convert single objects to an iterable list
+        if images:
+            try:
+                images = list(images)
+            except TypeError:
+                images = [images]
+
         return HttpResponse(
             render_to_string(
                 template_name="images/html/includes/upload_response.html",
                 context={
                     'upload_form': upload_form,
                     'fetch_form': fetch_form,
-                    'imageset': imageset
+                    'images': images
                 },
                 request=request
             )
@@ -44,13 +53,11 @@ class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
     model = Image
     form_class = ImageUploadForm
 
-    def form_valid(self, form: ImageUploadForm) -> HttpResponse:
-        form.instance.uploaded_by = self.request.user
-        self.object = form.save()
-
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        self.object = None
         form = self.get_form()
         imageset = ImageSet.objects.get(pk=request.POST.get('imageset'))
+        fetch_form = ImageFetchForm(initial={'imageset': imageset.id})
 
         if form.is_valid():
             form.instance.uploaded_by = self.request.user 
@@ -59,7 +66,7 @@ class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
         else:
             upload_form = form
 
-        return self.render_hx_response(request, imageset, upload_form)
+        return self.render_hx_response(request, self.object, upload_form, fetch_form)
 
 
 class HX_LoadForm(HXBase, views.TemplateView):
@@ -79,7 +86,7 @@ class HX_LoadForm(HXBase, views.TemplateView):
         self.extra_context = {
             "upload_form": ImageUploadForm(initial={'imageset': imageset}),
             "fetch_form": ImageFetchForm(initial={'imageset': imageset}),
-            "imageset": imageset
+            "images": imageset.images.all()
         }
         return super().get(request, *args, **kwargs)
     

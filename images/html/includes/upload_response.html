@@ -25,7 +25,6 @@
             hx-indicator="#id_saving_toast">
             {% csrf_token %}
             {% include 'images/html/includes/form_template.html' with form=fetch_form %}
-            <input type="hidden" name="imageset" value="{{ imageset.id }}"/>
             <button type="submit" class="btn btn-primary">
                 Upload
             </button>
@@ -70,7 +69,7 @@
 </div>
 
 <div id="id_image_list" class="row row-cols-auto gy-4 gx-2 p-3" hx-swap-oob="afterbegin">
-    {% for image in imageset.images.all %}
+    {% for image in images %}
         {% include "images/html/includes/image.html" with image=image %}
     {% endfor %}
 </div>
