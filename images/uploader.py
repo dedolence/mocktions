@@ -20,6 +20,16 @@ class HXBase:
             return HttpResponseRedirect(reverse_lazy("base:index"))
         return super().dispatch(request, *args, **kwargs)
     
+    def login_redirect(self, request):
+        """
+            If user isn't authenticated, provide a redirect to a login form.
+        """
+        return HttpResponse(
+            render_to_string(
+                template_name="images/html/includes/login_redirect.html",
+                request=request
+            )
+        )
 
     def render_hx_response(
             self, 
@@ -81,6 +91,10 @@ class HX_LoadForm(HXBase, views.TemplateView):
         return self.get(*args, **kwargs)
     
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+
+        if not request.user.is_authenticated:
+            return self.login_redirect(request)
+
         max_size = int(kwargs['imageset_size'])
         imageset = ImageSet.objects.create(max_size=max_size, user=self.request.user)
         self.extra_context = {
