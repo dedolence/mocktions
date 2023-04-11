@@ -112,5 +112,20 @@ class HX_Detail(views.View):
 class HX_Update(views.View):
     pass
 
-class HX_Destroy(views.View):
-    pass
+class HX_Destroy(LoginRequiredMixin, views.DeleteView):
+    model = Image
+    
+    def delete(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        obj = self.get_object()
+        image_id = obj.id
+        obj.delete()
+        return HttpResponse(
+            render_to_string(
+                template_name="images/html/templates/delete.html",
+                context={
+                    'image_id': image_id,
+                    'message': 'Image deleted.'
+                }
+            ), 
+            headers={'HX-Trigger': "displayToast"},
+        )

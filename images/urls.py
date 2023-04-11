@@ -9,5 +9,5 @@ urlpatterns = [
     path('hx-load/<int:imageset_size>', HX_LoadForm.as_view(), name="hx-load"),
     path('hx-detail/<int:pk>', HX_Detail.as_view(), name="hx-detail"),
     path('hx-update/<int:pk>', HX_Update.as_view(), name="hx-update"),
-    path('hx-destroy', HX_Destroy.as_view(), name="hx-destroy"),
+    path('hx-destroy/<int:pk>', HX_Destroy.as_view(), name="hx-destroy"),
 ]
