@@ -110,11 +110,6 @@ class HX_LoadForm(HXBase, views.TemplateView):
         }
         return super().get(request, *args, **kwargs)
     
-    
-    
-class HX_Detail(views.DetailView):
-    model = Image
-
 
 class HX_Update(views.UpdateView):
     model = Image

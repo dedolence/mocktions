@@ -8,9 +8,10 @@
             </svg>
         </div>
         <div class="container-fluid text-center p-0 m-0">
-            <a href="{% url 'images:hx-detail' image.id %}">
+            <button class="btn bg-link" data-bs-toggle="modal" data-bs-target="#id_modal_image_detail" data-bs-imageSrc="{{ image.image_field.url }}">
+                <p class="visually-hidden">Click to enlarge image.</p>
                 <img src="{{ image.image_field.url }}" class="img-fluid">
-            </a>
+            </button>
         </div>
         <div class="card-body">
             <form method="POST">

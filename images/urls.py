@@ -8,7 +8,6 @@ urlpatterns = [
     path('hx-fetch', HX_Upload.as_view(), name="hx_fetch"),
     path('hx-load/<int:pk>', HX_LoadForm.as_view(), name="hx-load"),
     path('hx-load/', HX_LoadForm.as_view(), name="hx-load"),
-    path('hx-detail/<int:pk>', HX_Detail.as_view(), name="hx-detail"),
     path('hx-update/<int:pk>', HX_Update.as_view(), name="hx-update"),
     path('hx-destroy/<int:pk>', HX_Destroy.as_view(), name="hx-destroy"),
 ]
