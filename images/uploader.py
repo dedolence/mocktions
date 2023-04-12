@@ -95,22 +95,44 @@ class HX_LoadForm(HXBase, views.TemplateView):
         if not request.user.is_authenticated:
             return self.login_redirect(request)
 
-        max_size = int(kwargs['imageset_size'])
-        imageset = ImageSet.objects.create(max_size=max_size, user=self.request.user)
+        # check for existing imageset, create a new one as necessary
+        try: 
+            pk = kwargs['pk']
+            imageset = ImageSet.objects.get(pk=pk)
+        except KeyError:
+            max_size = int(request.GET.get('size'))
+            imageset = ImageSet.objects.create(max_size=max_size, user=self.request.user)
+        
         self.extra_context = {
             "upload_form": ImageUploadForm(initial={'imageset': imageset}),
             "fetch_form": ImageFetchForm(initial={'imageset': imageset}),
-            "images": imageset.images.all()
+            "images": imageset.images.all(),
         }
         return super().get(request, *args, **kwargs)
     
     
     
-class HX_Detail(views.View):
-    pass
+class HX_Detail(views.DetailView):
+    model = Image
 
-class HX_Update(views.View):
-    pass
+
+class HX_Update(views.UpdateView):
+    model = Image
+    fields = ["alt"]
+
+    def form_valid(self, form):
+        self.object = form.save()
+        return HttpResponse(
+            render_to_string(
+                template_name="images/html/templates/toast_message.html",
+                context={
+                    'message': 'Image updated.'
+                }
+            ), 
+            headers={'HX-Trigger': "displayToast"},
+        )
+        
+
 
 class HX_Destroy(LoginRequiredMixin, views.DeleteView):
     model = Image

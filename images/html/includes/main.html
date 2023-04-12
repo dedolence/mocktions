@@ -1,12 +1,12 @@
 {# This is the template that should be included to generate an image upload form. #}
 
-<div class="card">
+{% comment %} <div class="card">
     <div class="card-header border-bottom">&nbsp;</div>
     <h5 class="card-title text-center mt-3 mb-0">Add images</h5>
     
     <div 
         id="id_image_add" 
-        hx-get="{% url 'images:hx-load' max_uploads %}" 
+        hx-get="{% url 'images:hx-load' %}?size={{ max_uploads }}" 
         hx-trigger="load" 
         hx-swap="outerHTML"
     ></div>
@@ -17,6 +17,26 @@
         {% endfor %}
     </div>
 </div>
+{% endcomment %}
+
+<div class="card">
+    <div class="card-header border-bottom">&nbsp;</div>
+    <h5 class="card-title text-center mt-3 mb-0">Add images</h5>
+    
+    <div 
+        id="id_image_add" 
+        hx-get="{% url 'images:hx-load' 14 %}" 
+        hx-trigger="load" 
+        hx-swap="outerHTML"
+    ></div>
+
+    <div id="id_image_list" class="row row-cols-auto gy-4 gx-2 p-3" hx-swap-oob="afterbegin">
+        {% for image in images %}
+            {% include "images/html/includes/image.html" with image=image %}
+        {% endfor %}
+    </div>
+</div>
+
     
 <script>
 
