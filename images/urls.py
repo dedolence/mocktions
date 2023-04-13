@@ -10,4 +10,5 @@ urlpatterns = [
     path('hx-load/', HX_LoadForm.as_view(), name="hx-load"),
     path('hx-update/<int:pk>', HX_Update.as_view(), name="hx-update"),
     path('hx-destroy/<int:pk>', HX_Destroy.as_view(), name="hx-destroy"),
+    path('hx-reorder/', HX_Reorder, name="hx-reorder"),
 ]

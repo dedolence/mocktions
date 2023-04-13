@@ -59,6 +59,10 @@ class HXBase:
         )
 
 
+def HX_Reorder(request):
+    return HttpResponse(content="", status=204)
+
+
 class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
     model = Image
     form_class = ImageUploadForm
