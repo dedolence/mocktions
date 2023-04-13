@@ -60,6 +60,7 @@ class HXBase:
 
 
 def HX_Reorder(request):
+    print(vars(request))
     return HttpResponse(content="", status=204)
 
 

@@ -30,9 +30,7 @@
         hx-swap="outerHTML"
     ></div>
 
-    <form hx-post="{% url 'images:hx-reorder' %}" hx-trigger="end" id="id_image_sortable">
-        {% include 'images/html/includes/image_list.html' with images=images %}
-    </form>
+    {% include 'images/html/includes/image_list.html' with images=images %}
 </div>
 
 
@@ -66,7 +64,7 @@
         e.detail.headers['X-CSRFToken'] = "{{ csrf_token }}";
     });
 
-    const sortableForm = document.getElementById("id_image_sortable");
+    const sortableForm = document.getElementById("id_image_list");
     const sortable = Sortable.create(sortableForm, {
         animation: 150,
         handle: '.card-header',
