@@ -36,4 +36,3 @@ class ImageFetchForm(BaseImageForm, forms.ModelForm):
         widget=forms.URLInput(attrs={'class': 'form-control my-1'}),
         label=""
     )
-    

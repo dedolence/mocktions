@@ -20,6 +20,10 @@ class HXBase:
     def dispatch(self, request, *args, **kwargs):
         if "Hx-Request" not in request.headers:
             return HttpResponseRedirect(reverse_lazy("base:index"))
+        
+        if not request.user.is_authenticated:
+            return self.login_redirect(request)
+
         return super().dispatch(request, *args, **kwargs)
     
     def login_redirect(self, request):
@@ -36,9 +40,10 @@ class HXBase:
     def render_hx_response(
             self, 
             request: HttpRequest, 
+            imageset: int,
             images: Optional[List[Image]] = None,
-            upload_form: Optional[ImageUploadForm] = ImageUploadForm(),
-            fetch_form: Optional[ImageFetchForm] = ImageFetchForm()
+            upload_form: Optional[ImageUploadForm] = None,
+            fetch_form: Optional[ImageFetchForm] = None,
             ) -> HttpResponse:
         
         # convert single objects to an iterable list
@@ -48,13 +53,20 @@ class HXBase:
             except TypeError:
                 images = [images]
 
+        initial = {'imageset': imageset}
+        if upload_form is None:
+            upload_form = ImageUploadForm(initial=initial)
+        if fetch_form is None:
+            fetch_form = ImageFetchForm(initial=initial)
+
         return HttpResponse(
             render_to_string(
                 template_name="images/html/includes/upload_response.html",
                 context={
                     'upload_form': upload_form,
                     'fetch_form': fetch_form,
-                    'images': images
+                    'images': images,
+                    'imageset': imageset
                 },
                 request=request
             )
@@ -62,6 +74,10 @@ class HXBase:
 
 
 def HX_Reorder(request):
+    """
+        Important: status 204 is required to indicate to HTMX that no
+        DOM changes should be made.
+    """
     image_list = request.POST.getlist('image_list')
     for i, id in enumerate(image_list):
         img = Image.objects.get(pk=id)
@@ -98,7 +114,7 @@ class HX_Fetch(LoginRequiredMixin, HXBase, views.CreateView):
         else:
             fetch_form = form
         
-        return self.render_hx_response(request, self.object, upload_form, fetch_form)
+        return self.render_hx_response(request, imageset, self.object, upload_form, fetch_form)
 
 
 class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
@@ -118,13 +134,15 @@ class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
         else:
             upload_form = form
 
-        return self.render_hx_response(request, self.object, upload_form, fetch_form)
+        return self.render_hx_response(request, imageset, self.object, upload_form, fetch_form)
 
 
 class HX_LoadForm(HXBase, views.TemplateView):
     """
         Either takes the pk of an existing imageset or generates a new one.
         All images subsequently uploaded will be related to the imageset.
+
+        TODO: take out the hard-coded max-size default.
     """
     template_name = "images/html/includes/upload_response.html"
 
@@ -132,24 +150,15 @@ class HX_LoadForm(HXBase, views.TemplateView):
         return self.get(*args, **kwargs)
     
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-
-        if not request.user.is_authenticated:
-            return self.login_redirect(request)
-
         # check for existing imageset, create a new one as necessary
         try: 
             pk = kwargs['pk']
             imageset = ImageSet.objects.get(pk=pk)
         except KeyError:
-            max_size = int(request.GET.get('size'))
+            max_size = int(request.GET.get('size', 10))
             imageset = ImageSet.objects.create(max_size=max_size, user=self.request.user)
         
-        self.extra_context = {
-            "upload_form": ImageUploadForm(initial={'imageset': imageset}),
-            "fetch_form": ImageFetchForm(initial={'imageset': imageset}),
-            "images": imageset.images.all(),
-        }
-        return super().get(request, *args, **kwargs)
+        return self.render_hx_response(request, imageset, imageset.images.all())
     
 
 class HX_Update(views.UpdateView):
