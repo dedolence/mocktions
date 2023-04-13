@@ -6,6 +6,8 @@ import django.views.generic as views
 from .forms import ImageUploadForm, ImageFetchForm
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.files import File
+from urllib import request as requests
 
 
 class HXBase:
@@ -66,6 +68,37 @@ def HX_Reorder(request):
         img.order = i 
         img.save()
     return HttpResponse(content="", status=204)
+
+
+class HX_Fetch(LoginRequiredMixin, HXBase, views.CreateView):
+    """ TODO: eliminate some of the redundancy with this and HX_Upload """
+    model = Image
+    form_class = ImageFetchForm
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        self.object = None
+        form = self.get_form()
+        imageset = ImageSet.objects.get(pk=request.POST.get('imageset'))
+        upload_form = ImageUploadForm(initial={'imageset': imageset.id})
+
+        if form.is_valid():
+            fetch_form = ImageFetchForm(initial={'imageset': imageset.id})
+            url = form.cleaned_data['url']
+            image = Image.objects.create(uploaded_by=request.user)
+            res = requests.urlretrieve(url)
+
+            name = res[0].split('/')[-1]
+            name = name + ".jpg" if ".jpg" not in name else name
+
+            image.image_field.save(name, File(open(res[0], 'rb')))
+            image.imageset = imageset
+            image.save()
+
+            self.object = image
+        else:
+            fetch_form = form
+        
+        return self.render_hx_response(request, self.object, upload_form, fetch_form)
 
 
 class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
