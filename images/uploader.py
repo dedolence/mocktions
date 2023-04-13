@@ -10,6 +10,15 @@ from django.core.files import File
 from urllib import request as requests
 
 
+"""
+    Usage:
+    To create a new imageset:
+    {% include 'images/html/includes/main.html' with max_uploads=n %}
+
+    To load and edit an existing imageset:
+    {% include 'images/html/includes/main.html' with imageset=n %}
+"""
+
 class HXBase:
     """
         Only allows HTMX requests through; redirects all others.
@@ -91,50 +100,42 @@ class HX_Fetch(LoginRequiredMixin, HXBase, views.CreateView):
     model = Image
     form_class = ImageFetchForm
 
-    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        self.object = None
-        form = self.get_form()
-        imageset = ImageSet.objects.get(pk=request.POST.get('imageset'))
-        upload_form = ImageUploadForm(initial={'imageset': imageset.id})
+    def form_valid(self, form: ImageFetchForm) -> HttpResponse:
+        imageset = ImageSet.objects.get(pk=self.request.POST.get('imageset'))
+        url = form.cleaned_data['url']
+        image = Image.objects.create(uploaded_by=self.request.user)
+        res = requests.urlretrieve(url)
 
-        if form.is_valid():
-            fetch_form = ImageFetchForm(initial={'imageset': imageset.id})
-            url = form.cleaned_data['url']
-            image = Image.objects.create(uploaded_by=request.user)
-            res = requests.urlretrieve(url)
+        name = res[0].split('/')[-1]
+        name = name + ".jpg" if ".jpg" not in name else name
 
-            name = res[0].split('/')[-1]
-            name = name + ".jpg" if ".jpg" not in name else name
+        image.image_field.save(name, File(open(res[0], 'rb')))
+        image.imageset = imageset
+        image.save()
 
-            image.image_field.save(name, File(open(res[0], 'rb')))
-            image.imageset = imageset
-            image.save()
-
-            self.object = image
-        else:
-            fetch_form = form
-        
-        return self.render_hx_response(request, imageset, self.object, upload_form, fetch_form)
+        self.object = image
+        return self.render_hx_response(self.request, imageset, self.object)
+    
+    def form_invalid(self, form: ImageFetchForm) -> HttpResponse:
+        imageset = ImageSet.objects.get(pk=self.request.POST.get('imageset'))
+        return self.render_hx_response(self.request, imageset, self.object)
 
 
 class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
     model = Image
     form_class = ImageUploadForm
 
-    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        self.object = None
-        form = self.get_form()
-        imageset = ImageSet.objects.get(pk=request.POST.get('imageset'))
-        fetch_form = ImageFetchForm(initial={'imageset': imageset.id})
+    def form_valid(self, form: ImageUploadForm) -> HttpResponse:
+        imageset = ImageSet.objects.get(pk=self.request.POST.get('imageset'))
+        form.instance.uploaded_by = self.request.user 
+        self.object = form.save()
+        return self.render_hx_response(self.request, imageset, self.object)
+    
+    def form_invalid(self, form: ImageUploadForm) -> HttpResponse:
+        imageset = ImageSet.objects.get(pk=self.request.POST.get('imageset'))
+        return self.render_hx_response(self.request, imageset, self.object, upload_form=form)
 
-        if form.is_valid():
-            form.instance.uploaded_by = self.request.user 
-            self.object = form.save()
-            upload_form = ImageUploadForm(initial={'imageset': imageset.id})
-        else:
-            upload_form = form
 
-        return self.render_hx_response(request, imageset, self.object, upload_form, fetch_form)
 
 
 class HX_LoadForm(HXBase, views.TemplateView):
