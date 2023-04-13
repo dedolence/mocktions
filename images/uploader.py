@@ -90,9 +90,8 @@ class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
 
 class HX_LoadForm(HXBase, views.TemplateView):
     """
-        Generates a new Imageset object and provides it, along with the image upload form.
-        Subsequent image uploads will be linked to the imageset for tracking maximum 
-        allowable uploads per post, user, etc..
+        Either takes the pk of an existing imageset or generates a new one.
+        All images subsequently uploaded will be related to the imageset.
     """
     template_name = "images/html/includes/upload_response.html"
 
@@ -121,6 +120,9 @@ class HX_LoadForm(HXBase, views.TemplateView):
     
 
 class HX_Update(views.UpdateView):
+    """
+        Updates the image alt text.
+    """
     model = Image
     fields = ["alt"]
 

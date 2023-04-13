@@ -57,8 +57,5 @@ class Image(TimeStampMixin, models.Model):
     )
     order = models.PositiveIntegerField(blank=True, null=True,)
 
-    def get_absolute_url(self):
-        return reverse("images:hx-update", kwargs={"pk": self.pk})
-    
     class Meta:
         ordering = ['order']
