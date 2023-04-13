@@ -64,9 +64,22 @@
         e.detail.headers['X-CSRFToken'] = "{{ csrf_token }}";
     });
 
-    const sortableForm = document.getElementById("id_image_list");
-    const sortable = Sortable.create(sortableForm, {
+    // save order of images when sorted
+    const sortableDiv = document.getElementById("id_image_list");
+    const sortable = Sortable.create(sortableDiv, {
         animation: 150,
         handle: '.card-header',
-    })
+        onSort: function(evt) {
+            const images = sortableDiv.querySelectorAll('.uploaded-image');
+            const formData = new FormData();
+            for (let i = 0; i < images.length; i++) {
+                formData.append("image_list", images[i].id);
+            }
+            fetch("{% url 'images:hx-reorder' %}", {
+                method: "POST",
+                body: formData,
+                headers: { 'X-CSRFToken': "{{ csrf_token }}" }
+            });
+        },
+    });
 </script>

@@ -60,7 +60,11 @@ class HXBase:
 
 
 def HX_Reorder(request):
-    print(vars(request))
+    image_list = request.POST.getlist('image_list')
+    for i, id in enumerate(image_list):
+        img = Image.objects.get(pk=id)
+        img.order = i 
+        img.save()
     return HttpResponse(content="", status=204)
 
 
