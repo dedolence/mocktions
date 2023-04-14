@@ -198,5 +198,7 @@ class HX_Destroy(LoginRequiredMixin, views.DeleteView):
                     'message': 'Image deleted.'
                 }
             ), 
-            headers={'HX-Trigger': "displayToast"},
+            headers={
+                'HX-Trigger': "displayToast",
+            },
         )
