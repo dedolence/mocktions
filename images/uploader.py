@@ -153,7 +153,7 @@ class HX_LoadForm(HXBase, views.TemplateView):
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         # check for existing imageset, create a new one as necessary
         try: 
-            pk = kwargs['pk']
+            pk = kwargs['imageset_id']
             imageset = ImageSet.objects.get(pk=pk)
         except KeyError:
             max_size = int(request.GET.get('size', 10))
