@@ -96,7 +96,7 @@ def HX_Reorder(request):
 
 
 class HX_Fetch(LoginRequiredMixin, HXBase, views.CreateView):
-    """ TODO: eliminate some of the redundancy with this and HX_Upload """
+    """ For saving an Image instance from a provided URL."""
     model = Image
     form_class = ImageFetchForm
 
