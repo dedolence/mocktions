@@ -4,7 +4,7 @@ from listings.models import Listing
 from django.db.models import QuerySet
 from typing import Any, Dict
 from django.http import HttpRequest, HttpResponse
-
+from listings.forms import ListingForm
 
 class HX_List(views.ListView):
     """
@@ -42,3 +42,5 @@ class HX_Create(views.CreateView):
         the DOM by HTMX.
     """
     model = Listing
+    form_class = ListingForm
+    template_name = "listings/html/templates/create.html"
