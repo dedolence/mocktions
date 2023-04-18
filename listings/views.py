@@ -49,4 +49,10 @@ class ListingCreate(views.CreateView):
     def form_valid(self, form: ListingForm) -> HttpResponse:
         form.instance.user = self.request.user
         self.object = form.save()
-        return HttpResponseRedirect(reverse_lazy("base:index"))
+        return HttpResponseRedirect(reverse_lazy("listings:detail", args=[self.object.id]))
+    
+
+class ListingDetail(views.DetailView):
+    model = Listing
+    context_object_name = "listing"
+    template_name = "listings/html/templates/detail.html"
