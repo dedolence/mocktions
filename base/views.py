@@ -8,14 +8,14 @@ from django.http import (
 )
 from django.urls import reverse_lazy
 from .strings import en
+import django.views.generic as views
 
 
 LOGGER = logging.getLogger('fly_stream')
 
-def index(request):
-    return HttpResponseRedirect(
-        reverse_lazy("accounts:index")
-    )
+
+class IndexView(views.TemplateView):
+    template_name = "base/html/templates/index.html"
 
 
 def handler403(request, exception):

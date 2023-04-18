@@ -6,7 +6,7 @@
 {% endcomment %}
 
 <div id="id_listings_list" 
-    hx-get="{% url 'listings:index' %}?list_by={{ list_by}}" 
+    hx-get="{% url 'listings:HX_List' %}?list_by={{ list_by }}" 
     hx-trigger="load" 
     hx-swap="outerHTML">
 </div>
