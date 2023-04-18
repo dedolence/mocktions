@@ -10,7 +10,7 @@
 
 {% block body %}
     
-    {% include "listings/html/includes/main.html" with list_by=user %}
+    {% include "listings/html/includes/main.html" with list_by="user" %}
 
     <h2>Delete your account</h2>
     <a href="{% url 'accounts:delete_account' pk=request.user.id %}">Click here to delete your account.</a>

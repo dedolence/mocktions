@@ -3,7 +3,8 @@ import django.views.generic as views
 from listings.models import Listing
 from django.db.models import QuerySet
 from typing import Any, Dict
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.urls import reverse_lazy
 from listings.forms import ListingForm
 
 class HX_List(views.ListView):
@@ -36,7 +37,7 @@ class HX_List(views.ListView):
         return super().get(request, *args, **kwargs)
     
 
-class HX_Create(views.CreateView):
+class ListingCreate(views.CreateView):
     """ 
         Creates a new model instance and returns HTML to be swapped into
         the DOM by HTMX.
@@ -44,3 +45,8 @@ class HX_Create(views.CreateView):
     model = Listing
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
+
+    def form_valid(self, form: ListingForm) -> HttpResponse:
+        form.instance.user = self.request.user
+        self.object = form.save()
+        return HttpResponseRedirect(reverse_lazy("base:index"))

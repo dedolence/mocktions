@@ -1,0 +1,15 @@
+{% extends 'base/html/templates/base.html' %}
+{% load static %}
+{% block body %}
+    <form action="{% url 'listings:create' %}" method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="mb-3">
+                <div class="form-label">{{ field.label }}</div>
+                <div>{{ field }}</div>
+                <div class="form-help">{{ field.errors }}</div>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}

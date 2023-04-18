@@ -6,5 +6,5 @@ app_name = 'listings'
 
 urlpatterns = [
     path("", views.HX_List.as_view(), name="HX_List"),
-    path("create/", views.HX_Create.as_view(), name="HX_Create"),
+    path("create/", views.ListingCreate.as_view(), name="create"),
 ]

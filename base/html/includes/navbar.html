@@ -34,7 +34,7 @@
                     <a href="{% comment %} {% url 'all_listings' %} {% endcomment %}" class="nav-link">All Listings</a>
                 </li>
                 <li class="nav-item p-2">
-                    <a href="{% url 'listings:HX_Create' %}" class="nav-link">Create a Listing</a>
+                    <a href="{% url 'listings:create' %}" class="nav-link">Create a Listing</a>
                 </li>
                 <li class="nav-item p-2">
                     {% if user.is_authenticated %}

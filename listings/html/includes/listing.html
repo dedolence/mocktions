@@ -1,4 +1,9 @@
 <div class="my-3 p-3 border">
     <h1>{{ listing.title }}</h1>
     <p>{{ listing.description }}</p>
+    <div class="d-flex flex-row">
+        {% for image in listing.imageset.images.all %}
+            {% include "images/html/includes/image.html" with image=image %}
+        {% endfor %}
+    </div>
 </div>
