@@ -9,7 +9,8 @@ urlpatterns = [
     path('', include('base.urls', namespace='base')),
     path('', include("django_backblaze_b2.urls", namespace="b2")),
     path('accounts/', include('accounts.urls', namespace="accounts")),
-    path('images/', include("images.urls", namespace="images"))
+    path('images/', include("images.urls", namespace="images")),
+    path('listings/', include('listings.urls', namespace='listings')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

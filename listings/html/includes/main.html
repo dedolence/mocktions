@@ -1,0 +1,12 @@
+{% comment  %}
+    Include this on a page to insert a list of listings determined by the list_by context variable.
+    list_by:
+     "user"
+     "all"
+{% endcomment %}
+
+<div id="id_listings_list" 
+    hx-get="{% url 'listings:index' %}?list_by={{ list_by}}" 
+    hx-trigger="load" 
+    hx-swap="outerHTML">
+</div>

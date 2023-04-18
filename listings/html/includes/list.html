@@ -1,0 +1,5 @@
+<div id="id_listings_list">
+    {% for listing in listings %}
+        {% include 'listings/html/includes/listing.html' with listing=listing %}
+    {% endfor %}
+</div>

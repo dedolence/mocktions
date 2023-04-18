@@ -1,15 +1,20 @@
 from django.shortcuts import render
 import logging
-from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
+from django.http import (
+    HttpResponseBadRequest, 
+    HttpResponseForbidden, 
+    HttpResponseServerError,
+    HttpResponseRedirect,
+)
+from django.urls import reverse_lazy
 from .strings import en
 
 
 LOGGER = logging.getLogger('fly_stream')
 
 def index(request):
-    return render(
-        request, 
-        'base/html/templates/index.html',
+    return HttpResponseRedirect(
+        reverse_lazy("accounts:index")
     )
 
 

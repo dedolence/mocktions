@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'base',
     'accounts',
+    'listings',
     'images',
     'storages',
     'whitenoise.runserver_nostatic',
