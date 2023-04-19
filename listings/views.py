@@ -68,12 +68,14 @@ class ListingDetail(ListingBase, views.DetailView):
 
 
 class ListingUpdate(
+        SuccessMessageMixin,
         LoginRequiredMixin, 
         ListingBase, 
         ListingOwnerOnly, 
         views.UpdateView): 
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
+    success_message = "Listing updated."
 
 
 class ListingDelete(

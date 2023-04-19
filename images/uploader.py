@@ -19,7 +19,7 @@ from urllib import request as requests
     {% include 'images/html/includes/main.html' with imageset=n %}
 """
 
-class HXBase:
+class HXImageBase:
     """
         Only allows HTMX requests through; redirects all others.
         Includes a method for rendering upload_response.html which is
@@ -95,7 +95,7 @@ def HX_Reorder(request):
     return HttpResponse(content="", status=204)
 
 
-class HX_Fetch(LoginRequiredMixin, HXBase, views.CreateView):
+class HX_Fetch(LoginRequiredMixin, HXImageBase, views.CreateView):
     """ For saving an Image instance from a provided URL."""
     model = Image
     form_class = ImageFetchForm
@@ -121,7 +121,7 @@ class HX_Fetch(LoginRequiredMixin, HXBase, views.CreateView):
         return self.render_hx_response(self.request, imageset, self.object)
 
 
-class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
+class HX_Upload(LoginRequiredMixin, HXImageBase, views.CreateView):
     model = Image
     form_class = ImageUploadForm
 
@@ -138,7 +138,7 @@ class HX_Upload(LoginRequiredMixin, HXBase, views.CreateView):
 
 
 
-class HX_LoadForm(HXBase, views.TemplateView):
+class HX_LoadForm(HXImageBase, views.TemplateView):
     """
         Either takes the pk of an existing imageset or generates a new one.
         All images subsequently uploaded will be related to the imageset.
@@ -178,7 +178,7 @@ class HX_Update(views.UpdateView):
                     'message': 'Image updated.'
                 }
             ), 
-            headers={'HX-Trigger': "displayToast"},
+            #headers={'HX-Trigger': "displayToast"},
         )
         
 
