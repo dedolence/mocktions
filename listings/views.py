@@ -67,12 +67,21 @@ class ListingDetail(ListingBase, views.DetailView):
     template_name = "listings/html/templates/detail.html"
 
 
-class ListingUpdate(LoginRequiredMixin, ListingBase, ListingOwnerOnly, views.UpdateView): 
+class ListingUpdate(
+        LoginRequiredMixin, 
+        ListingBase, 
+        ListingOwnerOnly, 
+        views.UpdateView): 
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
 
 
-class ListingDelete(SuccessMessageMixin, LoginRequiredMixin, ListingBase, ListingOwnerOnly, views.DeleteView):
+class ListingDelete(
+        SuccessMessageMixin, 
+        LoginRequiredMixin, 
+        ListingBase, 
+        ListingOwnerOnly, 
+        views.DeleteView):
     """
         To do: check there are no bids on the listing before deleting.
     """
