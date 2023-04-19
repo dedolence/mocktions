@@ -9,4 +9,5 @@ urlpatterns = [
     path("create/", views.ListingCreate.as_view(), name="create"),
     path("detail/<int:pk>", views.ListingDetail.as_view(), name="detail"),
     path("update/<int:pk>", views.ListingUpdate.as_view(), name="update"),
+    path("delete/<int:pk>", views.ListingDelete.as_view(), name="delete"),
 ]

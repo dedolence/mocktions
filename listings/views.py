@@ -6,6 +6,7 @@ from typing import Any, Dict
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from listings.forms import ListingForm
+from django.contrib.messages.views import SuccessMessageMixin
 
 class HX_List(views.ListView):
     """
@@ -21,17 +22,14 @@ class HX_List(views.ListView):
     template_name = "listings/html/includes/list.html"
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        list_by = request.GET.get("list_by", "user")
-
-        if list_by not in self.list_by_values:
-            list_by = "user"
+        list_by = request.GET.get("list_by", None)
 
         match list_by:
             case "all":
                 self.queryset = Listing.objects.all()
             case "user":
                 self.queryset = request.user.listings.all()
-            case other:
+            case None:
                 self.queryset = Listing.objects.all()
 
         return super().get(request, *args, **kwargs)
@@ -65,3 +63,15 @@ class ListingUpdate(views.UpdateView):
     template_name = "listings/html/templates/create.html"
 
 
+class ListingDelete(SuccessMessageMixin, views.DeleteView):
+    """
+        To do: check there are no bids on the listing before deleting.
+    """
+    model = Listing
+    context_object_name = "listing"
+    success_url = reverse_lazy("base:index")
+    template_name = "listings/html/templates/delete.html"
+    
+    def get_success_message(self, cleaned_data: Dict[str, str]) -> str:
+        title = self.object.title 
+        return f"Listing, \"{title}\" has been deleted."

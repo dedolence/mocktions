@@ -1,0 +1,9 @@
+{% extends 'base/html/templates/base.html' %}
+{% load static %}
+{% block body %}
+    <form method="POST">
+        {% csrf_token %}
+        <p>Confirm deletion of listing, "{{ listing.title }}".</p>
+        <button type="submit" class="btn btn-danger">Yes, delete this listing</button>
+    </form>
+{% endblock body %}
