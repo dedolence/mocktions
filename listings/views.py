@@ -56,3 +56,12 @@ class ListingDetail(views.DetailView):
     model = Listing
     context_object_name = "listing"
     template_name = "listings/html/templates/detail.html"
+
+
+class ListingUpdate(views.UpdateView):
+    model = Listing 
+    context_object_name = "listing"
+    form_class = ListingForm
+    template_name = "listings/html/templates/create.html"
+
+
