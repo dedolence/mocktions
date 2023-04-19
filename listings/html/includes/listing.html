@@ -1,5 +1,6 @@
 <div class="my-3 p-3 border">
     <h1>{{ listing.title }}</h1>
+    <div>Posted by: {{ listing.user }}</div>
     <a href="{% url 'listings:update' listing.id %}" class="btn btn-outline-secondary">Edit</a>
     <a href="{% url 'listings:delete' listing.id %}" class="btn btn-outline-danger">Delete</a>
     <hr class="my-4"/>

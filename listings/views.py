@@ -7,8 +7,23 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from listings.forms import ListingForm
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class HX_List(views.ListView):
+class ListingBase():
+    model = Listing
+    context_object_name = "listing"
+
+
+class ListingOwnerOnly():
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.user != request.user:
+            return HttpResponseRedirect(reverse_lazy("base:index"))
+        
+        return super().dispatch(request, *args, **kwargs)
+
+
+class HX_List(ListingBase, views.ListView):
     """
         To insert a list of listings, add
         {% include 'listings/html/includes/main.html with list_by=user|all %}
@@ -18,7 +33,6 @@ class HX_List(views.ListView):
     allow_empty = True
     context_object_name = "listings"    # the context variable name in templates
     list_by_values = ["all", "user"]    # specify queryset
-    model = Listing
     template_name = "listings/html/includes/list.html"
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -35,12 +49,11 @@ class HX_List(views.ListView):
         return super().get(request, *args, **kwargs)
     
 
-class ListingCreate(views.CreateView):
+class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
     """ 
         Creates a new model instance and returns HTML to be swapped into
         the DOM by HTMX.
     """
-    model = Listing
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
 
@@ -50,25 +63,19 @@ class ListingCreate(views.CreateView):
         return HttpResponseRedirect(reverse_lazy("listings:detail", args=[self.object.id]))
     
 
-class ListingDetail(views.DetailView):
-    model = Listing
-    context_object_name = "listing"
+class ListingDetail(ListingBase, views.DetailView):
     template_name = "listings/html/templates/detail.html"
 
 
-class ListingUpdate(views.UpdateView):
-    model = Listing 
-    context_object_name = "listing"
+class ListingUpdate(LoginRequiredMixin, ListingBase, ListingOwnerOnly, views.UpdateView): 
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
 
 
-class ListingDelete(SuccessMessageMixin, views.DeleteView):
+class ListingDelete(SuccessMessageMixin, LoginRequiredMixin, ListingBase, ListingOwnerOnly, views.DeleteView):
     """
         To do: check there are no bids on the listing before deleting.
     """
-    model = Listing
-    context_object_name = "listing"
     success_url = reverse_lazy("base:index")
     template_name = "listings/html/templates/delete.html"
     
