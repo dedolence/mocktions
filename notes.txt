@@ -267,3 +267,12 @@ This document is version-controlled, so don't put anything sensitive here!!!
     HX_LoadForm captures the max size in kwargs via url param, creates an imageset object with that max size, adds imageset 
     to template context. form template returns imageset pk with uploaded image. also makes it easier to display already-uploaded 
     images by iterating over imageset.images.all 
+
+4/20
+    currently debating separating out the listing part of creating a listing from the uploading images part.
+    i think i'd like it combined in one. the difficulty was that uploading images involves its own little sub-forms.
+    not really a problem since the sub-forms all update the FKs on the imageset, and the imageset remains static in the main form, 
+    so the component forms don't need to be nested. the submit button can even be separated from the main form with 
+    valid html5 by using the form= attribute and specifying the id of the main form. 
+
+    
