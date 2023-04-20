@@ -4,6 +4,24 @@ from base.models import TimeStampMixin
 from globals import LISTING_DRAFT_EXPIRATION_DAYS
 from django.utils.translation import gettext_lazy as _
 from images.models import ImageSet
+from django.core.exceptions import ValidationError
+
+def validate_images_added(pk_imageset):
+    imageset = ImageSet.objects.get(pk=pk_imageset)
+    if imageset.images.count() == 0:
+        raise ValidationError(
+            _("Listings must contain images.")
+        )
+
+
+def validate_max_images(pk_imageset):
+    imageset = ImageSet.objects.get(pk=pk_imageset)
+    if imageset.images.count() > imageset.max_size:
+        raise ValidationError(
+            _("This listing may have a maximum of %(max) \images."),
+            params={"max": imageset.max_size},
+        )
+
 
 class Listing(TimeStampMixin, models.Model):
     class CategoryChoices(models.TextChoices):
@@ -56,4 +74,5 @@ class Listing(TimeStampMixin, models.Model):
         null=False,
         on_delete=models.RESTRICT,
         related_name="listing",
+        #validators=[validate_images_added, validate_max_images]
     )
