@@ -5,3 +5,5 @@ class ListingForm(forms.ModelForm):
     class Meta:
         model = Listing
         exclude = ["user"]
+        labels = {"imageset": ""}
+        widgets = {"description": forms.Textarea()}
