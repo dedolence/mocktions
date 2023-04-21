@@ -10,19 +10,7 @@
                 <div class="form-help">{{ field.errors }}</div>
             </div>
         {% endfor %}
+        <button type="submit" class="btn btn-primary my-3" form="id_listing_create_form">Next: add images</button>
     </form>
-    
-    {% comment %}
-        If validation fails, the server will lookup the imageset that was previously created 
-        and add it to the context dictionary here. This way, any previously-uploaded images 
-        are preserved even if the form can't be submitted.
-    {% endcomment %}
-    {% if imageset %}
-        {% include 'images/html/includes/main.html' with imageset=imageset %}
-    {% else %}
-        {% include 'images/html/includes/main.html' with max_uploads=1 %}
-    {% endif %}
-
-    <button type="submit" class="btn btn-primary my-3" form="id_listing_create_form">Submit</button>
 
 {% endblock %}

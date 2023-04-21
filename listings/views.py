@@ -9,6 +9,7 @@ from listings.forms import ListingForm
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from images.models import ImageSet
+from globals import LISTING_DEFAULT_MAX_IMAGES
 
 class ListingBase():
     model = Listing
@@ -57,20 +58,21 @@ class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
     """
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
-    extra_context = {}
 
     def form_valid(self, form: ListingForm) -> HttpResponse:
         form.instance.user = self.request.user
         self.object = form.save()
-        return HttpResponseRedirect(reverse_lazy("listings:detail", args=[self.object.id]))
+        return HttpResponseRedirect(reverse_lazy("listings:add_images", args=[self.object.id]))
     
-    def form_invalid(self, form: ListingForm) -> HttpResponse:
-        """ 
-            In order to not lose any previously uploaded images, make sure the new imageset
-            is included in the template's context data.
-        """
-        self.extra_context["imageset"] = ImageSet.objects.get(pk=form["imageset"].value())
-        return super().form_invalid(form)
+
+class ListingAddImages(LoginRequiredMixin, ListingBase, views.TemplateView):
+    template_name = "listings/html/templates/add_images.html"
+    extra_context = {}
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        listing_id = kwargs["pk"]
+        self.extra_context["listing_id"] = listing_id
+        return super().get(request, *args, **kwargs)
     
 
 class ListingDetail(ListingBase, views.DetailView):

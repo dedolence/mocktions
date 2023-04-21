@@ -302,3 +302,6 @@ This document is version-controlled, so don't put anything sensitive here!!!
     
     one possible solution:
         if an imageset exists for this listing, add it to context data and check for it. 
+
+    a truly unbelievable amount of errors resulted in what seemed like a simple fix.
+    i mean, it was like my computer had suddenly been possessed by ghosts. i slammed the lid shut.

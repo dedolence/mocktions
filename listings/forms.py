@@ -12,9 +12,10 @@ from django.utils.translation import gettext_lazy as _
 class ListingForm(forms.ModelForm):
     class Meta:
         model = Listing
-        exclude = ["user"]
-        labels = {"imageset": ""}
-        widgets = {"description": forms.Textarea()}
+        exclude = ["user", "imageset"]
+        widgets = {
+            "description": forms.Textarea(),
+        }
 
     def clean_imageset(self):
         cd = self.cleaned_data

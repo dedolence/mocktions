@@ -71,8 +71,8 @@ class Listing(TimeStampMixin, models.Model):
     )
     imageset = models.ForeignKey(
         ImageSet,
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
         on_delete=models.RESTRICT,
         related_name="listing",
     )
