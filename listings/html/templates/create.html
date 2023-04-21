@@ -12,7 +12,12 @@
         {% endfor %}
     </form>
     
-    {% include 'images/html/includes/main.html' with max_uploads=1 %}
+    {% if imageset %}
+        {% include 'images/html/includes/main.html' with imageset=imageset %}
+    {% else %}
+        {% include 'images/html/includes/main.html' with max_uploads=1 %}
+    {% endif %}
 
     <button type="submit" class="btn btn-primary my-3" form="id_listing_create_form">Submit</button>
+
 {% endblock %}

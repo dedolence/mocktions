@@ -287,3 +287,18 @@ This document is version-controlled, so don't put anything sensitive here!!!
 
     but what if a submit button on the images, which validates the images, swaps the submit button for the 
     listing form, from a deactivated state to an activated state, if images are valid? 
+
+    the problem:
+        if too many/few images are uploaded and the submit button is clicked, all uploaded images are lost 
+        and the form is returned with an error message.
+
+    what it should do:
+        if too many/few images are uploaded and the submit button is clicked, all uploaded images should 
+        remain and the form is returned with an error message. 
+
+    one possible cause:
+        the listing create template ALWAYS loads a fresh image upload include; it has no way to retrieve an 
+        existing imageset.
+    
+    one possible solution:
+        if an imageset exists for this listing, add it to context data and check for it. 

@@ -57,11 +57,20 @@ class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
     """
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
+    extra_context = {}
 
     def form_valid(self, form: ListingForm) -> HttpResponse:
         form.instance.user = self.request.user
         self.object = form.save()
         return HttpResponseRedirect(reverse_lazy("listings:detail", args=[self.object.id]))
+    
+    def form_invalid(self, form: ListingForm) -> HttpResponse:
+        """ 
+            In order to not lose any previously uploaded images, make sure the new imageset
+            is included in the template's context data.
+        """
+        self.extra_context["imageset"] = ImageSet.objects.get(pk=form["imageset"].value())
+        return super().form_invalid(form)
     
 
 class ListingDetail(ListingBase, views.DetailView):
