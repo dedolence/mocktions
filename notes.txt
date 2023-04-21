@@ -275,4 +275,15 @@ This document is version-controlled, so don't put anything sensitive here!!!
     so the component forms don't need to be nested. the submit button can even be separated from the main form with 
     valid html5 by using the form= attribute and specifying the id of the main form. 
 
-    
+    now need to figure out how to validate that there are enough and not too many images. hoping to not use JS but
+    that may be easiest.
+
+    ok, so one thing is clear: validating images via the listing form isn't the way to go: there's no way 
+    to comfortable reload previously-uploaded images and maintain a filled-out form (including images) with 
+    errors displayed. it also makes some semantic sense that the image uploader should validate itself. 
+
+    however, how do we prevent the submit button from activating? it brings me back to a two-part upload process.
+    which i don't want to do. 
+
+    but what if a submit button on the images, which validates the images, swaps the submit button for the 
+    listing form, from a deactivated state to an activated state, if images are valid? 

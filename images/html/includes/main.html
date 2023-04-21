@@ -5,8 +5,8 @@
     <h5 class="card-title text-center mt-3 mb-0">Add images</h5>
     <div 
         id="id_image_add" 
-        {% if imageset %}
-            hx-get="{% url 'images:hx-load' imageset.id %}" 
+        {% if imageset_id %}
+            hx-get="{% url 'images:hx-load' imageset_id %}" 
         {% elif max_uploads %}
             hx-get="{% url 'images:hx-load' %}?size={{ max_uploads }}" 
         {% endif %}

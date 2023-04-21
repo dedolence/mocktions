@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from listings.forms import ListingForm
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from images.models import ImageSet
 
 class ListingBase():
     model = Listing

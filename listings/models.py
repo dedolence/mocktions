@@ -5,6 +5,7 @@ from globals import LISTING_DRAFT_EXPIRATION_DAYS
 from django.utils.translation import gettext_lazy as _
 from images.models import ImageSet
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 def validate_images_added(pk_imageset):
     imageset = ImageSet.objects.get(pk=pk_imageset)
@@ -74,5 +75,4 @@ class Listing(TimeStampMixin, models.Model):
         null=False,
         on_delete=models.RESTRICT,
         related_name="listing",
-        #validators=[validate_images_added, validate_max_images]
     )
