@@ -12,6 +12,11 @@
         {% endfor %}
     </form>
     
+    {% comment %}
+        If validation fails, the server will lookup the imageset that was previously created 
+        and add it to the context dictionary here. This way, any previously-uploaded images 
+        are preserved even if the form can't be submitted.
+    {% endcomment %}
     {% if imageset %}
         {% include 'images/html/includes/main.html' with imageset=imageset %}
     {% else %}
