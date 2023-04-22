@@ -10,7 +10,11 @@
                 <div class="form-help">{{ field.errors }}</div>
             </div>
         {% endfor %}
-        <button type="submit" class="btn btn-primary my-3" form="id_listing_create_form">Next: add images</button>
     </form>
+    
+    {% with form.imageset.value as imageset_id %}
+        {% include "images/html/includes/main.html" with imageset_id=imageset_id %}
+    {% endwith %}
 
+    <button class="btn btn-primary my-3" form="id_listing_create_form" type="submit">Submit</button>
 {% endblock %}

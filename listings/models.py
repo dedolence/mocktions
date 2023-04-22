@@ -76,3 +76,9 @@ class Listing(TimeStampMixin, models.Model):
         on_delete=models.RESTRICT,
         related_name="listing",
     )
+    posted = models.BooleanField(
+        default=False,
+        blank=False,
+        null=False,
+        help_text="False = listing has not been posted; a draft. True = Listing has been posted."
+    )

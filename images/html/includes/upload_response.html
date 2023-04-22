@@ -10,7 +10,7 @@
         >
             {% csrf_token %}
             {% include 'images/html/includes/form_template.html' with form=upload_form %}
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-outline-primary">
                 Upload
             </button>
         </form>
@@ -25,7 +25,7 @@
             hx-indicator="#id_loading_toast">
             {% csrf_token %}
             {% include 'images/html/includes/form_template.html' with form=fetch_form %}
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-outline-primary">
                 Upload
             </button>
         </form>
@@ -42,7 +42,7 @@
             {% csrf_token %}
             <input type="hidden" name="imageset" value="{{ imageset.id }}"/>
             <input type="hidden" name="url" value="https://picsum.photos/300"/>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-outline-primary">
                 Upload random
             </button>
         </form>

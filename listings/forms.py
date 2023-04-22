@@ -12,12 +12,14 @@ from django.utils.translation import gettext_lazy as _
 class ListingForm(forms.ModelForm):
     class Meta:
         model = Listing
-        exclude = ["user", "imageset"]
+        exclude = ["user", "posted"]
         widgets = {
             "description": forms.Textarea(),
+            "imageset": forms.HiddenInput()
         }
+        labels = {'imageset': ""}
 
-    def clean_imageset(self):
+    """ def clean_imageset(self):
         cd = self.cleaned_data
         imageset = cd.get("imageset")
         if imageset.images.count() == 0:
@@ -26,4 +28,4 @@ class ListingForm(forms.ModelForm):
         if imageset.images.count() > imageset.max_size:
             raise ValidationError(
                 _(f"Too many images. This listing can have a maximum of {imageset.max_size} images.")
-            )
+            ) """

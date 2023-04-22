@@ -52,27 +52,29 @@ class HX_List(ListingBase, views.ListView):
     
 
 class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
-    """ 
-        Creates a new model instance and returns HTML to be swapped into
-        the DOM by HTMX.
-    """
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
+
+    def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        # instantiate a new ImageSet object for this new listing.
+        # add it to initial values for the listing form.
+        imageset = ImageSet.objects.create(
+            user=request.user, 
+            max_size=LISTING_DEFAULT_MAX_IMAGES
+        )
+        self.initial = {'imageset': imageset}
+        return super().get(request, *args, **kwargs)
 
     def form_valid(self, form: ListingForm) -> HttpResponse:
         form.instance.user = self.request.user
         self.object = form.save()
-        return HttpResponseRedirect(reverse_lazy("listings:add_images", args=[self.object.id]))
-    
+        return HttpResponseRedirect(reverse_lazy("listings:detail", args=[self.object.id]))
 
-class ListingAddImages(LoginRequiredMixin, ListingBase, views.TemplateView):
+
+class ListingAddImages(LoginRequiredMixin, ListingBase, views.UpdateView):
     template_name = "listings/html/templates/add_images.html"
     extra_context = {}
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        listing_id = kwargs["pk"]
-        self.extra_context["listing_id"] = listing_id
-        return super().get(request, *args, **kwargs)
+    fields = ["posted"]
     
 
 class ListingDetail(ListingBase, views.DetailView):

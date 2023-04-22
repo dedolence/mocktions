@@ -305,3 +305,11 @@ This document is version-controlled, so don't put anything sensitive here!!!
 
     a truly unbelievable amount of errors resulted in what seemed like a simple fix.
     i mean, it was like my computer had suddenly been possessed by ghosts. i slammed the lid shut.
+
+
+    New tactic.
+    ONCE AGAIN MOVING TO A TWO PART LISTING CREATION PROCESS.
+
+    first instantiate a new imageset object. set its value to the ListingForm's initial values.
+    load form. fill out form. submit, validate, return redirect to images. all that's needed then is 
+    the imageset id. will need a flag on the listing to indicate it's not posted yet.
