@@ -58,10 +58,7 @@ class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
     def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         # instantiate a new ImageSet object for this new listing.
         # add it to initial values for the listing form.
-        imageset = ImageSet.objects.create(
-            user=request.user, 
-            max_size=LISTING_DEFAULT_MAX_IMAGES
-        )
+        imageset = ImageSet.objects.create(user=request.user)
         self.initial = {'imageset': imageset}
         return super().get(request, *args, **kwargs)
 

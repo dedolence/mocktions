@@ -22,8 +22,10 @@ class ListingForm(forms.ModelForm):
     def clean_imageset(self):
         imageset = self.cleaned_data["imageset"]
 
-        if imageset.images.count() == 0:
-            raise ValidationError(_("A listing must contain at least one image."))
+        if imageset.images.count() < imageset.min_size:
+            raise ValidationError(
+                _(f"A listing must contain at least {imageset.min_size} image.")
+            )
         
         if imageset.images.count() > imageset.max_size:
             raise ValidationError(

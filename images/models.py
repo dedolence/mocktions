@@ -7,6 +7,7 @@ from django.forms import ValidationError
 from django.utils.translation import gettext as _
 from django.template.defaultfilters import filesizeformat
 from base.models import TimeStampMixin
+from globals import LISTING_DEFAULT_MIN_IMAGES, LISTING_DEFAULT_MAX_IMAGES
 
 ALLOWED_CONTENT_TYPES = [
     "image/png",
@@ -29,7 +30,8 @@ def size_validator(value: models.ImageField) -> ValidationError | None:
 
 class ImageSet(TimeStampMixin, models.Model):
     """ Add any foreign keys to this model. """
-    max_size = models.IntegerField()
+    min_size = models.IntegerField(default=LISTING_DEFAULT_MIN_IMAGES)
+    max_size = models.IntegerField(default=LISTING_DEFAULT_MAX_IMAGES)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="imagesets"
     )

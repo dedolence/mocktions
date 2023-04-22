@@ -12,6 +12,11 @@
         {% endfor %}
     </form>
     
+    {% comment %}
+        When first rendered, an imageset object is created and the form's initial
+        value for that field is populated. Therefore we can load the image uploader
+        here using that imageset's ID by accessing the relevant form field's value.
+    {% endcomment %}
     {% with form.imageset.value as imageset_id %}
         {% include "images/html/includes/main.html" with imageset_id=imageset_id %}
     {% endwith %}
