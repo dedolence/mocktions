@@ -1,8 +1,6 @@
 {% extends 'base/html/templates/base.html' %}
 {% load static %}
 {% block body %}
-    {% include 'images/html/includes/main.html' with max_uploads=10 %}
-    <br class="my-5"/>
     <h1>All Listings</h1>
     {% include 'listings/html/includes/main.html' %}
 {% endblock body %}

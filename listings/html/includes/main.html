@@ -10,3 +10,22 @@
     hx-trigger="load" 
     hx-swap="outerHTML">
 </div>
+
+
+<div id="id_listing_paginator" class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a hx-get="?page=1" hx-target="#id_listings_list">&laquo; first</a>
+            <a hx-get="?page={{ page_obj.previous_page_number }}" hx-target="#id_listings_list">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a hx-get="?page={{ page_obj.next_page_number }}" hx-target="#id_listings_list">next</a>
+            <a hx-get="?page={{ page_obj.paginator.num_pages }}" hx-target="#id_listings_list">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>

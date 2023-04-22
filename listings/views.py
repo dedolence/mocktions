@@ -37,6 +37,7 @@ class HX_List(ListingBase, views.ListView):
     context_object_name = "listings"    # the context variable name in templates
     list_by_values = ["all", "user"]    # specify queryset
     template_name = "listings/html/includes/list.html"
+    paginate_by = 2
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         list_by = request.GET.get("list_by", None)
@@ -50,6 +51,7 @@ class HX_List(ListingBase, views.ListView):
                 self.queryset = Listing.objects.all()
 
         return super().get(request, *args, **kwargs)
+    
     
 
 class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
