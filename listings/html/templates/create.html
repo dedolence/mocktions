@@ -1,7 +1,8 @@
 {% extends 'base/html/templates/base.html' %}
 {% load static %}
 {% block body %}
-    <form id="id_listing_create_form" action="{% url 'listings:create' %}" method="POST">
+    {# Make sure to provide the action URL here to distinguish between create and update. #}
+    <form id="id_listing_create_form" action="{{ submit_url }}" method="POST">
         {% csrf_token %}
         {% for field in form %}
             <div class="mb-3">

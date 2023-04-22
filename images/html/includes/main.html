@@ -8,7 +8,7 @@
         {% if imageset_id %}
             hx-get="{% url 'images:hx-load' imageset_id %}" 
         {% else %}
-            hx-get="{% url 'images:hx-load' %}?size={{ max_uploads }}" 
+            hx-get="{% url 'images:hx-load' %}?size=10" 
         {% endif %}
         hx-trigger="load" 
         hx-swap="outerHTML"

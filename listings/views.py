@@ -10,6 +10,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from images.models import ImageSet
 from globals import LISTING_DEFAULT_MAX_IMAGES
+from django.utils.translation import gettext_lazy as _
 
 class ListingBase():
     model = Listing
@@ -54,6 +55,7 @@ class HX_List(ListingBase, views.ListView):
 class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
+    extra_context = {'submit_url': reverse_lazy("listings:create")}
 
     def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         # instantiate a new ImageSet object for this new listing.
@@ -86,7 +88,18 @@ class ListingUpdate(
         views.UpdateView): 
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
-    success_message = "Listing updated."
+    success_message = _("Listing updated.")
+    
+    def get_success_url(self) -> str:
+        return reverse_lazy("listings:detail", args=[self.object.id])
+    
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        """
+            Update and create use the same template, distinguished only
+            by the form POST url, which is added to the template context here.
+        """
+        kwargs["update_url"] = reverse_lazy("listings:update", args=[self.object.id])
+        return super().get_context_data(**kwargs)
 
 
 class ListingDelete(
