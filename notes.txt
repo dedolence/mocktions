@@ -313,3 +313,9 @@ This document is version-controlled, so don't put anything sensitive here!!!
     first instantiate a new imageset object. set its value to the ListingForm's initial values.
     load form. fill out form. submit, validate, return redirect to images. all that's needed then is 
     the imageset id. will need a flag on the listing to indicate it's not posted yet.
+
+    ok actually.... back to a one-part listing form. basically did the above (instantiate an imageset 
+    object and use it to populate initial value on a listing form). in the template, access the imageset 
+    id by form value: form.imageset.value. also, the validators for the imageset work fine when they're
+    part of the listing form (checked on listing creation, not imageset creation), just remember to 
+    return the data after validating. 
