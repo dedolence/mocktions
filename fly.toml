@@ -1,5 +1,8 @@
 # fly.toml file generated for mocktions on 2022-10-10T12:35:00-04:00
 
+# to collectstatic post-deploy:
+# fly ssh console
+
 app = "mocktions"
 kill_signal = "SIGINT"
 kill_timeout = 5

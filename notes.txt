@@ -98,7 +98,7 @@ This document is version-controlled, so don't put anything sensitive here!!!
 11/28
     - Access shell to run tests within container:
     - exec to run arbitrary commands
-    - start container, then run sudo docker exect -it <container_name> sh to start a shell
+    - start container, then run sudo docker exec -it <container_name> sh to start a shell
 
 1/18
     - building selenium page objects and tests:
