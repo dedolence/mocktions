@@ -73,7 +73,7 @@ class Listing(TimeStampMixin, models.Model):
         ImageSet,
         blank=True,
         null=True,
-        on_delete=models.RESTRICT,
+        on_delete=models.SET_NULL,
         related_name="listing",
     )
     posted = models.BooleanField(
