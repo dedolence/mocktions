@@ -1,11 +1,21 @@
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 from listings.models import Listing
+from images.models import ImageSet
 from typing import Any, Optional
 
+"""
+    python manage.py clearlistings [-y] [-i]
+    -y: confirm
+    -i: delete all associated ImageSets (and their images)
+"""
 class Command(BaseCommand):
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
             '-y',
+            action="store_true"
+        )
+        parser.add_argument(
+            '-i',
             action="store_true"
         )
 
@@ -19,7 +29,13 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.ERROR("Canceled."))
             
             for i, listing in enumerate(queryset, start=1):
+                imageset = None
+                if options['i']:
+                    imageset = listing.imageset
+                
                 listing.delete()
+                if imageset:
+                    imageset.delete()
             self.stdout.write(self.style.SUCCESS(f"{i} listings deleted."))
         else:
             self.stdout.write(self.style.NOTICE("No listings found."))
