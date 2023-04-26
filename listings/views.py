@@ -11,6 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from images.models import ImageSet
 from globals import LISTING_DEFAULT_MAX_IMAGES
 from django.utils.translation import gettext_lazy as _
+from images.uploader import fetch_image
 
 class ListingBase():
     model = Listing
@@ -70,6 +71,19 @@ class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
         form.instance.user = self.request.user
         self.object = form.save()
         return HttpResponseRedirect(reverse_lazy("listings:detail", args=[self.object.id]))
+
+
+class ListingRandomizer(ListingCreate):
+    def get_initial(self) -> Dict[str, Any]:
+        initial = super().get_initial()
+        initial["title"] = "random title"
+        initial["description"] = "random description"
+
+        for i in range(0,3):
+            # generates 3 random images and attaches them to the imageset
+            fetch_image(self.request.user, self.initial["imageset"])
+
+        return initial
 
 
 class ListingAddImages(LoginRequiredMixin, ListingBase, views.UpdateView):

@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files import File
 from urllib import request as requests
+from mocktions.settings import AUTH_USER_MODEL as User
 
 
 """
@@ -103,16 +104,7 @@ class HX_Fetch(LoginRequiredMixin, HXImageBase, views.CreateView):
     def form_valid(self, form: ImageFetchForm) -> HttpResponse:
         imageset = ImageSet.objects.get(pk=self.request.POST.get('imageset'))
         url = form.cleaned_data['url']
-        image = Image.objects.create(uploaded_by=self.request.user)
-        res = requests.urlretrieve(url)
-
-        name = res[0].split('/')[-1]
-        name = name + ".jpg" if ".jpg" not in name else name
-
-        image.image_field.save(name, File(open(res[0], 'rb')))
-        image.imageset = imageset
-        image.save()
-
+        image = fetch_image(self.request.user, imageset, url)
         self.object = image
         return self.render_hx_response(self.request, imageset, self.object)
     
@@ -177,8 +169,7 @@ class HX_Update(views.UpdateView):
                 context={
                     'message': 'Image updated.'
                 }
-            ), 
-            #headers={'HX-Trigger': "displayToast"},
+            ),
         )
         
 
@@ -202,3 +193,20 @@ class HX_Destroy(LoginRequiredMixin, views.DeleteView):
                 'HX-Trigger': "displayToast",
             },
         )
+    
+
+def fetch_image(user: User, imageset: ImageSet, url: str = "https://picsum.photos/300") -> Image:
+    """
+        Fetches the image located at URL and returns an Image instance.
+    """
+    image = Image.objects.create(uploaded_by=user)
+    res = requests.urlretrieve(url)
+
+    name = res[0].split('/')[-1]
+    name = name + ".jpg" if ".jpg" not in name else name
+
+    image.image_field.save(name, File(open(res[0], 'rb')))
+    image.imageset = imageset
+    image.save()
+
+    return image
