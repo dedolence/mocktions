@@ -12,6 +12,8 @@ from images.models import ImageSet
 from globals import LISTING_DEFAULT_MAX_IMAGES
 from django.utils.translation import gettext_lazy as _
 from images.uploader import fetch_image
+from django.utils import lorem_ipsum
+import random
 
 class ListingBase():
     model = Listing
@@ -75,9 +77,21 @@ class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
 
 class ListingRandomizer(ListingCreate):
     def get_initial(self) -> Dict[str, Any]:
+        # get the initial imageset which has already been created 
         initial = super().get_initial()
-        initial["title"] = "random title"
-        initial["description"] = "random description"
+
+        initial["title"] = lorem_ipsum.words(2, False).title()
+
+        desc_list = lorem_ipsum.paragraphs(2, False)
+        max_length = Listing.description.field.max_length
+        initial["description"] = '\n'.join(desc_list)[:max_length]
+
+        max_digits = Listing.starting_bid.field.max_digits
+        max_bid = int("9" + ("9" * (max_digits-1)))
+        initial["starting_bid"] = random.randint(1, max_bid)/100
+
+        categories = Listing.category.field.choices
+        initial["category"] = random.choice(categories)[0]
 
         for i in range(0,3):
             # generates 3 random images and attaches them to the imageset
