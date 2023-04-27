@@ -83,7 +83,7 @@ class ListingRandomizer(ListingCreate):
         initial["title"] = lorem_ipsum.words(2, False).title()
 
         desc_list = lorem_ipsum.paragraphs(2, False)
-        max_length = Listing.description.field.max_length
+        max_length = Listing.description.field.max_length - 1
         initial["description"] = '\n'.join(desc_list)[:max_length]
 
         max_digits = Listing.starting_bid.field.max_digits
@@ -93,8 +93,10 @@ class ListingRandomizer(ListingCreate):
         categories = Listing.category.field.choices
         initial["category"] = random.choice(categories)[0]
 
-        for i in range(0,3):
-            # generates 3 random images and attaches them to the imageset
+        imageset = self.initial["imageset"]
+        min_images = imageset.min_size
+        max_images = imageset.max_size
+        for i in range(random.randint(min_images, max_images)):
             fetch_image(self.request.user, self.initial["imageset"])
 
         return initial
