@@ -15,6 +15,7 @@ from images.uploader import fetch_image
 from django.utils import lorem_ipsum
 import random
 
+
 class ListingBase():
     model = Listing
     context_object_name = "listing"
@@ -31,6 +32,7 @@ class ListingOwnerOnly():
 
 class HX_List(ListingBase, views.ListView):
     """
+        HX_ prefix indicates this view is an AJAX call using HTMX in the template.
         To insert a list of listings, add
         {% include 'listings/html/includes/main.html with list_by=user|all %}
         to any template. The template will make an AJAX HTMX call to this view
@@ -101,12 +103,6 @@ class ListingRandomizer(ListingCreate):
 
         return initial
 
-
-class ListingAddImages(LoginRequiredMixin, ListingBase, views.UpdateView):
-    template_name = "listings/html/templates/add_images.html"
-    extra_context = {}
-    fields = ["posted"]
-    
 
 class ListingDetail(ListingBase, views.DetailView):
     template_name = "listings/html/templates/detail.html"
