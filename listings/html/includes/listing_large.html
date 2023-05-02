@@ -1,0 +1,70 @@
+<div class="card mb-3">
+
+    <!-- Header, expiration timer -->
+    <div class="card-header">
+        <span class="d-block text-center text-muted small">
+            {# TODO: expiration timer #}
+            Expires in: XXd XXm
+        </span>
+    </div>
+
+    <!-- Category, watchlist toggle -->
+    <div class="card-body d-flex text-muted small">
+        <span class="flex-item">Category: {{ listing.get_category_display }}</span>
+        <span class="flex-item flex-grow-1 text-end">
+            {# TODO: watchlist #}
+            {% comment %} {% if listing not in user.watchlist.all %} {% endcomment %}
+            <a href="" class="text-reset text-decoration-none">
+            {% if True %}
+                Add to watchlist 
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                </svg>
+            {% else %}
+                Watching 
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="red" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                </svg>
+            {% endif %}
+            </a>
+        </span>
+    </div>
+
+    <!-- Image carousel -->
+    <div class="container-fluid text-center p-0 m-0">
+        {% include 'listings/html/includes/image_carousel.html' with images=listing.imageset.images.all %}
+    </div>
+
+    <!-- Listing title and description -->
+    <div class="card-body">
+        <h5 class="card-title">
+            <a href="{% url 'listings:detail' listing.id %}" class="stretched-link text-decoration-none">{{ listing.title }}</a>
+        </h5>
+        <p class="card-text">{{ listing.description }}</p>
+    </div>
+
+    <!-- Current bid and watchers -->
+    <div class="card-body border-rounded">
+        <div class="lead">
+            {# TODO: current bid #}
+            <strong>${{ listing.current_bid.amount|default:69|stringformat:".2f" }}</strong>
+        </div>
+        <div class="text-muted">
+            {# TODO: number of bids #}
+            <small>{{ listing.bids.count|default:0 }} bids, {{ listing.watchers.count|default:0 }} watchers</small>
+        </div>
+    </div>
+
+    <!-- Footer, posted by/created at, edit/delete buttons -->
+    <div class="card-footer d-flex align-items-center">
+        <span class="flex-item text-muted small">
+            Posted by: <a href="{% url 'accounts:profile' listing.user.id %}" class="text-secondary">{{ listing.user }}</a> at {{ listing.created_at }}
+        </span>
+        <span class="flex-item flex-grow-1 text-end">
+            {% if listing.user == user %}
+                <a href="{% url 'listings:update' listing.id %}" class="btn btn-outline-secondary me-2">Edit</a>
+                <a href="{% url 'listings:delete' listing.id %}" class="btn btn-outline-danger">Delete</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
