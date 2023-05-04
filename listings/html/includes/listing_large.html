@@ -1,4 +1,4 @@
-<div class="card mb-3">
+<div class="card">
 
     <!-- Header, expiration timer -->
     <div class="card-header">
@@ -38,13 +38,15 @@
     <!-- Listing title and description -->
     <div class="card-body">
         <h5 class="card-title">
-            <a href="{% url 'listings:detail' listing.id %}" class="stretched-link text-decoration-none">{{ listing.title }}</a>
+            <a href="{% url 'listings:detail' listing.id %}" class="text-decoration-none">{{ listing.title }}</a>
         </h5>
+        {# TODO: condition #}
+        <p class="text-muted small">{{ listing.condition|default:"Like new"}}</p>
         <p class="card-text">{{ listing.description }}</p>
     </div>
 
     <!-- Current bid and watchers -->
-    <div class="card-body border-rounded">
+    <div class="card-body">
         <div class="lead">
             {# TODO: current bid #}
             <strong>${{ listing.current_bid.amount|default:69|stringformat:".2f" }}</strong>

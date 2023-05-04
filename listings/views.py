@@ -42,7 +42,7 @@ class HX_List(ListingBase, views.ListView):
     context_object_name = "listings"    # the context variable name in templates
     list_by_values = ["all", "user"]    # specify queryset
     template_name = "listings/html/includes/list.html"
-    paginate_by = 2
+    paginate_by = 10
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         list_by = request.GET.get("list_by", None)
