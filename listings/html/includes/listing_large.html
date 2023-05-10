@@ -1,3 +1,4 @@
+{% load static %}
 <div class="card">
 
     <!-- Header, expiration timer -->
@@ -59,14 +60,20 @@
 
     <!-- Footer, posted by/created at, edit/delete buttons -->
     <div class="card-footer d-flex align-items-center">
-        <span class="flex-item text-muted small">
+        <span class="flex-item me-auto text-muted small">
             Posted by: <a href="{% url 'accounts:profile' listing.user.id %}" class="text-secondary">{{ listing.user }}</a> at {{ listing.created_at }}
         </span>
-        <span class="flex-item flex-grow-1 text-end">
-            {% if listing.user == user %}
-                <a href="{% url 'listings:update' listing.id %}" class="btn btn-outline-secondary me-2">Edit</a>
-                <a href="{% url 'listings:delete' listing.id %}" class="btn btn-outline-danger">Delete</a>
-            {% endif %}
-        </span>
+        {% if listing.user == user %}
+            <span class="flex-item text-end ms-2 me-1">
+                <a href="{% url 'listings:update' listing.id %}" class="btn btn-sm btn-outline-secondary me-2">
+                    Edit
+                </a>
+            </span>
+            <span class="flex-item text-end">
+                <a href="{% url 'listings:delete' listing.id %}" class="btn btn-sm btn-outline-danger">
+                    Delete
+                </a>
+            </span>
+        {% endif %}
     </div>
 </div>

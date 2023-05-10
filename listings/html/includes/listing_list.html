@@ -1,0 +1,44 @@
+{% load static %}
+<!-- <div class="d-flex flex-row">
+    <div class="flex-item w-25" style="background-image: url('{{ listing.imageset.images.first.image_field.url }}'); background-repeat: no-repeat; background-size: contain; height: 100px;"></div>
+</div> -->
+<div class="container-fluid position-relative border-bottom py-2">
+    <div class="row">
+        <!--<div class="col-2 position-relative" style="background-image: url('{{ listing.imageset.images.first.image_field.url }}'); background-repeat: no-repeat; background-size: contain; background-position: left; height: 100px;">-->
+        <div class="col-2 position-relative mx-0 px-0" style="height:150px;">
+            <img src="{{ listing.imageset.images.first.image_field.url }}" class="rounded w-100 h-100 mw-100 mh-100" alt="{{ listing.imageset.images.first.alt|default:"No alt provided"}}"/>
+            {% include "listings/html/includes/listing_favorite_toggle.html" with listing=listing %}            
+        </div>
+        <div class="col-10">
+            <div class="d-flex flex-row">
+                <div class="flex-item me-auto">
+                    <p class="mb-1"><a href="{% url 'listings:detail' listing.id %}" class="stretched-link lead text-decoration-none text-reset">{{ listing.title }}</a></p>
+                </div>
+                {% if listing.user == user %}
+                    <div class="flex-item me-2 m-0 p-0">
+                        <a href="{% url 'listings:update' listing.id %}" class="btn btn-outline-secondary p-1">
+                            <img src="{% static 'images/edit_icon.svg' %}" alt="Edit listing" class="text-secondary">
+                        </a>
+                    </div>
+                    <div class="flex-item m-0 p-0">
+                        <a href="{% url 'listings:delete' listing.id %}" class="btn btn-outline-danger p-1">
+                            <img src="{% static 'images/delete_icon.svg' %}" alt="Delete listing">
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            <p class="mb-2 text-muted small ">{{ listing.condition|default:"Like new" }}</p>
+            <p class="small">{{ listing.description|truncatewords:25 }}</p>
+            <div class="d-flex flex-row justify-content-">
+                <div class="flex-item me-auto">
+                    <p class="lead mb-0"><strong>${{ listing.current_bid.amount|default:69|stringformat:".2f" }}</strong></p>
+                    {# TODO: number of bids #}
+                    <p class="mb-0 text-muted"><small>{{ listing.bids.count|default:0 }} bids, {{ listing.watchers.count|default:0 }} watchers, 1d 0h</small></p>
+                </div>
+                <div class="flex-item align-self-end">
+                    <span class="text-muted small">Posted by: <a href="{% url 'accounts:profile' listing.user.id %}" class="text-secondary">{{ listing.user }}</a> at {{ listing.created_at }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
