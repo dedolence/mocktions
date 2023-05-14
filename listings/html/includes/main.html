@@ -1,14 +1,12 @@
-{% comment  %}
-    Include this on a page to insert a list of listings determined by the list_by context variable.
-    list_by:
-     "user"
-     "all"
-{% endcomment %}
+{% load static %}
+
+{% include "listings/html/includes/list_controls.html" %}
 
 <div id="id_listings_list" 
-    hx-get="{% url 'listings:HX_List' %}?list_by={{ list_by }}" 
+    hx-get="{% url 'listings:HX_List' %}" 
     hx-trigger="load" 
-    hx-swap="outerHTML">
+    hx-swap="outerHTML"
+    hx-vals='{"list_by": "{{ list_by|default:"all" }}", "view_as": "{{ view_as|default:"small" }}"}'>
 </div>
 
 {% include "base/html/includes/pagination_buttons.html" with page_obj=page_obj %}

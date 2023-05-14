@@ -1,0 +1,14 @@
+<div id="id_listings_list" hx-swap="outerHTML">
+    <div class="container g-3">
+        {# TODO: switch display mode: large, small, list #}
+        <div class="row">
+            {% for listing in page_obj %}
+                <div class="col-md-6 mb-3">
+                    {% include 'listings/html/includes/listing_large.html' with listing=listing %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% include "base/html/includes/pagination_buttons.html" with page_obj=page_obj %}

@@ -1,0 +1,69 @@
+{% load static %}
+{% comment %}
+    Attributes that need to be preserved between content reloads:
+    - View as (icon size)
+    - Order by (price, date)
+    - Exclude user
+    - page_obj
+{% endcomment %}
+<div class="navbar navbar-expand-md navbar-light border-bottom p-0 mb-3" role="navigation">
+    {% include "base/html/includes/pagination_buttons.html" with page_obj=page_obj %}
+    <ul class="navbar-nav">
+        <!-- Icon size -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="viewAsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                View as
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="viewAsDropdown">
+                <li>
+                    <button class="dropdown-item d-flex align-items-center">
+                        <img src="{% static 'images/list_icon.svg' %}" class="me-2" alt="Display as list" />
+                        List
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item d-flex align-items-center">
+                        <img src="{% static 'images/small_grid_icon.svg' %}" class="me-2" alt="Display as small grid" />
+                        Small
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item d-flex align-items-center">
+                        <img src="{% static 'images/large_grid_icon.svg' %}" class="me-2" alt="Display as large grid" />
+                        Large
+                    </button>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Order by -->
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="orderByDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Order by
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="orderByDropdown">
+                <li>
+                    <button class="dropdown-item">
+                        Price: low to high
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item">
+                    Price: high to low
+                    </button>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                    <button class="dropdown-item">
+                        Date added: newest first
+                    </button>
+                </li>
+                <li>
+                    <button class="dropdown-item">
+                        Date added: oldest first
+                    </button>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>

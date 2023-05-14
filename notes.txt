@@ -319,3 +319,17 @@ This document is version-controlled, so don't put anything sensitive here!!!
     id by form value: form.imageset.value. also, the validators for the imageset work fine when they're
     part of the listing form (checked on listing creation, not imageset creation), just remember to 
     return the data after validating. 
+
+5/11
+    how to handle list?
+    several different methods of filtering the list content, how to branch accordingly?
+    should get_queryset have one long switch case for every filter method?
+    how to preserve choices in the template?
+    view display type: small, large 
+    model field filter: date added, price, etc.
+    page #, # per page
+    should those preferences be added to a context dictionary? ["view_as", "filter_by", "page", "paginate_by"]
+    (how to maintain automatic pagination?)
+
+    for what it's worth, the built-in pagination class adds a context variable. so that's an established
+    pattern
