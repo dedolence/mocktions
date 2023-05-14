@@ -5,8 +5,7 @@
 <div id="id_listings_list" 
     hx-get="{% url 'listings:HX_List' %}" 
     hx-trigger="load" 
-    hx-swap="outerHTML"
-    hx-vals='{"list_by": "{{ list_by|default:"all" }}", "view_as": "{{ view_as|default:"small" }}"}'>
+    hx-swap="outerHTML">
 </div>
 
 {% include "base/html/includes/pagination_buttons.html" with page_obj=page_obj %}

@@ -7,8 +7,14 @@
     - page_obj
 {% endcomment %}
 <div class="navbar navbar-expand-md navbar-light border-bottom p-0 mb-3" role="navigation">
-    {% include "base/html/includes/pagination_buttons.html" with page_obj=page_obj %}
     <ul class="navbar-nav">
+        <!-- Exclude current user's listing -->
+        <li class="nav-item">
+            <label class="text-secondary nav-link text-nowrap">
+                <input type="checkbox" /> Exclude your listings
+            </label>
+        </li>
+
         <!-- Icon size -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="viewAsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -66,4 +72,6 @@
             </ul>
         </li>
     </ul>
+
+    {% include "base/html/includes/pagination_buttons.html" with page_obj=page_obj %}
 </div>

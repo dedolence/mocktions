@@ -1,4 +1,4 @@
-<div id="id_listing_paginator" class="container-fluid d-flex justify-content-start" hx-swap-oob="true">
+<div id="id_listing_paginator" class="container-fluid d-flex justify-content-end" hx-swap-oob="true">
     {% if page_obj.has_previous %}
         <button class="btn btn-sm btn-outline-primary me-2"
                 hx-get="{% url 'listings:HX_List' %}?page=1"
