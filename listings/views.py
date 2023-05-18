@@ -41,37 +41,13 @@ class HX_List(ListingBase, views.ListView):
     """
     allow_empty = True
     context_object_name = "listings"    # the context variable name in templates
-    list_by_values = ["all", "user"]    # specify queryset
     template_name = "listings/html/templates/list_small.html"
     paginate_by = 10
-    extra_context = {}
+    extra_context = {
+        
+    }
 
-    def get_ordering(self) -> Sequence[str]:
-        order_by = self.request.GET.get("order_by", None)
-        self.ordering = order_by
-        self.extra_context["order_by"] = order_by
-        return super().get_ordering()
-
-    def get_queryset(self) -> QuerySet[Any]:
-        list_by = self.request.GET.get("list_by", None)
-        match list_by:
-            case "all":
-                self.queryset = Listing.objects.all()
-            case "user":
-                self.queryset = self.request.user.listings.all()
-            case "exclude_user":
-                self.queryset = Listing.objects.exclude(username=self.request.user)
-            case None:
-                self.queryset = Listing.objects.all()
-        self.extra_context["list_by"] = list_by
-        return super().get_queryset()
     
-    def get_template_names(self) -> List[str]:
-        view_as = self.request.GET.get("view_as", "small")
-        self.template_name = f"listings/html/templates/list_{view_as}.html"
-        return super().get_template_names()
-    
-
 class ListingCreate(LoginRequiredMixin, ListingBase, views.CreateView):
     form_class = ListingForm
     template_name = "listings/html/templates/create.html"
